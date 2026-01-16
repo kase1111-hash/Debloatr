@@ -7,6 +7,14 @@ from .engine import (
     ClassificationDecision,
     create_default_engine,
 )
+from .heuristics import (
+    HeuristicsEngine,
+    HeuristicRule,
+    HeuristicResult,
+    HeuristicCategory,
+    HEURISTIC_RULES,
+    create_checker_for_engine,
+)
 
 __all__ = [
     # Signature Database
@@ -17,4 +25,11 @@ __all__ = [
     "ClassificationSource",
     "ClassificationDecision",
     "create_default_engine",
+    # Heuristics Engine
+    "HeuristicsEngine",
+    "HeuristicRule",
+    "HeuristicResult",
+    "HeuristicCategory",
+    "HEURISTIC_RULES",
+    "create_checker_for_engine",
 ]
