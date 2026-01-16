@@ -7,15 +7,15 @@ This module scans for startup entries from multiple sources:
 - Winlogon hooks
 """
 
+import logging
 import os
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional
-import logging
+from typing import Any
 
-from src.core.models import Component, ComponentType, Classification, RiskLevel
+from src.core.models import Component, ComponentType
 from src.discovery.base import BaseDiscoveryModule
 
 logger = logging.getLogger("debloatr.discovery.startup")
@@ -66,16 +66,16 @@ class StartupEntry(Component):
 
     entry_type: StartupEntryType = StartupEntryType.UNKNOWN
     entry_name: str = ""
-    target_path: Optional[Path] = None
+    target_path: Path | None = None
     arguments: str = ""
     scope: StartupScope = StartupScope.USER
     registry_key: str = ""
     registry_value: str = ""
-    folder_path: Optional[Path] = None
+    folder_path: Path | None = None
     is_enabled: bool = True
     is_approved: bool = True
     description: str = ""
-    working_directory: Optional[Path] = None
+    working_directory: Path | None = None
 
     def __post_init__(self) -> None:
         """Set component type to STARTUP."""
@@ -100,12 +100,18 @@ REGISTRY_STARTUP_PATHS = {
     ],
     "RunOnce": [
         (r"SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce", StartupEntryType.RUN_ONCE),
-        (r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\RunOnce", StartupEntryType.RUN_ONCE),
+        (
+            r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\RunOnce",
+            StartupEntryType.RUN_ONCE,
+        ),
     ],
     # Legacy keys
     "RunServices": [
         (r"SOFTWARE\Microsoft\Windows\CurrentVersion\RunServices", StartupEntryType.RUN_SERVICES),
-        (r"SOFTWARE\Microsoft\Windows\CurrentVersion\RunServicesOnce", StartupEntryType.RUN_SERVICES),
+        (
+            r"SOFTWARE\Microsoft\Windows\CurrentVersion\RunServicesOnce",
+            StartupEntryType.RUN_SERVICES,
+        ),
     ],
     # Winlogon
     "Winlogon": [
@@ -114,7 +120,10 @@ REGISTRY_STARTUP_PATHS = {
     # Active Setup
     "ActiveSetup": [
         (r"SOFTWARE\Microsoft\Active Setup\Installed Components", StartupEntryType.ACTIVE_SETUP),
-        (r"SOFTWARE\WOW6432Node\Microsoft\Active Setup\Installed Components", StartupEntryType.ACTIVE_SETUP),
+        (
+            r"SOFTWARE\WOW6432Node\Microsoft\Active Setup\Installed Components",
+            StartupEntryType.ACTIVE_SETUP,
+        ),
     ],
 }
 
@@ -264,9 +273,7 @@ class StartupScanner(BaseDiscoveryModule):
 
                 for reg_path, entry_type in REGISTRY_STARTUP_PATHS[category]:
                     entries.extend(
-                        self._scan_registry_key(
-                            hive, hive_name, reg_path, entry_type, scope
-                        )
+                        self._scan_registry_key(hive, hive_name, reg_path, entry_type, scope)
                     )
 
         return entries
@@ -409,11 +416,9 @@ class StartupScanner(BaseDiscoveryModule):
         except ImportError:
             return entries
 
-        for reg_path, entry_type in REGISTRY_STARTUP_PATHS.get("ActiveSetup", []):
+        for reg_path, _entry_type in REGISTRY_STARTUP_PATHS.get("ActiveSetup", []):
             try:
-                key = winreg.OpenKey(
-                    winreg.HKEY_LOCAL_MACHINE, reg_path, 0, winreg.KEY_READ
-                )
+                key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, reg_path, 0, winreg.KEY_READ)
             except OSError:
                 continue
 
@@ -441,14 +446,12 @@ class StartupScanner(BaseDiscoveryModule):
         self,
         subkey_path: str,
         subkey_name: str,
-    ) -> Optional[StartupEntry]:
+    ) -> StartupEntry | None:
         """Parse an Active Setup registry entry."""
         import winreg
 
         try:
-            key = winreg.OpenKey(
-                winreg.HKEY_LOCAL_MACHINE, subkey_path, 0, winreg.KEY_READ
-            )
+            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, subkey_path, 0, winreg.KEY_READ)
         except OSError:
             return None
 
@@ -522,7 +525,7 @@ class StartupScanner(BaseDiscoveryModule):
         item: Path,
         folder: Path,
         scope: StartupScope,
-    ) -> Optional[StartupEntry]:
+    ) -> StartupEntry | None:
         """Parse an item from a startup folder."""
         if item.suffix.lower() == ".lnk":
             return self._parse_shortcut(item, folder, scope)
@@ -535,7 +538,7 @@ class StartupScanner(BaseDiscoveryModule):
         shortcut_path: Path,
         folder: Path,
         scope: StartupScope,
-    ) -> Optional[StartupEntry]:
+    ) -> StartupEntry | None:
         """Parse a Windows shortcut (.lnk) file."""
         # Reading .lnk files requires COM or special library
         # For now, just record the shortcut existence
@@ -556,7 +559,9 @@ class StartupScanner(BaseDiscoveryModule):
                     WorkingDirectory = $shortcut.WorkingDirectory
                     Description = $shortcut.Description
                 }} | ConvertTo-Json -Compress
-                """.replace("\n", " ")
+                """.replace(
+                    "\n", " "
+                ),
             ]
 
             result = subprocess.run(
@@ -564,13 +569,16 @@ class StartupScanner(BaseDiscoveryModule):
                 capture_output=True,
                 text=True,
                 timeout=10,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             if result.returncode != 0:
                 return None
 
             import json
+
             data = json.loads(result.stdout)
 
             target = data.get("TargetPath", "")
@@ -610,7 +618,7 @@ class StartupScanner(BaseDiscoveryModule):
         exe_path: Path,
         folder: Path,
         scope: StartupScope,
-    ) -> Optional[StartupEntry]:
+    ) -> StartupEntry | None:
         """Parse a direct executable in startup folder."""
         publisher = self._detect_publisher(exe_path)
         internal_name = self._normalize_name(exe_path.stem)
@@ -636,7 +644,9 @@ class StartupScanner(BaseDiscoveryModule):
         try:
             import winreg
 
-            approval_path = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run"
+            approval_path = (
+                r"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run"
+            )
 
             for hive in [winreg.HKEY_LOCAL_MACHINE, winreg.HKEY_CURRENT_USER]:
                 try:
@@ -671,7 +681,7 @@ class StartupScanner(BaseDiscoveryModule):
         except ImportError:
             pass
 
-    def _parse_command_line(self, cmd: str) -> tuple[Optional[Path], str]:
+    def _parse_command_line(self, cmd: str) -> tuple[Path | None, str]:
         """Parse a command line into path and arguments.
 
         Args:
@@ -699,8 +709,8 @@ class StartupScanner(BaseDiscoveryModule):
         for ext in [".exe", ".bat", ".cmd", ".vbs", ".ps1", ".dll"]:
             idx = cmd.lower().find(ext)
             if idx != -1:
-                path = cmd[:idx + len(ext)]
-                args = cmd[idx + len(ext):].strip()
+                path = cmd[: idx + len(ext)]
+                args = cmd[idx + len(ext) :].strip()
                 return Path(path), args
 
         # No extension found - try splitting on first space
@@ -726,7 +736,7 @@ class StartupScanner(BaseDiscoveryModule):
 
         return False
 
-    def _detect_publisher(self, path: Optional[Path]) -> str:
+    def _detect_publisher(self, path: Path | None) -> str:
         """Detect publisher from path."""
         if not path:
             return "Unknown"

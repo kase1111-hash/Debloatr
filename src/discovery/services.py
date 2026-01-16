@@ -9,17 +9,17 @@ This module scans for Windows services and collects metadata including:
 - Recovery/restart behavior
 """
 
+import json
+import logging
 import os
 import re
 import subprocess
-import json
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional
-import logging
+from typing import Any
 
-from src.core.models import Component, ComponentType, Classification, RiskLevel
+from src.core.models import Component, ComponentType
 from src.discovery.base import BaseDiscoveryModule
 
 logger = logging.getLogger("debloatr.discovery.services")
@@ -169,7 +169,7 @@ class WindowsService(Component):
     service_name: str = ""
     start_type: ServiceStartType = ServiceStartType.UNKNOWN
     current_state: ServiceState = ServiceState.UNKNOWN
-    binary_path: Optional[Path] = None
+    binary_path: Path | None = None
     account_context: str = ""
     account_type: ServiceAccountType = ServiceAccountType.UNKNOWN
     dependencies: list[str] = field(default_factory=list)
@@ -183,7 +183,7 @@ class WindowsService(Component):
     accepts_shutdown: bool = True
     is_driver: bool = False
     parent_program: str = ""
-    process_id: Optional[int] = None
+    process_id: int | None = None
 
     def __post_init__(self) -> None:
         """Set component type to SERVICE."""
@@ -363,7 +363,9 @@ class ServicesScanner(BaseDiscoveryModule):
                     @{N='Dependencies';E={($_.ServiceDependencies -join ',')}},
                     @{N='DependentServices';E={(Get-Service $_.Name -ErrorAction SilentlyContinue).DependentServices.Name -join ','}}
                 | ConvertTo-Json -Compress
-                """.replace("\n", " ")
+                """.replace(
+                    "\n", " "
+                ),
             ]
 
             result = subprocess.run(
@@ -371,7 +373,9 @@ class ServicesScanner(BaseDiscoveryModule):
                 capture_output=True,
                 text=True,
                 timeout=120,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             if result.returncode != 0:
@@ -410,22 +414,25 @@ class ServicesScanner(BaseDiscoveryModule):
 
         try:
             import wmi
+
             c = wmi.WMI()
 
             for svc in c.Win32_Service():
-                services.append({
-                    "Name": svc.Name,
-                    "DisplayName": svc.DisplayName,
-                    "Description": svc.Description,
-                    "PathName": svc.PathName,
-                    "StartMode": svc.StartMode,
-                    "State": svc.State,
-                    "StartName": svc.StartName,
-                    "ServiceType": svc.ServiceType,
-                    "ProcessId": svc.ProcessId,
-                    "AcceptStop": svc.AcceptStop,
-                    "AcceptPause": svc.AcceptPause,
-                })
+                services.append(
+                    {
+                        "Name": svc.Name,
+                        "DisplayName": svc.DisplayName,
+                        "Description": svc.Description,
+                        "PathName": svc.PathName,
+                        "StartMode": svc.StartMode,
+                        "State": svc.State,
+                        "StartName": svc.StartName,
+                        "ServiceType": svc.ServiceType,
+                        "ProcessId": svc.ProcessId,
+                        "AcceptStop": svc.AcceptStop,
+                        "AcceptPause": svc.AcceptPause,
+                    }
+                )
 
         except ImportError:
             logger.debug("WMI module not available")
@@ -434,7 +441,7 @@ class ServicesScanner(BaseDiscoveryModule):
 
         return services
 
-    def _process_service(self, raw: dict[str, Any]) -> Optional[WindowsService]:
+    def _process_service(self, raw: dict[str, Any]) -> WindowsService | None:
         """Process a raw service dictionary into a WindowsService.
 
         Args:
@@ -520,7 +527,7 @@ class ServicesScanner(BaseDiscoveryModule):
             process_id=process_id if process_id and process_id > 0 else None,
         )
 
-    def _parse_binary_path(self, path_name: str) -> Optional[Path]:
+    def _parse_binary_path(self, path_name: str) -> Path | None:
         """Parse a service binary path.
 
         Windows service paths can include:
@@ -551,7 +558,7 @@ class ServicesScanner(BaseDiscoveryModule):
         for ext in [".exe", ".sys", ".dll"]:
             idx = path_name.lower().find(ext)
             if idx != -1:
-                return Path(path_name[:idx + len(ext)])
+                return Path(path_name[: idx + len(ext)])
 
         # Fallback: take up to first space (if no extension found)
         parts = path_name.split()
@@ -562,7 +569,7 @@ class ServicesScanner(BaseDiscoveryModule):
 
     def _detect_publisher(
         self,
-        binary_path: Optional[Path],
+        binary_path: Path | None,
         display_name: str,
     ) -> str:
         """Detect the publisher of a service.
@@ -610,7 +617,9 @@ class ServicesScanner(BaseDiscoveryModule):
                 capture_output=True,
                 text=True,
                 timeout=30,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             if result.returncode != 0:
@@ -659,7 +668,9 @@ class ServicesScanner(BaseDiscoveryModule):
                 capture_output=True,
                 text=True,
                 timeout=10,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             if result.returncode != 0:

@@ -8,14 +8,13 @@ This module implements the 5-dimension risk assessment system:
 5. User Experience - Impact on user-facing functionality
 """
 
-from dataclasses import dataclass, field
-from enum import Enum
-from pathlib import Path
-from typing import Any, Optional, Callable
 import logging
 import re
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Any
 
-from src.core.models import Component, ComponentType, RiskLevel, Classification
+from src.core.models import Component, ComponentType, RiskLevel
 
 logger = logging.getLogger("debloatr.analysis.risk")
 
@@ -236,7 +235,7 @@ class RiskAnalyzer:
 
     def __init__(
         self,
-        dimension_weights: Optional[dict[RiskDimension, float]] = None,
+        dimension_weights: dict[RiskDimension, float] | None = None,
     ) -> None:
         """Initialize the risk analyzer.
 
@@ -261,7 +260,7 @@ class RiskAnalyzer:
     def analyze(
         self,
         component: Component,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> RiskAssessment:
         """Analyze risk for a component.
 
@@ -277,21 +276,13 @@ class RiskAnalyzer:
         # Analyze each dimension
         scores: dict[RiskDimension, DimensionScore] = {}
 
-        scores[RiskDimension.BOOT_STABILITY] = self._analyze_boot_stability(
-            component, context
-        )
+        scores[RiskDimension.BOOT_STABILITY] = self._analyze_boot_stability(component, context)
         scores[RiskDimension.HARDWARE_FUNCTION] = self._analyze_hardware_function(
             component, context
         )
-        scores[RiskDimension.UPDATE_PIPELINE] = self._analyze_update_pipeline(
-            component, context
-        )
-        scores[RiskDimension.SECURITY_SURFACE] = self._analyze_security_surface(
-            component, context
-        )
-        scores[RiskDimension.USER_EXPERIENCE] = self._analyze_user_experience(
-            component, context
-        )
+        scores[RiskDimension.UPDATE_PIPELINE] = self._analyze_update_pipeline(component, context)
+        scores[RiskDimension.SECURITY_SURFACE] = self._analyze_security_surface(component, context)
+        scores[RiskDimension.USER_EXPERIENCE] = self._analyze_user_experience(component, context)
 
         # Calculate overall risk (highest dimension wins)
         overall_risk = max(s.level for s in scores.values())
@@ -344,7 +335,6 @@ class RiskAnalyzer:
         level = RiskLevel.NONE
 
         name = component.name or ""
-        display_name = component.display_name or ""
         path_str = str(component.install_path) if component.install_path else ""
 
         # Check boot-critical patterns
@@ -365,9 +355,7 @@ class RiskAnalyzer:
         # Check dependencies
         dependents = context.get("dependents", [])
         if dependents:
-            boot_dependent = any(
-                _is_in_list(d, BOOT_CRITICAL_SERVICES) for d in dependents
-            )
+            boot_dependent = any(_is_in_list(d, BOOT_CRITICAL_SERVICES) for d in dependents)
             if boot_dependent:
                 factors.append("Has boot-critical dependents")
                 level = max(level, RiskLevel.HIGH)
@@ -714,24 +702,24 @@ class RiskAnalyzer:
         for dimension, score in scores.items():
             if score.level >= RiskLevel.HIGH:
                 warnings.append(
-                    f"{dimension.value}: {score.level.name} risk - "
-                    f"{', '.join(score.factors)}"
+                    f"{dimension.value}: {score.level.name} risk - " f"{', '.join(score.factors)}"
                 )
 
         # Add specific warnings
         if context.get("has_dependents", False):
             dependents = context.get("dependents", [])
-            warnings.append(
-                f"Has {len(dependents)} dependent components that may be affected"
-            )
+            warnings.append(f"Has {len(dependents)} dependent components that may be affected")
 
         if component.component_type == ComponentType.DRIVER:
             warnings.append("Modifying drivers may cause hardware malfunction")
 
-        if scores.get(RiskDimension.BOOT_STABILITY, DimensionScore(
-            dimension=RiskDimension.BOOT_STABILITY,
-            level=RiskLevel.NONE
-        )).level >= RiskLevel.HIGH:
+        if (
+            scores.get(
+                RiskDimension.BOOT_STABILITY,
+                DimensionScore(dimension=RiskDimension.BOOT_STABILITY, level=RiskLevel.NONE),
+            ).level
+            >= RiskLevel.HIGH
+        ):
             warnings.append("Changes may prevent system from booting properly")
 
         return warnings
@@ -796,14 +784,14 @@ class RiskAnalyzer:
             Formatted report string
         """
         lines = [
-            f"Risk Assessment Report",
-            f"=" * 50,
+            "Risk Assessment Report",
+            "=" * 50,
             f"Component ID: {assessment.component_id}",
             f"Overall Risk: {assessment.overall_risk.name}",
             f"Composite Score: {assessment.composite_score:.1%}",
-            f"",
-            f"Dimension Analysis:",
-            f"-" * 30,
+            "",
+            "Dimension Analysis:",
+            "-" * 30,
         ]
 
         for dimension, score in assessment.dimension_scores.items():
@@ -812,17 +800,17 @@ class RiskAnalyzer:
             lines.append(f"  Factors: {', '.join(score.factors) if score.factors else 'None'}")
             lines.append(f"  {score.explanation}")
 
-        lines.append(f"\n" + "-" * 30)
+        lines.append("\n" + "-" * 30)
         lines.append(f"Safe to Disable: {'Yes' if assessment.safe_to_disable else 'No'}")
         lines.append(f"Safe to Remove: {'Yes' if assessment.safe_to_remove else 'No'}")
         lines.append(f"Requires Staging: {'Yes' if assessment.requires_staging else 'No'}")
 
         if assessment.warnings:
-            lines.append(f"\nWarnings:")
+            lines.append("\nWarnings:")
             for warning in assessment.warnings:
                 lines.append(f"  - {warning}")
 
-        lines.append(f"\nRecommendation:")
+        lines.append("\nRecommendation:")
         lines.append(f"  {assessment.recommendation}")
 
         return "\n".join(lines)

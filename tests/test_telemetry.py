@@ -1,23 +1,23 @@
 """Tests for the telemetry scanner."""
 
-import pytest
 import sys
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+
+import pytest
 
 from src.core.models import ComponentType
 from src.discovery.telemetry import (
-    TelemetryComponent,
-    TelemetryScanner,
+    ADVERTISING_ENDPOINTS,
+    MICROSOFT_TELEMETRY_ENDPOINTS,
+    TELEMETRY_PROCESS_NAMES,
+    THIRD_PARTY_TELEMETRY_ENDPOINTS,
     ConnectionType,
     EndpointCategory,
     NetworkEndpoint,
-    get_components_by_category,
+    TelemetryComponent,
+    TelemetryScanner,
     get_advertising_components,
-    MICROSOFT_TELEMETRY_ENDPOINTS,
-    THIRD_PARTY_TELEMETRY_ENDPOINTS,
-    ADVERTISING_ENDPOINTS,
-    TELEMETRY_PROCESS_NAMES,
+    get_components_by_category,
 )
 
 
@@ -251,9 +251,18 @@ class TestTelemetryScanner:
         """Test publisher detection."""
         scanner = TelemetryScanner()
 
-        assert scanner._detect_publisher("DiagTrack", "C:\\Windows\\System32\\diagtrack.exe") == "Microsoft"
-        assert scanner._detect_publisher("NvContainer", "C:\\Program Files\\NVIDIA\\container.exe") == "NVIDIA"
-        assert scanner._detect_publisher("ChromeUpdate", "C:\\Program Files\\Google\\update.exe") == "Google"
+        assert (
+            scanner._detect_publisher("DiagTrack", "C:\\Windows\\System32\\diagtrack.exe")
+            == "Microsoft"
+        )
+        assert (
+            scanner._detect_publisher("NvContainer", "C:\\Program Files\\NVIDIA\\container.exe")
+            == "NVIDIA"
+        )
+        assert (
+            scanner._detect_publisher("ChromeUpdate", "C:\\Program Files\\Google\\update.exe")
+            == "Google"
+        )
         assert scanner._detect_publisher("SomeApp", "C:\\Apps\\someapp.exe") == "Unknown"
 
     def test_normalize_name(self):
@@ -371,19 +380,25 @@ class TestTelemetryHelperFunctions:
         components = [
             TelemetryComponent(
                 component_type=ComponentType.TELEMETRY,
-                name="ms", display_name="MS", publisher="Microsoft",
+                name="ms",
+                display_name="MS",
+                publisher="Microsoft",
                 process_name="ms",
                 telemetry_category=EndpointCategory.MICROSOFT,
             ),
             TelemetryComponent(
                 component_type=ComponentType.TELEMETRY,
-                name="ad", display_name="Ad", publisher="Ads",
+                name="ad",
+                display_name="Ad",
+                publisher="Ads",
                 process_name="ad",
                 telemetry_category=EndpointCategory.ADVERTISING,
             ),
             TelemetryComponent(
                 component_type=ComponentType.TELEMETRY,
-                name="ms2", display_name="MS2", publisher="Microsoft",
+                name="ms2",
+                display_name="MS2",
+                publisher="Microsoft",
                 process_name="ms2",
                 telemetry_category=EndpointCategory.MICROSOFT,
             ),
@@ -400,19 +415,25 @@ class TestTelemetryHelperFunctions:
         components = [
             TelemetryComponent(
                 component_type=ComponentType.TELEMETRY,
-                name="normal", display_name="Normal", publisher="Test",
+                name="normal",
+                display_name="Normal",
+                publisher="Test",
                 process_name="normal",
                 telemetry_category=EndpointCategory.MICROSOFT,
             ),
             TelemetryComponent(
                 component_type=ComponentType.TELEMETRY,
-                name="ads", display_name="Ads", publisher="Ads",
+                name="ads",
+                display_name="Ads",
+                publisher="Ads",
                 process_name="ads",
                 telemetry_category=EndpointCategory.ADVERTISING,
             ),
             TelemetryComponent(
                 component_type=ComponentType.TELEMETRY,
-                name="mixed", display_name="Mixed", publisher="Test",
+                name="mixed",
+                display_name="Mixed",
+                publisher="Test",
                 process_name="mixed",
                 telemetry_category=EndpointCategory.ANALYTICS,
                 remote_endpoints=[

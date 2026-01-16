@@ -5,21 +5,20 @@ and retrieving snapshots of component state before modifications.
 """
 
 import json
+import logging
 import os
 import subprocess
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Optional
-import logging
-import shutil
+from typing import Any
 
+from src.core.config import Config, get_default_config
 from src.core.models import (
-    Snapshot,
     ActionType,
     ComponentType,
+    Snapshot,
 )
-from src.core.config import Config, get_default_config
 
 logger = logging.getLogger("debloatr.core.snapshot")
 
@@ -46,8 +45,8 @@ class SnapshotMetadata:
     component_type: str
     action: str
     timestamp: str
-    session_id: Optional[str] = None
-    file_path: Optional[str] = None
+    session_id: str | None = None
+    file_path: str | None = None
     size_bytes: int = 0
 
 
@@ -68,8 +67,8 @@ class SnapshotManager:
 
     def __init__(
         self,
-        config: Optional[Config] = None,
-        snapshots_dir: Optional[Path] = None,
+        config: Config | None = None,
+        snapshots_dir: Path | None = None,
         max_snapshots: int = 100,
         retention_days: int = 30,
     ) -> None:
@@ -110,10 +109,7 @@ class SnapshotManager:
     def _save_index(self) -> None:
         """Save snapshot index to disk."""
         try:
-            data = {
-                snapshot_id: asdict(meta)
-                for snapshot_id, meta in self._index.items()
-            }
+            data = {snapshot_id: asdict(meta) for snapshot_id, meta in self._index.items()}
             with open(self._index_file, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2)
         except Exception as e:
@@ -126,7 +122,7 @@ class SnapshotManager:
         component_type: ComponentType,
         action: ActionType,
         state: dict[str, Any],
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
     ) -> Snapshot:
         """Capture a snapshot of component state.
 
@@ -150,7 +146,11 @@ class SnapshotManager:
         # Add extra metadata to state
         snapshot.captured_state["_meta"] = {
             "component_name": component_name,
-            "component_type": component_type.name if isinstance(component_type, ComponentType) else str(component_type),
+            "component_type": (
+                component_type.name
+                if isinstance(component_type, ComponentType)
+                else str(component_type)
+            ),
             "session_id": session_id,
             "capture_time": datetime.now().isoformat(),
         }
@@ -161,7 +161,7 @@ class SnapshotManager:
         self,
         service_name: str,
         component_id: str,
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
     ) -> Snapshot:
         """Capture complete state of a Windows service.
 
@@ -200,7 +200,7 @@ class SnapshotManager:
         self,
         task_path: str,
         component_id: str,
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
     ) -> Snapshot:
         """Capture complete state of a scheduled task.
 
@@ -237,7 +237,7 @@ class SnapshotManager:
         entry_type: str,
         registry_key: str,
         component_id: str,
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
     ) -> Snapshot:
         """Capture complete state of a startup entry.
 
@@ -259,9 +259,7 @@ class SnapshotManager:
 
         if self._is_windows and entry_type == "registry":
             # Capture registry value
-            state["registry_value"] = self._capture_registry_value(
-                registry_key, entry_name
-            )
+            state["registry_value"] = self._capture_registry_value(registry_key, entry_name)
 
         return self.capture_snapshot(
             component_id=component_id,
@@ -276,7 +274,7 @@ class SnapshotManager:
         self,
         driver_name: str,
         component_id: str,
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
     ) -> Snapshot:
         """Capture complete state of a driver.
 
@@ -312,7 +310,7 @@ class SnapshotManager:
         component_name: str,
         executables: list[str],
         component_id: str,
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
     ) -> Snapshot:
         """Capture firewall rules state before containment.
 
@@ -350,7 +348,7 @@ class SnapshotManager:
         paths: list[str],
         component_id: str,
         component_name: str,
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
     ) -> Snapshot:
         """Capture ACL state for paths.
 
@@ -387,7 +385,7 @@ class SnapshotManager:
         snapshot: Snapshot,
         component_name: str,
         component_type: ComponentType,
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
     ) -> str:
         """Save a snapshot to disk.
 
@@ -410,8 +408,16 @@ class SnapshotManager:
         data = {
             "snapshot_id": snapshot.snapshot_id,
             "component_id": snapshot.component_id,
-            "action": snapshot.action.value if isinstance(snapshot.action, ActionType) else str(snapshot.action),
-            "timestamp": snapshot.timestamp.isoformat() if isinstance(snapshot.timestamp, datetime) else str(snapshot.timestamp),
+            "action": (
+                snapshot.action.value
+                if isinstance(snapshot.action, ActionType)
+                else str(snapshot.action)
+            ),
+            "timestamp": (
+                snapshot.timestamp.isoformat()
+                if isinstance(snapshot.timestamp, datetime)
+                else str(snapshot.timestamp)
+            ),
             "captured_state": snapshot.captured_state,
         }
 
@@ -424,9 +430,21 @@ class SnapshotManager:
             snapshot_id=snapshot.snapshot_id,
             component_id=snapshot.component_id,
             component_name=component_name,
-            component_type=component_type.name if isinstance(component_type, ComponentType) else str(component_type),
-            action=snapshot.action.value if isinstance(snapshot.action, ActionType) else str(snapshot.action),
-            timestamp=snapshot.timestamp.isoformat() if isinstance(snapshot.timestamp, datetime) else str(snapshot.timestamp),
+            component_type=(
+                component_type.name
+                if isinstance(component_type, ComponentType)
+                else str(component_type)
+            ),
+            action=(
+                snapshot.action.value
+                if isinstance(snapshot.action, ActionType)
+                else str(snapshot.action)
+            ),
+            timestamp=(
+                snapshot.timestamp.isoformat()
+                if isinstance(snapshot.timestamp, datetime)
+                else str(snapshot.timestamp)
+            ),
             session_id=session_id,
             file_path=str(filepath),
             size_bytes=filepath.stat().st_size,
@@ -440,7 +458,7 @@ class SnapshotManager:
         logger.info(f"Saved snapshot: {snapshot.snapshot_id} to {filepath}")
         return str(filepath)
 
-    def load_snapshot(self, snapshot_id: str) -> Optional[Snapshot]:
+    def load_snapshot(self, snapshot_id: str) -> Snapshot | None:
         """Load a snapshot from disk.
 
         Args:
@@ -465,7 +483,11 @@ class SnapshotManager:
 
             snapshot = Snapshot(
                 component_id=data["component_id"],
-                action=ActionType(data["action"]) if data["action"] in [a.value for a in ActionType] else ActionType.IGNORE,
+                action=(
+                    ActionType(data["action"])
+                    if data["action"] in [a.value for a in ActionType]
+                    else ActionType.IGNORE
+                ),
                 captured_state=data["captured_state"],
                 snapshot_id=data["snapshot_id"],
                 timestamp=datetime.fromisoformat(data["timestamp"]),
@@ -478,7 +500,7 @@ class SnapshotManager:
             logger.error(f"Failed to load snapshot {snapshot_id}: {e}")
             return None
 
-    def get_snapshot_metadata(self, snapshot_id: str) -> Optional[SnapshotMetadata]:
+    def get_snapshot_metadata(self, snapshot_id: str) -> SnapshotMetadata | None:
         """Get metadata for a snapshot.
 
         Args:
@@ -491,10 +513,10 @@ class SnapshotManager:
 
     def list_snapshots(
         self,
-        session_id: Optional[str] = None,
-        component_id: Optional[str] = None,
-        component_type: Optional[str] = None,
-        action: Optional[str] = None,
+        session_id: str | None = None,
+        component_id: str | None = None,
+        component_type: str | None = None,
+        action: str | None = None,
         limit: int = 100,
     ) -> list[SnapshotMetadata]:
         """List snapshots with optional filtering.
@@ -658,9 +680,7 @@ class SnapshotManager:
                 pass
         return {}
 
-    def _capture_registry_value(
-        self, registry_key: str, value_name: str
-    ) -> dict[str, Any]:
+    def _capture_registry_value(self, registry_key: str, value_name: str) -> dict[str, Any]:
         """Capture a registry value."""
         result = self._run_powershell(
             f"$val = Get-ItemProperty -Path '{registry_key}' -Name '{value_name}' "
@@ -735,7 +755,9 @@ class SnapshotManager:
                 capture_output=True,
                 text=True,
                 timeout=60,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             return {
@@ -761,7 +783,9 @@ class SnapshotManager:
                 capture_output=True,
                 text=True,
                 timeout=60,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             return {
@@ -776,7 +800,7 @@ class SnapshotManager:
             return {"success": False, "output": "", "error": str(e)}
 
 
-def create_snapshot_manager(config: Optional[Config] = None) -> SnapshotManager:
+def create_snapshot_manager(config: Config | None = None) -> SnapshotManager:
     """Create a snapshot manager with default or provided configuration.
 
     Args:

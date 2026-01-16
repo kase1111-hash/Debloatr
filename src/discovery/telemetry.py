@@ -6,17 +6,17 @@ This module scans for telemetry and network tracking components including:
 - Background web helper processes
 """
 
+import json
+import logging
 import os
 import re
 import subprocess
-import json
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional
-import logging
+from typing import Any
 
-from src.core.models import Component, ComponentType, Classification, RiskLevel
+from src.core.models import Component, ComponentType
 from src.discovery.base import BaseDiscoveryModule
 
 logger = logging.getLogger("debloatr.discovery.telemetry")
@@ -76,8 +76,8 @@ class TelemetryComponent(Component):
     """
 
     process_name: str = ""
-    process_path: Optional[Path] = None
-    process_id: Optional[int] = None
+    process_path: Path | None = None
+    process_id: int | None = None
     remote_endpoints: list[NetworkEndpoint] = field(default_factory=list)
     connection_type: ConnectionType = ConnectionType.UNKNOWN
     bytes_sent: int = 0
@@ -353,7 +353,9 @@ class TelemetryScanner(BaseDiscoveryModule):
                         ProcessPath = if ($proc) { $proc.Path } else { "" }
                     }
                 } | ConvertTo-Json -Compress
-                """.replace("\n", " ")
+                """.replace(
+                    "\n", " "
+                ),
             ]
 
             result = subprocess.run(
@@ -361,7 +363,9 @@ class TelemetryScanner(BaseDiscoveryModule):
                 capture_output=True,
                 text=True,
                 timeout=60,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             if result.returncode != 0:
@@ -390,7 +394,7 @@ class TelemetryScanner(BaseDiscoveryModule):
         self,
         pid: int,
         connections: list[dict],
-    ) -> Optional[TelemetryComponent]:
+    ) -> TelemetryComponent | None:
         """Process connections for a single process.
 
         Args:
@@ -626,7 +630,8 @@ def get_advertising_components(
         Advertising components.
     """
     return [
-        c for c in components
+        c
+        for c in components
         if c.telemetry_category == EndpointCategory.ADVERTISING
         or any(e.category == EndpointCategory.ADVERTISING for e in c.remote_endpoints)
     ]

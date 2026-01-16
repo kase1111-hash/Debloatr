@@ -4,38 +4,38 @@ This module tests the CLI formatters, commands, and GUI components.
 """
 
 import json
-import pytest
 from datetime import datetime
 from pathlib import Path
-from unittest.mock import Mock, MagicMock, patch
+from unittest.mock import Mock, patch
+
+import pytest
 
 from src.core.models import (
+    ActionResult,
+    ActionType,
+    Classification,
     Component,
     ComponentType,
-    Classification,
     RiskLevel,
-    ActionType,
-    ActionPlan,
-    ActionResult,
 )
+from src.core.session import SessionSummary
 from src.ui.cli.formatters import (
     Colors,
-    colorize,
-    get_classification_color,
-    get_risk_color,
-    TextFormatter,
     JsonFormatter,
     TableFormatter,
+    TextFormatter,
+    colorize,
+    format_action_result,
     format_component,
     format_component_list,
     format_session,
     format_session_list,
-    format_action_result,
+    get_classification_color,
+    get_risk_color,
 )
-from src.core.session import SessionSummary
-
 
 # Test fixtures
+
 
 @pytest.fixture
 def sample_component():
@@ -113,6 +113,7 @@ def sample_action_result(sample_component):
 
 
 # Tests for Colors class
+
 
 class TestColors:
     """Tests for the Colors class."""
@@ -201,6 +202,7 @@ class TestGetRiskColor:
 
 # Tests for TextFormatter
 
+
 class TestTextFormatter:
     """Tests for the TextFormatter class."""
 
@@ -275,6 +277,7 @@ class TestTextFormatter:
 
 # Tests for JsonFormatter
 
+
 class TestJsonFormatter:
     """Tests for the JsonFormatter class."""
 
@@ -339,6 +342,7 @@ class TestJsonFormatter:
 
 # Tests for TableFormatter
 
+
 class TestTableFormatter:
     """Tests for the TableFormatter class."""
 
@@ -379,6 +383,7 @@ class TestTableFormatter:
 
 
 # Tests for convenience functions
+
 
 class TestConvenienceFunctions:
     """Tests for the convenience formatting functions."""
@@ -441,14 +446,15 @@ class TestConvenienceFunctions:
 
 # Tests for CLI commands (using mocks)
 
+
 class TestCLICommands:
     """Tests for CLI command functions."""
 
     @patch("src.ui.cli.commands.ScanOrchestrator")
     def test_run_list_command_basic(self, mock_orchestrator_class):
         """Test basic list command."""
-        from src.ui.cli.commands import run_list_command
         from src.core.config import Config
+        from src.ui.cli.commands import run_list_command
 
         # Setup mock
         mock_component = Component(
@@ -486,8 +492,8 @@ class TestCLICommands:
     @patch("src.ui.cli.commands.create_session_manager")
     def test_run_sessions_command(self, mock_create_session_manager):
         """Test sessions command."""
-        from src.ui.cli.commands import run_sessions_command
         from src.core.config import Config
+        from src.ui.cli.commands import run_sessions_command
 
         # Setup mock
         mock_session = SessionSummary(
@@ -521,6 +527,7 @@ class TestCLICommands:
 
 # Tests for GUI components (import tests only, as GUI requires display)
 
+
 class TestGUIImports:
     """Test that GUI modules can be imported."""
 
@@ -529,15 +536,19 @@ class TestGUIImports:
         # Try to import - may succeed or fail depending on PySide6 availability
         try:
             from src.ui.gui import (
-                MainWindow,
-                DashboardWidget,
-                ComponentTreeWidget,
                 ComponentDetailWidget,
+                ComponentTreeWidget,
+                DashboardWidget,
+                MainWindow,
                 SessionHistoryWidget,
             )
+
             # PySide6 is available - all classes should be real
             assert MainWindow is not None
             assert DashboardWidget is not None
+            assert ComponentTreeWidget is not None
+            assert ComponentDetailWidget is not None
+            assert SessionHistoryWidget is not None
         except ImportError:
             # PySide6 not installed - this is expected in test environment
             # Just verify the import mechanism works
@@ -559,16 +570,17 @@ class TestGUIImports:
 
 # Tests for CLI module structure
 
+
 class TestCLIModuleStructure:
     """Test CLI module structure and exports."""
 
     def test_cli_formatters_exports(self):
         """Test that CLI formatters module exports expected classes."""
         from src.ui.cli.formatters import (
-            OutputFormatter,
-            TextFormatter,
             JsonFormatter,
+            OutputFormatter,
             TableFormatter,
+            TextFormatter,
         )
 
         assert OutputFormatter is not None
@@ -579,13 +591,13 @@ class TestCLIModuleStructure:
     def test_cli_commands_exports(self):
         """Test that CLI commands module exports expected functions."""
         from src.ui.cli.commands import (
+            run_disable_command,
             run_list_command,
             run_plan_command,
-            run_disable_command,
+            run_recovery_command,
             run_remove_command,
             run_sessions_command,
             run_undo_command,
-            run_recovery_command,
         )
 
         # All should be callable
@@ -600,9 +612,9 @@ class TestCLIModuleStructure:
     def test_ui_package_exports(self):
         """Test that UI package exports expected formatters."""
         from src.ui import (
+            JsonFormatter,
             OutputFormatter,
             TextFormatter,
-            JsonFormatter,
             format_component,
             format_component_list,
             format_session,
@@ -619,6 +631,7 @@ class TestCLIModuleStructure:
 
 
 # Tests for formatter edge cases
+
 
 class TestFormatterEdgeCases:
     """Tests for edge cases in formatters."""

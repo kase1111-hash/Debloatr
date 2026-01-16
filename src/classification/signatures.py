@@ -6,21 +6,21 @@ for deterministic classification of system components.
 
 import hashlib
 import json
+import logging
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
-import logging
+from typing import Any
 
 from src.core.models import (
+    ActionType,
+    Classification,
     Component,
     ComponentType,
-    Classification,
-    ActionType,
+    ReinstallBehavior,
     Signature,
     SignatureMatchRule,
-    ReinstallBehavior,
 )
 
 logger = logging.getLogger("debloatr.classification.signatures")
@@ -62,7 +62,7 @@ class SignatureDatabase:
         self,
         file_path: Path,
         verify_hash: bool = False,
-        expected_hash: Optional[str] = None,
+        expected_hash: str | None = None,
     ) -> int:
         """Load signatures from a JSON file.
 
@@ -91,15 +91,14 @@ class SignatureDatabase:
 
             if expected_hash and file_hash != expected_hash:
                 raise ValueError(
-                    f"Signature file hash mismatch. "
-                    f"Expected: {expected_hash}, Got: {file_hash}"
+                    f"Signature file hash mismatch. " f"Expected: {expected_hash}, Got: {file_hash}"
                 )
 
         # Parse JSON
         try:
             data = json.loads(content)
         except json.JSONDecodeError as e:
-            raise ValueError(f"Invalid JSON in signature file: {e}")
+            raise ValueError(f"Invalid JSON in signature file: {e}") from e
 
         # Handle both array and object with signatures key
         if isinstance(data, list):
@@ -179,7 +178,11 @@ class SignatureDatabase:
 
         # Parse classification
         class_str = data.get("classification", "UNKNOWN").upper()
-        classification = Classification[class_str] if class_str in Classification.__members__ else Classification.UNKNOWN
+        classification = (
+            Classification[class_str]
+            if class_str in Classification.__members__
+            else Classification.UNKNOWN
+        )
 
         # Parse safe/unsafe actions
         safe_actions = [
@@ -245,7 +248,7 @@ class SignatureDatabase:
             self._by_publisher[publisher_key] = []
         self._by_publisher[publisher_key].append(signature)
 
-    def match_component(self, component: Component) -> Optional[SignatureMatch]:
+    def match_component(self, component: Component) -> SignatureMatch | None:
         """Find the best matching signature for a component.
 
         Args:
@@ -254,7 +257,7 @@ class SignatureDatabase:
         Returns:
             SignatureMatch if found, None otherwise.
         """
-        best_match: Optional[SignatureMatch] = None
+        best_match: SignatureMatch | None = None
         best_score = 0.0
 
         # Get signatures for this component type
@@ -275,7 +278,7 @@ class SignatureDatabase:
         self,
         component: Component,
         signature: Signature,
-    ) -> Optional[SignatureMatch]:
+    ) -> SignatureMatch | None:
         """Try to match a component against a signature.
 
         Args:
@@ -349,7 +352,7 @@ class SignatureDatabase:
             logger.warning(f"Invalid regex pattern: {pattern}")
             return False
 
-    def _get_file_hash(self, path: Path) -> Optional[str]:
+    def _get_file_hash(self, path: Path) -> str | None:
         """Get SHA256 hash of a file.
 
         Args:
@@ -365,7 +368,7 @@ class SignatureDatabase:
             pass
         return None
 
-    def get_signature(self, signature_id: str) -> Optional[Signature]:
+    def get_signature(self, signature_id: str) -> Signature | None:
         """Get a signature by ID.
 
         Args:
@@ -426,10 +429,7 @@ class SignatureDatabase:
         Returns:
             List of matching signatures.
         """
-        return [
-            sig for sig in self.signatures.values()
-            if sig.classification == classification
-        ]
+        return [sig for sig in self.signatures.values() if sig.classification == classification]
 
     def export_to_file(self, file_path: Path) -> None:
         """Export all signatures to a JSON file.

@@ -6,17 +6,17 @@ This module scans for installed software from multiple sources:
 - Portable applications (filesystem heuristics)
 """
 
+import json
+import logging
 import os
 import re
 import subprocess
-import json
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
-import logging
+from typing import Any
 
-from src.core.models import Component, ComponentType, Classification, RiskLevel
+from src.core.models import Component, ComponentType
 from src.discovery.base import BaseDiscoveryModule
 
 logger = logging.getLogger("debloatr.discovery.programs")
@@ -73,13 +73,13 @@ class InstalledProgram(Component):
         package_family_name: UWP package family name (if UWP)
     """
 
-    install_date: Optional[datetime] = None
+    install_date: datetime | None = None
     size_bytes: int = 0
     version: str = ""
     executables: list[Path] = field(default_factory=list)
     uninstall_string: str = ""
     quiet_uninstall_string: str = ""
-    update_mechanism: Optional[str] = None
+    update_mechanism: str | None = None
     is_uwp: bool = False
     is_portable: bool = False
     is_system_component: bool = False
@@ -215,9 +215,7 @@ class ProgramsScanner(BaseDiscoveryModule):
 
             for reg_path in UNINSTALL_REGISTRY_PATHS:
                 try:
-                    programs.extend(
-                        self._scan_registry_key(hive, hive_name, reg_path)
-                    )
+                    programs.extend(self._scan_registry_key(hive, hive_name, reg_path))
                 except OSError as e:
                     logger.debug(f"Could not access {hive_name}\\{reg_path}: {e}")
 
@@ -256,9 +254,7 @@ class ProgramsScanner(BaseDiscoveryModule):
                     subkey_name = winreg.EnumKey(key, i)
                     subkey_path = f"{reg_path}\\{subkey_name}"
 
-                    program = self._parse_registry_entry(
-                        hive, hive_name, subkey_path
-                    )
+                    program = self._parse_registry_entry(hive, hive_name, subkey_path)
                     if program:
                         programs.append(program)
 
@@ -275,7 +271,7 @@ class ProgramsScanner(BaseDiscoveryModule):
         hive: Any,
         hive_name: str,
         subkey_path: str,
-    ) -> Optional[InstalledProgram]:
+    ) -> InstalledProgram | None:
         """Parse a single registry entry into an InstalledProgram.
 
         Args:
@@ -345,9 +341,7 @@ class ProgramsScanner(BaseDiscoveryModule):
                 executables = self._find_executables(install_path)
 
             # Detect update mechanism
-            update_mechanism = self._detect_update_mechanism(
-                display_name, publisher, install_path
-            )
+            update_mechanism = self._detect_update_mechanism(display_name, publisher, install_path)
 
             # Create internal name from display name
             name = self._normalize_name(display_name)
@@ -421,7 +415,7 @@ class ProgramsScanner(BaseDiscoveryModule):
                 "-Command",
                 "Get-AppxPackage | Select-Object Name, PackageFullName, "
                 "PackageFamilyName, Publisher, Version, InstallLocation, "
-                "IsFramework, SignatureKind | ConvertTo-Json -Compress"
+                "IsFramework, SignatureKind | ConvertTo-Json -Compress",
             ]
 
             result = subprocess.run(
@@ -429,7 +423,9 @@ class ProgramsScanner(BaseDiscoveryModule):
                 capture_output=True,
                 text=True,
                 timeout=60,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             if result.returncode != 0:
@@ -462,7 +458,7 @@ class ProgramsScanner(BaseDiscoveryModule):
 
         return apps
 
-    def _parse_uwp_package(self, pkg: dict[str, Any]) -> Optional[InstalledProgram]:
+    def _parse_uwp_package(self, pkg: dict[str, Any]) -> InstalledProgram | None:
         """Parse a UWP package dictionary into an InstalledProgram.
 
         Args:
@@ -570,9 +566,7 @@ class ProgramsScanner(BaseDiscoveryModule):
 
         return apps
 
-    def _check_portable_app_directory(
-        self, directory: Path
-    ) -> Optional[InstalledProgram]:
+    def _check_portable_app_directory(self, directory: Path) -> InstalledProgram | None:
         """Check if a directory contains a portable application.
 
         Args:
@@ -630,9 +624,7 @@ class ProgramsScanner(BaseDiscoveryModule):
 
         return name.strip()
 
-    def _find_executables(
-        self, directory: Path, max_depth: int = 3
-    ) -> list[Path]:
+    def _find_executables(self, directory: Path, max_depth: int = 3) -> list[Path]:
         """Find executable files in a directory.
 
         Args:
@@ -656,7 +648,8 @@ class ProgramsScanner(BaseDiscoveryModule):
 
             # Filter out uninstallers and updaters
             executables = [
-                exe for exe in executables
+                exe
+                for exe in executables
                 if not any(
                     skip in exe.name.lower()
                     for skip in ["unins", "uninst", "update", "setup", "install"]
@@ -695,8 +688,8 @@ class ProgramsScanner(BaseDiscoveryModule):
         self,
         display_name: str,
         publisher: str,
-        install_path: Optional[Path],
-    ) -> Optional[str]:
+        install_path: Path | None,
+    ) -> str | None:
         """Detect the update mechanism used by a program.
 
         Args:
@@ -716,7 +709,7 @@ class ProgramsScanner(BaseDiscoveryModule):
 
         return None
 
-    def _get_exe_publisher(self, exe_path: Path) -> Optional[str]:
+    def _get_exe_publisher(self, exe_path: Path) -> str | None:
         """Get publisher information from an executable's metadata.
 
         Args:

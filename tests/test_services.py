@@ -1,22 +1,20 @@
 """Tests for the Windows services scanner."""
 
-import pytest
 import sys
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+
+import pytest
 
 from src.core.models import ComponentType
 from src.discovery.services import (
-    WindowsService,
+    RecoveryAction,
+    ServiceAccountType,
     ServicesScanner,
     ServiceStartType,
     ServiceState,
-    ServiceAccountType,
-    RecoveryAction,
+    WindowsService,
     get_service_dependency_chain,
     get_services_by_account,
-    CRITICAL_SERVICES,
-    TELEMETRY_SERVICES,
 )
 
 
@@ -37,7 +35,10 @@ class TestServiceEnums:
         assert ServiceStartType.from_value("Boot") == ServiceStartType.BOOT
         assert ServiceStartType.from_value("Auto") == ServiceStartType.AUTOMATIC
         assert ServiceStartType.from_value("Automatic") == ServiceStartType.AUTOMATIC
-        assert ServiceStartType.from_value("Automatic (Delayed Start)") == ServiceStartType.AUTOMATIC_DELAYED
+        assert (
+            ServiceStartType.from_value("Automatic (Delayed Start)")
+            == ServiceStartType.AUTOMATIC_DELAYED
+        )
         assert ServiceStartType.from_value("Manual") == ServiceStartType.MANUAL
         assert ServiceStartType.from_value("Disabled") == ServiceStartType.DISABLED
 
@@ -52,9 +53,18 @@ class TestServiceEnums:
     def test_account_type_from_string(self):
         """Test ServiceAccountType conversion from strings."""
         assert ServiceAccountType.from_string("LocalSystem") == ServiceAccountType.LOCAL_SYSTEM
-        assert ServiceAccountType.from_string("NT AUTHORITY\\LocalService") == ServiceAccountType.LOCAL_SERVICE
-        assert ServiceAccountType.from_string("NT AUTHORITY\\NetworkService") == ServiceAccountType.NETWORK_SERVICE
-        assert ServiceAccountType.from_string("NT SERVICE\\SomeService") == ServiceAccountType.VIRTUAL_ACCOUNT
+        assert (
+            ServiceAccountType.from_string("NT AUTHORITY\\LocalService")
+            == ServiceAccountType.LOCAL_SERVICE
+        )
+        assert (
+            ServiceAccountType.from_string("NT AUTHORITY\\NetworkService")
+            == ServiceAccountType.NETWORK_SERVICE
+        )
+        assert (
+            ServiceAccountType.from_string("NT SERVICE\\SomeService")
+            == ServiceAccountType.VIRTUAL_ACCOUNT
+        )
         assert ServiceAccountType.from_string("DOMAIN\\User") == ServiceAccountType.USER_ACCOUNT
         assert ServiceAccountType.from_string("") == ServiceAccountType.UNKNOWN
 
@@ -73,9 +83,7 @@ class TestRecoveryAction:
     def test_run_command_action(self):
         """Test RecoveryAction with command."""
         action = RecoveryAction(
-            action_type="run_command",
-            delay_ms=30000,
-            command="C:\\Scripts\\restart.bat"
+            action_type="run_command", delay_ms=30000, command="C:\\Scripts\\restart.bat"
         )
 
         assert action.action_type == "run_command"
@@ -424,13 +432,17 @@ class TestDependencyChain:
         services = [
             WindowsService(
                 component_type=ComponentType.SERVICE,
-                name="a", display_name="A", publisher="Test",
+                name="a",
+                display_name="A",
+                publisher="Test",
                 service_name="A",
                 dependencies=["B"],
             ),
             WindowsService(
                 component_type=ComponentType.SERVICE,
-                name="b", display_name="B", publisher="Test",
+                name="b",
+                display_name="B",
+                publisher="Test",
                 service_name="B",
                 dependencies=[],
             ),
@@ -445,19 +457,25 @@ class TestDependencyChain:
         services = [
             WindowsService(
                 component_type=ComponentType.SERVICE,
-                name="a", display_name="A", publisher="Test",
+                name="a",
+                display_name="A",
+                publisher="Test",
                 service_name="A",
                 dependencies=["B"],
             ),
             WindowsService(
                 component_type=ComponentType.SERVICE,
-                name="b", display_name="B", publisher="Test",
+                name="b",
+                display_name="B",
+                publisher="Test",
                 service_name="B",
                 dependencies=["C"],
             ),
             WindowsService(
                 component_type=ComponentType.SERVICE,
-                name="c", display_name="C", publisher="Test",
+                name="c",
+                display_name="C",
+                publisher="Test",
                 service_name="C",
                 dependencies=[],
             ),
@@ -472,7 +490,9 @@ class TestDependencyChain:
         services = [
             WindowsService(
                 component_type=ComponentType.SERVICE,
-                name="standalone", display_name="Standalone", publisher="Test",
+                name="standalone",
+                display_name="Standalone",
+                publisher="Test",
                 service_name="Standalone",
                 dependencies=[],
             ),
@@ -487,19 +507,25 @@ class TestDependencyChain:
         services = [
             WindowsService(
                 component_type=ComponentType.SERVICE,
-                name="a", display_name="A", publisher="Test",
+                name="a",
+                display_name="A",
+                publisher="Test",
                 service_name="A",
                 account_type=ServiceAccountType.LOCAL_SYSTEM,
             ),
             WindowsService(
                 component_type=ComponentType.SERVICE,
-                name="b", display_name="B", publisher="Test",
+                name="b",
+                display_name="B",
+                publisher="Test",
                 service_name="B",
                 account_type=ServiceAccountType.NETWORK_SERVICE,
             ),
             WindowsService(
                 component_type=ComponentType.SERVICE,
-                name="c", display_name="C", publisher="Test",
+                name="c",
+                display_name="C",
+                publisher="Test",
                 service_name="C",
                 account_type=ServiceAccountType.LOCAL_SYSTEM,
             ),

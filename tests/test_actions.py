@@ -1,34 +1,31 @@
 """Unit tests for actions module."""
 
-import pytest
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
-from src.core.models import (
-    Component,
-    ComponentType,
-    Classification,
-    RiskLevel,
-    ActionType,
-    ActionPlan,
-    ExecutionMode,
-)
-from src.actions.planner import (
-    ActionPlanner,
-    ActionAvailability,
-    SafetyRule,
-    SAFETY_RULES,
-    create_default_planner,
-)
-from src.actions.disable import DisableHandler, DisableResult, create_disable_handler
-from src.actions.contain import ContainHandler, ContainResult, create_contain_handler
-from src.actions.remove import RemoveHandler, RemoveResult, create_remove_handler
+import pytest
+
+from src.actions.contain import ContainHandler, create_contain_handler
+from src.actions.disable import DisableHandler, create_disable_handler
 from src.actions.executor import (
-    ExecutionEngine,
     ExecutionContext,
-    ExecutionResult,
+    ExecutionEngine,
     create_execution_engine,
     create_interactive_engine,
+)
+from src.actions.planner import (
+    SAFETY_RULES,
+    ActionPlanner,
+    SafetyRule,
+    create_default_planner,
+)
+from src.actions.remove import RemoveHandler, create_remove_handler
+from src.core.models import (
+    ActionType,
+    Classification,
+    Component,
+    ComponentType,
+    ExecutionMode,
+    RiskLevel,
 )
 
 
@@ -638,7 +635,7 @@ class TestExecutionEngine:
         )
 
         plan = engine.planner.create_action_plan(component, ActionType.DISABLE)
-        result = engine.execute(plan)
+        _result = engine.execute(plan)  # Result not used, testing confirmation callback
 
         # Verify confirmation was requested
         assert confirmation_called[0] is True
@@ -681,10 +678,7 @@ class TestExecutionEngine:
             for i in range(3)
         ]
 
-        plans = [
-            engine.planner.create_action_plan(c, ActionType.DISABLE)
-            for c in components
-        ]
+        plans = [engine.planner.create_action_plan(c, ActionType.DISABLE) for c in components]
 
         results = engine.execute_batch(plans)
 
@@ -748,7 +742,10 @@ class TestFactoryFunctions:
 
     def test_create_interactive_engine(self) -> None:
         """Test create_interactive_engine."""
-        callback = lambda ctx: True
+
+        def callback(ctx):
+            return True
+
         engine = create_interactive_engine(confirmation_callback=callback)
 
         assert isinstance(engine, ExecutionEngine)

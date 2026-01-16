@@ -4,27 +4,24 @@ This module provides the execution engine that coordinates action
 execution with different modes (scan-only, dry-run, interactive, batch).
 """
 
+import logging
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
-from pathlib import Path
-from typing import Any, Callable, Optional
-from uuid import uuid4
-import logging
+from typing import Any
 
+from src.actions.contain import ContainHandler
+from src.actions.disable import DisableHandler
+from src.actions.planner import ActionPlanner
+from src.actions.remove import RemoveHandler
 from src.core.models import (
-    Component,
-    ActionType,
     ActionPlan,
     ActionResult,
+    ActionType,
+    Component,
     ExecutionMode,
     Session,
-    Snapshot,
 )
-from src.actions.planner import ActionPlanner
-from src.actions.disable import DisableHandler, DisableResult
-from src.actions.contain import ContainHandler, ContainResult
-from src.actions.remove import RemoveHandler, RemoveResult
 
 logger = logging.getLogger("debloatr.actions.executor")
 
@@ -67,11 +64,11 @@ class ExecutionResult:
     """
 
     success: bool
-    action_result: Optional[ActionResult] = None
-    snapshot_id: Optional[str] = None
+    action_result: ActionResult | None = None
+    snapshot_id: str | None = None
     execution_time_ms: float = 0.0
     requires_reboot: bool = False
-    error_message: Optional[str] = None
+    error_message: str | None = None
     was_simulated: bool = False
 
 
@@ -96,9 +93,9 @@ class ExecutionEngine:
     def __init__(
         self,
         mode: ExecutionMode = ExecutionMode.DRY_RUN,
-        planner: Optional[ActionPlanner] = None,
-        confirmation_callback: Optional[Callable[[ExecutionContext], bool]] = None,
-        progress_callback: Optional[Callable[[str, float], None]] = None,
+        planner: ActionPlanner | None = None,
+        confirmation_callback: Callable[[ExecutionContext], bool] | None = None,
+        progress_callback: Callable[[str, float], None] | None = None,
     ) -> None:
         """Initialize the execution engine.
 
@@ -120,7 +117,7 @@ class ExecutionEngine:
         self.remove_handler = RemoveHandler(dry_run=is_dry_run)
 
         # Session management
-        self._current_session: Optional[Session] = None
+        self._current_session: Session | None = None
         self._action_log: list[ActionResult] = []
 
     def start_session(self, description: str = "") -> Session:
@@ -157,14 +154,14 @@ class ExecutionEngine:
         return session
 
     @property
-    def current_session(self) -> Optional[Session]:
+    def current_session(self) -> Session | None:
         """Get the current session."""
         return self._current_session
 
     def execute(
         self,
         plan: ActionPlan,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> ExecutionResult:
         """Execute an action plan.
 
@@ -229,7 +226,7 @@ class ExecutionEngine:
     def execute_batch(
         self,
         plans: list[ActionPlan],
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> list[ExecutionResult]:
         """Execute multiple action plans.
 
@@ -278,11 +275,13 @@ class ExecutionEngine:
             if not result.success and context.get("stop_on_failure", False):
                 logger.warning("Stopping batch execution due to failure")
                 # Add cancelled results for remaining plans
-                for remaining in plans[i + 1:]:
-                    results.append(ExecutionResult(
-                        success=False,
-                        error_message="Cancelled due to previous failure",
-                    ))
+                for _remaining in plans[i + 1 :]:
+                    results.append(
+                        ExecutionResult(
+                            success=False,
+                            error_message="Cancelled due to previous failure",
+                        )
+                    )
                 break
 
         if self.progress_callback:
@@ -292,7 +291,9 @@ class ExecutionEngine:
 
     def _simulate_execution(self, context: ExecutionContext) -> ExecutionResult:
         """Simulate execution without any changes (SCAN_ONLY mode)."""
-        logger.info(f"[SCAN_ONLY] Would execute: {context.action.value} on {context.component.name}")
+        logger.info(
+            f"[SCAN_ONLY] Would execute: {context.action.value} on {context.component.name}"
+        )
 
         return ExecutionResult(
             success=True,
@@ -423,8 +424,7 @@ class ExecutionEngine:
             "failed": sum(1 for a in actions if not a.success),
             "by_action_type": self._count_by_action_type(actions),
             "requires_reboot": any(
-                r.requires_reboot for r in self._action_log
-                if hasattr(r, 'requires_reboot')
+                r.requires_reboot for r in self._action_log if hasattr(r, "requires_reboot")
             ),
         }
 
@@ -453,7 +453,7 @@ def create_execution_engine(
 
 def create_interactive_engine(
     confirmation_callback: Callable[[ExecutionContext], bool],
-    progress_callback: Optional[Callable[[str, float], None]] = None,
+    progress_callback: Callable[[str, float], None] | None = None,
 ) -> ExecutionEngine:
     """Create an interactive execution engine.
 

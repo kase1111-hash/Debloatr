@@ -5,22 +5,20 @@ restore system state after problematic debloat operations, including
 support for Safe Mode recovery.
 """
 
+import json
+import logging
 import os
-import sys
 import subprocess
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
-import logging
-import json
+from typing import Any
 
-from src.core.models import ActionType
 from src.core.config import Config, get_default_config
-from src.core.session import SessionManager, SessionSummary, create_session_manager
-from src.core.snapshot import SnapshotManager, create_snapshot_manager
-from src.core.rollback import RollbackManager, SessionRollbackResult, create_rollback_manager
-from src.core.restore import SystemRestoreManager, RestorePoint, create_system_restore_manager
+from src.core.restore import create_system_restore_manager
+from src.core.rollback import create_rollback_manager
+from src.core.session import create_session_manager
+from src.core.snapshot import create_snapshot_manager
 
 logger = logging.getLogger("debloatr.core.recovery")
 
@@ -43,8 +41,8 @@ class RecoveryStatus:
     """
 
     has_sessions: bool
-    last_session_id: Optional[str]
-    last_session_description: Optional[str]
+    last_session_id: str | None
+    last_session_description: str | None
     last_session_actions: int
     rollbackable_actions: int
     has_restore_points: bool
@@ -69,7 +67,7 @@ class RecoveryResult:
     success: bool
     method: str
     details: dict[str, Any]
-    error_message: Optional[str] = None
+    error_message: str | None = None
     requires_reboot: bool = False
 
 
@@ -95,7 +93,7 @@ class RecoveryMode:
 
     def __init__(
         self,
-        config: Optional[Config] = None,
+        config: Config | None = None,
         dry_run: bool = False,
     ) -> None:
         """Initialize recovery mode.
@@ -128,6 +126,7 @@ class RecoveryMode:
 
         try:
             import winreg
+
             key = winreg.OpenKey(
                 winreg.HKEY_LOCAL_MACHINE,
                 r"SYSTEM\CurrentControlSet\Control\SafeBoot\Option",
@@ -140,8 +139,12 @@ class RecoveryMode:
             # Alternative check via GetSystemMetrics
             try:
                 result = subprocess.run(
-                    ["powershell.exe", "-NoProfile", "-Command",
-                     "(Get-WmiObject Win32_ComputerSystem).BootupState"],
+                    [
+                        "powershell.exe",
+                        "-NoProfile",
+                        "-Command",
+                        "(Get-WmiObject Win32_ComputerSystem).BootupState",
+                    ],
                     capture_output=True,
                     text=True,
                     timeout=10,
@@ -162,9 +165,7 @@ class RecoveryMode:
 
         rollbackable_count = 0
         if last_session:
-            actions = self.session_manager.get_rollbackable_actions(
-                last_session.session_id
-            )
+            actions = self.session_manager.get_rollbackable_actions(last_session.session_id)
             rollbackable_count = len(actions)
 
         # Get restore point info
@@ -179,9 +180,9 @@ class RecoveryMode:
 
         # Determine if recovery is available
         recovery_available = (
-            rollbackable_count > 0 or
-            len(debloatr_points) > 0 or
-            (restore_enabled and len(restore_points) > 0)
+            rollbackable_count > 0
+            or len(debloatr_points) > 0
+            or (restore_enabled and len(restore_points) > 0)
         )
 
         return RecoveryStatus(
@@ -214,11 +215,14 @@ class RecoveryMode:
         result = self.rollback_manager.rollback_last_session(stop_on_failure)
 
         if result.success:
-            self._log_recovery_action("rollback_complete", {
-                "session_id": result.session_id,
-                "successful": result.successful_rollbacks,
-                "failed": result.failed_rollbacks,
-            })
+            self._log_recovery_action(
+                "rollback_complete",
+                {
+                    "session_id": result.session_id,
+                    "successful": result.successful_rollbacks,
+                    "failed": result.failed_rollbacks,
+                },
+            )
             return RecoveryResult(
                 success=True,
                 method="session_rollback",
@@ -231,10 +235,7 @@ class RecoveryMode:
                 requires_reboot=result.requires_reboot,
             )
         else:
-            error_messages = [
-                r.error_message for r in result.results
-                if r.error_message
-            ]
+            error_messages = [r.error_message for r in result.results if r.error_message]
             return RecoveryResult(
                 success=False,
                 method="session_rollback",
@@ -277,10 +278,7 @@ class RecoveryMode:
                 requires_reboot=result.requires_reboot,
             )
         else:
-            error_messages = [
-                r.error_message for r in result.results
-                if r.error_message
-            ]
+            error_messages = [r.error_message for r in result.results if r.error_message]
             return RecoveryResult(
                 success=False,
                 method="session_rollback",
@@ -308,10 +306,13 @@ class RecoveryMode:
         Returns:
             RecoveryResult with outcome
         """
-        self._log_recovery_action("restore_to_point", {
-            "sequence_number": sequence_number,
-            "confirm": confirm,
-        })
+        self._log_recovery_action(
+            "restore_to_point",
+            {
+                "sequence_number": sequence_number,
+                "confirm": confirm,
+            },
+        )
 
         point = self.restore_manager.get_restore_point(sequence_number)
         if not point:
@@ -368,49 +369,63 @@ class RecoveryMode:
         for session in sessions:
             actions = self.session_manager.get_rollbackable_actions(session.session_id)
             if actions:
-                options["sessions"].append({
-                    "session_id": session.session_id,
-                    "description": session.description,
-                    "started_at": session.started_at,
-                    "rollbackable_actions": len(actions),
-                    "total_actions": session.total_actions,
-                })
+                options["sessions"].append(
+                    {
+                        "session_id": session.session_id,
+                        "description": session.description,
+                        "started_at": session.started_at,
+                        "rollbackable_actions": len(actions),
+                        "total_actions": session.total_actions,
+                    }
+                )
 
         # List Debloatr restore points
         debloatr_points = self.restore_manager.get_debloatr_restore_points()
         for point in debloatr_points:
-            options["restore_points"].append({
-                "sequence_number": point.sequence_number,
-                "description": point.description,
-                "creation_time": point.creation_time.isoformat(),
-            })
+            options["restore_points"].append(
+                {
+                    "sequence_number": point.sequence_number,
+                    "description": point.description,
+                    "creation_time": point.creation_time.isoformat(),
+                }
+            )
 
         # Add non-Debloatr restore points
         all_points = self.restore_manager.list_restore_points(limit=5)
         for point in all_points:
             if point not in debloatr_points:
-                options["restore_points"].append({
-                    "sequence_number": point.sequence_number,
-                    "description": point.description,
-                    "creation_time": point.creation_time.isoformat(),
-                    "external": True,
-                })
+                options["restore_points"].append(
+                    {
+                        "sequence_number": point.sequence_number,
+                        "description": point.description,
+                        "creation_time": point.creation_time.isoformat(),
+                        "external": True,
+                    }
+                )
 
         # Add recommendations
         status = self.get_status()
         if status.rollbackable_actions > 0:
-            options["recommendations"].append({
-                "action": "rollback_last_session",
-                "description": f"Rollback last session ({status.rollbackable_actions} actions)",
-                "command": "debloatd --recovery --last",
-            })
+            options["recommendations"].append(
+                {
+                    "action": "rollback_last_session",
+                    "description": f"Rollback last session ({status.rollbackable_actions} actions)",
+                    "command": "debloatd --recovery --last",
+                }
+            )
 
         if status.debloatr_restore_points > 0:
-            options["recommendations"].append({
-                "action": "system_restore",
-                "description": "Restore to Debloatr restore point",
-                "command": f"debloatd --recovery --restore {debloatr_points[0].sequence_number}" if debloatr_points else "",
-            })
+            options["recommendations"].append(
+                {
+                    "action": "system_restore",
+                    "description": "Restore to Debloatr restore point",
+                    "command": (
+                        f"debloatd --recovery --restore {debloatr_points[0].sequence_number}"
+                        if debloatr_points
+                        else ""
+                    ),
+                }
+            )
 
         return options
 
@@ -455,7 +470,7 @@ class RecoveryMode:
             error_message="No recovery options available",
         )
 
-    def create_recovery_script(self, output_path: Optional[Path] = None) -> Path:
+    def create_recovery_script(self, output_path: Path | None = None) -> Path:
         """Create a standalone recovery script.
 
         Creates a batch file that can be run from Safe Mode to
@@ -471,10 +486,10 @@ class RecoveryMode:
 
         # Get last session info
         last_session = self.session_manager.get_last_session()
-        session_id = last_session.session_id if last_session else ""
+        _session_id = last_session.session_id if last_session else ""  # Reserved for future use
 
         # Create batch script content
-        script = f'''@echo off
+        script = f"""@echo off
 echo Debloatr Recovery Script
 echo ========================
 echo.
@@ -521,7 +536,7 @@ if "%choice%"=="3" (
 
 echo Invalid choice
 pause
-'''
+"""
 
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, "w") as f:
@@ -576,12 +591,19 @@ if __name__ == "__main__":
         # Create scheduled task
         task_name = "DebloatrBootRecoveryCheck"
         result = subprocess.run(
-            ["schtasks", "/Create",
-             "/TN", task_name,
-             "/TR", f'python "{script_path}"',
-             "/SC", "ONSTART",
-             "/RU", "SYSTEM",
-             "/F"],
+            [
+                "schtasks",
+                "/Create",
+                "/TN",
+                task_name,
+                "/TR",
+                f'python "{script_path}"',
+                "/SC",
+                "ONSTART",
+                "/RU",
+                "SYSTEM",
+                "/F",
+            ],
             capture_output=True,
             text=True,
         )
@@ -629,7 +651,7 @@ if __name__ == "__main__":
 
 
 def create_recovery_mode(
-    config: Optional[Config] = None,
+    config: Config | None = None,
     dry_run: bool = False,
 ) -> RecoveryMode:
     """Create a recovery mode instance.

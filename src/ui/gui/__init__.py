@@ -6,10 +6,10 @@ Requires PySide6 to be installed: pip install PySide6
 
 try:
     from .main import (
-        MainWindow,
-        DashboardWidget,
-        ComponentTreeWidget,
         ComponentDetailWidget,
+        ComponentTreeWidget,
+        DashboardWidget,
+        MainWindow,
         SessionHistoryWidget,
         run_gui_app,
     )

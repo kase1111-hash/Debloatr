@@ -4,37 +4,30 @@ This module provides the command handlers for all CLI commands.
 """
 
 import argparse
-import sys
-from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
+from src.actions.executor import create_execution_engine
+from src.actions.planner import create_default_planner
 from src.core.config import Config
 from src.core.models import (
-    Component,
-    Classification,
-    RiskLevel,
     ActionType,
+    Classification,
+    Component,
     ExecutionMode,
+    RiskLevel,
 )
 from src.core.orchestrator import ScanOrchestrator
-from src.core.session import SessionManager, create_session_manager
-from src.core.snapshot import SnapshotManager, create_snapshot_manager
-from src.core.rollback import RollbackManager, create_rollback_manager
-from src.core.recovery import RecoveryMode, create_recovery_mode, run_recovery_interactive
+from src.core.recovery import create_recovery_mode
 from src.core.restore import create_restore_point_for_session
-
-from src.actions.planner import ActionPlanner, create_default_planner
-from src.actions.executor import ExecutionEngine, create_execution_engine
+from src.core.rollback import create_rollback_manager
+from src.core.session import create_session_manager
 
 from .formatters import (
-    TextFormatter,
     JsonFormatter,
-    format_component,
+    TextFormatter,
     format_component_list,
     format_session_list,
-    format_action_result,
 )
-
 
 # Global component cache for lookups
 _component_cache: dict[str, Component] = {}
@@ -56,12 +49,14 @@ def _load_components(config: Config, args: argparse.Namespace) -> list[Component
 
     if cache_file.exists():
         import json
+
         try:
             with open(cache_file) as f:
                 data = json.load(f)
             components = []
             for item in data.get("components", []):
                 from src.core.models import ComponentType
+
                 comp = Component(
                     component_type=ComponentType[item["component_type"]],
                     name=item["name"],
@@ -87,6 +82,7 @@ def _load_components(config: Config, args: argparse.Namespace) -> list[Component
     # Save to cache file
     try:
         import json
+
         data = {
             "components": [
                 {
@@ -109,7 +105,9 @@ def _load_components(config: Config, args: argparse.Namespace) -> list[Component
     return result.components
 
 
-def _find_component(component_id: str, config: Config, args: argparse.Namespace) -> Optional[Component]:
+def _find_component(
+    component_id: str, config: Config, args: argparse.Namespace
+) -> Component | None:
     """Find a component by ID (full or partial)."""
     global _component_cache
 
@@ -142,8 +140,6 @@ def run_list_command(args: argparse.Namespace, config: Config) -> int:
     Returns:
         Exit code
     """
-    formatter = _get_formatter(args)
-
     # Load components
     components = _load_components(config, args)
 
@@ -181,8 +177,6 @@ def run_plan_command(args: argparse.Namespace, config: Config) -> int:
     Returns:
         Exit code
     """
-    formatter = _get_formatter(args)
-
     # Find the component
     component = _find_component(args.component_id, config, args)
     if not component:
@@ -273,7 +267,6 @@ def run_disable_command(args: argparse.Namespace, config: Config) -> int:
 
     # Create session and execute
     session_manager = create_session_manager(config)
-    snapshot_manager = create_snapshot_manager(config)
 
     # Create restore point
     restore_point = create_restore_point_for_session(
@@ -305,13 +298,12 @@ def run_disable_command(args: argparse.Namespace, config: Config) -> int:
     session_manager.end_session(session.session_id)
 
     # Output result
-    formatter = TextFormatter()
     if result.success:
         print(f"\n✓ Successfully disabled: {component.display_name}")
         if result.requires_reboot:
             print("  Note: A reboot is required to complete the operation.")
         print(f"\n  Session ID: {session.session_id[:8]}...")
-        print(f"  Use 'debloatd undo --last' to undo this action.")
+        print("  Use 'debloatd undo --last' to undo this action.")
     else:
         print(f"\n✗ Failed to disable: {component.display_name}")
         print(f"  Error: {result.error_message}")

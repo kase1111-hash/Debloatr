@@ -5,19 +5,17 @@ and persisting debloat sessions with their associated actions.
 """
 
 import json
-import os
-from dataclasses import dataclass, asdict, field
+import logging
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
-import logging
 
+from src.core.config import Config, get_default_config
 from src.core.models import (
-    Session,
     ActionResult,
     ActionType,
+    Session,
 )
-from src.core.config import Config, get_default_config
 
 logger = logging.getLogger("debloatr.core.session")
 
@@ -41,11 +39,11 @@ class SessionSummary:
     session_id: str
     description: str
     started_at: str
-    ended_at: Optional[str]
+    ended_at: str | None
     total_actions: int
     successful_actions: int
     failed_actions: int
-    restore_point_id: Optional[str]
+    restore_point_id: str | None
     is_active: bool
 
 
@@ -70,10 +68,10 @@ class ActionSummary:
     component_id: str
     component_name: str
     success: bool
-    snapshot_id: Optional[str]
+    snapshot_id: str | None
     executed_at: str
     rollback_available: bool
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
 
 class SessionManager:
@@ -99,8 +97,8 @@ class SessionManager:
 
     def __init__(
         self,
-        config: Optional[Config] = None,
-        sessions_dir: Optional[Path] = None,
+        config: Config | None = None,
+        sessions_dir: Path | None = None,
         max_sessions: int = 50,
     ) -> None:
         """Initialize the session manager.
@@ -139,10 +137,7 @@ class SessionManager:
     def _save_index(self) -> None:
         """Save session index to disk."""
         try:
-            data = {
-                session_id: asdict(summary)
-                for session_id, summary in self._index.items()
-            }
+            data = {session_id: asdict(summary) for session_id, summary in self._index.items()}
             with open(self._index_file, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2)
         except Exception as e:
@@ -151,7 +146,7 @@ class SessionManager:
     def create_session(
         self,
         description: str = "",
-        restore_point_id: Optional[str] = None,
+        restore_point_id: str | None = None,
     ) -> Session:
         """Create a new session.
 
@@ -192,7 +187,7 @@ class SessionManager:
         logger.info(f"Created session: {session.session_id} - {description}")
         return session
 
-    def get_session(self, session_id: str) -> Optional[Session]:
+    def get_session(self, session_id: str) -> Session | None:
         """Get a session by ID.
 
         Args:
@@ -257,7 +252,7 @@ class SessionManager:
         logger.debug(f"Added action to session {session_id}: {action_result.action.value}")
         return True
 
-    def end_session(self, session_id: str) -> Optional[Session]:
+    def end_session(self, session_id: str) -> Session | None:
         """End a session.
 
         Args:
@@ -325,7 +320,7 @@ class SessionManager:
 
         return results[:limit]
 
-    def get_last_session(self) -> Optional[SessionSummary]:
+    def get_last_session(self) -> SessionSummary | None:
         """Get the most recent session.
 
         Returns:
@@ -361,12 +356,20 @@ class SessionManager:
         for action in session.actions:
             summary = ActionSummary(
                 plan_id=action.plan_id,
-                action=action.action.value if isinstance(action.action, ActionType) else str(action.action),
+                action=(
+                    action.action.value
+                    if isinstance(action.action, ActionType)
+                    else str(action.action)
+                ),
                 component_id=action.component_id,
                 component_name=names.get(action.component_id, "Unknown"),
                 success=action.success,
                 snapshot_id=action.snapshot_id,
-                executed_at=action.executed_at.isoformat() if isinstance(action.executed_at, datetime) else str(action.executed_at),
+                executed_at=(
+                    action.executed_at.isoformat()
+                    if isinstance(action.executed_at, datetime)
+                    else str(action.executed_at)
+                ),
                 rollback_available=action.rollback_available,
                 error_message=action.error_message,
             )
@@ -456,7 +459,11 @@ class SessionManager:
         data = {
             "session_id": session.session_id,
             "description": session.description,
-            "started_at": session.started_at.isoformat() if isinstance(session.started_at, datetime) else str(session.started_at),
+            "started_at": (
+                session.started_at.isoformat()
+                if isinstance(session.started_at, datetime)
+                else str(session.started_at)
+            ),
             "ended_at": session.ended_at.isoformat() if session.ended_at else None,
             "restore_point_id": session.restore_point_id,
             "actions": [
@@ -467,7 +474,11 @@ class SessionManager:
                     "component_id": a.component_id,
                     "snapshot_id": a.snapshot_id,
                     "error_message": a.error_message,
-                    "executed_at": a.executed_at.isoformat() if isinstance(a.executed_at, datetime) else str(a.executed_at),
+                    "executed_at": (
+                        a.executed_at.isoformat()
+                        if isinstance(a.executed_at, datetime)
+                        else str(a.executed_at)
+                    ),
                     "rollback_available": a.rollback_available,
                 }
                 for a in session.actions
@@ -481,7 +492,7 @@ class SessionManager:
         except Exception as e:
             logger.error(f"Failed to save session {session.session_id}: {e}")
 
-    def _load_session(self, session_id: str) -> Optional[Session]:
+    def _load_session(self, session_id: str) -> Session | None:
         """Load a session from disk."""
         filepath = self._get_session_path(session_id)
 
@@ -498,11 +509,19 @@ class SessionManager:
                 action = ActionResult(
                     plan_id=action_data["plan_id"],
                     success=action_data["success"],
-                    action=ActionType(action_data["action"]) if action_data["action"] in [a.value for a in ActionType] else ActionType.IGNORE,
+                    action=(
+                        ActionType(action_data["action"])
+                        if action_data["action"] in [a.value for a in ActionType]
+                        else ActionType.IGNORE
+                    ),
                     component_id=action_data["component_id"],
                     snapshot_id=action_data.get("snapshot_id"),
                     error_message=action_data.get("error_message"),
-                    executed_at=datetime.fromisoformat(action_data["executed_at"]) if action_data.get("executed_at") else datetime.now(),
+                    executed_at=(
+                        datetime.fromisoformat(action_data["executed_at"])
+                        if action_data.get("executed_at")
+                        else datetime.now()
+                    ),
                     rollback_available=action_data.get("rollback_available", False),
                 )
                 actions.append(action)
@@ -511,7 +530,11 @@ class SessionManager:
             session = Session(
                 session_id=data["session_id"],
                 description=data.get("description", ""),
-                started_at=datetime.fromisoformat(data["started_at"]) if data.get("started_at") else datetime.now(),
+                started_at=(
+                    datetime.fromisoformat(data["started_at"])
+                    if data.get("started_at")
+                    else datetime.now()
+                ),
                 ended_at=datetime.fromisoformat(data["ended_at"]) if data.get("ended_at") else None,
                 restore_point_id=data.get("restore_point_id"),
                 actions=actions,
@@ -541,7 +564,7 @@ class SessionManager:
             return {}
 
 
-def create_session_manager(config: Optional[Config] = None) -> SessionManager:
+def create_session_manager(config: Config | None = None) -> SessionManager:
     """Create a session manager with default or provided configuration.
 
     Args:

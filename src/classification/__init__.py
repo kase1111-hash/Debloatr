@@ -1,20 +1,20 @@
 """Classification engine for categorizing discovered components."""
 
-from .signatures import SignatureDatabase, SignatureMatch
 from .engine import (
+    ClassificationDecision,
     ClassificationEngine,
     ClassificationSource,
-    ClassificationDecision,
     create_default_engine,
 )
 from .heuristics import (
-    HeuristicsEngine,
-    HeuristicRule,
-    HeuristicResult,
-    HeuristicCategory,
     HEURISTIC_RULES,
+    HeuristicCategory,
+    HeuristicResult,
+    HeuristicRule,
+    HeuristicsEngine,
     create_checker_for_engine,
 )
+from .signatures import SignatureDatabase, SignatureMatch
 
 __all__ = [
     # Signature Database

@@ -5,21 +5,20 @@ signature matching, heuristics, and optional LLM analysis
 to classify discovered components.
 """
 
+import logging
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional, Callable
-import logging
+from typing import Any
 
+from src.classification.signatures import SignatureDatabase
 from src.core.models import (
-    Component,
-    ComponentType,
-    Classification,
-    ClassificationResult,
     ActionType,
+    Classification,
+    Component,
 )
-from src.classification.signatures import SignatureDatabase, SignatureMatch
 
 logger = logging.getLogger("debloatr.classification.engine")
 
@@ -56,7 +55,7 @@ class ClassificationDecision:
     classification: Classification
     source: ClassificationSource = ClassificationSource.NONE
     confidence: float = 0.0
-    signature_id: Optional[str] = None
+    signature_id: str | None = None
     heuristic_flags: list[str] = field(default_factory=list)
     explanation: str = ""
     safe_actions: list[ActionType] = field(default_factory=list)
@@ -82,7 +81,7 @@ class ClassificationEngine:
 
     def __init__(
         self,
-        signature_db: Optional[SignatureDatabase] = None,
+        signature_db: SignatureDatabase | None = None,
         enable_heuristics: bool = True,
         heuristic_threshold: float = 0.6,
     ) -> None:
@@ -177,7 +176,7 @@ class ClassificationEngine:
     def _classify_by_signature(
         self,
         component: Component,
-    ) -> Optional[ClassificationDecision]:
+    ) -> ClassificationDecision | None:
         """Attempt to classify by signature match.
 
         Args:
@@ -195,8 +194,7 @@ class ClassificationEngine:
 
         # Build explanation
         explanation = (
-            f"Matched signature '{signature.component_name}' "
-            f"by {match.match_type} pattern"
+            f"Matched signature '{signature.component_name}' " f"by {match.match_type} pattern"
         )
         if signature.breakage_notes:
             explanation += f". Note: {signature.breakage_notes}"
@@ -216,7 +214,7 @@ class ClassificationEngine:
     def _classify_by_heuristics(
         self,
         component: Component,
-    ) -> Optional[ClassificationDecision]:
+    ) -> ClassificationDecision | None:
         """Attempt to classify by heuristic rules.
 
         Args:
@@ -428,7 +426,7 @@ class ClassificationEngine:
         return stats
 
 
-def create_default_engine(signatures_path: Optional[Path] = None) -> ClassificationEngine:
+def create_default_engine(signatures_path: Path | None = None) -> ClassificationEngine:
     """Create a classification engine with default settings.
 
     Args:

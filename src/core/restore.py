@@ -5,12 +5,12 @@ creating restore points before batch operations and restoring to
 previous states.
 """
 
+import logging
 import os
 import subprocess
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Optional
-import logging
+from typing import Any
 
 logger = logging.getLogger("debloatr.core.restore")
 
@@ -80,8 +80,7 @@ class SystemRestoreManager:
             return False
 
         result = self._run_powershell(
-            "Get-ComputerRestorePoint -ErrorAction SilentlyContinue | "
-            "Select-Object -First 1"
+            "Get-ComputerRestorePoint -ErrorAction SilentlyContinue | " "Select-Object -First 1"
         )
 
         # System Restore is available even if no points exist
@@ -136,7 +135,7 @@ class SystemRestoreManager:
             return {"enabled": False, "error": "Not Windows"}
 
         result = self._run_powershell(
-            "Get-WmiObject -Class Win32_Volume -Filter \"DriveType=3\" | "
+            'Get-WmiObject -Class Win32_Volume -Filter "DriveType=3" | '
             "ForEach-Object { "
             "$protection = (vssadmin list shadowstorage /for=$($_.DriveLetter) 2>&1); "
             "@{Drive=$_.DriveLetter; Protected=($protection -notmatch 'No shadow')} "
@@ -146,6 +145,7 @@ class SystemRestoreManager:
         if result["success"] and result["output"]:
             try:
                 import json
+
                 return {"drives": json.loads(result["output"])}
             except Exception:
                 pass
@@ -156,7 +156,7 @@ class SystemRestoreManager:
         self,
         description: str,
         restore_point_type: int = RestorePointType.MODIFY_SETTINGS,
-    ) -> Optional[int]:
+    ) -> int | None:
         """Create a System Restore point.
 
         Args:
@@ -224,6 +224,7 @@ class SystemRestoreManager:
 
         try:
             import json
+
             data = json.loads(result["output"])
 
             # Handle single result (not a list)
@@ -237,7 +238,9 @@ class SystemRestoreManager:
                     creation_str = str(item.get("CreationTime", ""))
                     if "/Date(" in creation_str:
                         # Extract timestamp from /Date(timestamp)/
-                        timestamp = int(creation_str.split("(")[1].split(")")[0].split("+")[0].split("-")[0])
+                        timestamp = int(
+                            creation_str.split("(")[1].split(")")[0].split("+")[0].split("-")[0]
+                        )
                         creation_time = datetime.fromtimestamp(timestamp / 1000)
                     else:
                         creation_time = datetime.now()
@@ -246,7 +249,9 @@ class SystemRestoreManager:
                         sequence_number=int(item.get("SequenceNumber", 0)),
                         description=str(item.get("Description", "")),
                         creation_time=creation_time,
-                        restore_point_type=self._get_restore_type_name(item.get("RestorePointType", 0)),
+                        restore_point_type=self._get_restore_type_name(
+                            item.get("RestorePointType", 0)
+                        ),
                         event_type=self._get_event_type_name(item.get("EventType", 0)),
                     )
                     points.append(point)
@@ -260,7 +265,7 @@ class SystemRestoreManager:
             logger.error(f"Failed to parse restore points: {e}")
             return []
 
-    def get_restore_point(self, sequence_number: int) -> Optional[RestorePoint]:
+    def get_restore_point(self, sequence_number: int) -> RestorePoint | None:
         """Get a specific restore point by sequence number.
 
         Args:
@@ -292,9 +297,7 @@ class SystemRestoreManager:
             return True
 
         # Use vssadmin to delete the shadow copy
-        result = self._run_command(
-            f'vssadmin delete shadows /shadow={{sequence_number}} /quiet'
-        )
+        result = self._run_command("vssadmin delete shadows /shadow={sequence_number} /quiet")
 
         # Alternative: use WMI
         if not result["success"]:
@@ -375,7 +378,8 @@ class SystemRestoreManager:
         """
         all_points = self.list_restore_points(limit=100)
         return [
-            p for p in all_points
+            p
+            for p in all_points
             if "Debloatr" in p.description or "debloat" in p.description.lower()
         ]
 
@@ -411,7 +415,9 @@ class SystemRestoreManager:
                 capture_output=True,
                 text=True,
                 timeout=120,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             return {
@@ -437,7 +443,9 @@ class SystemRestoreManager:
                 capture_output=True,
                 text=True,
                 timeout=120,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             return {
@@ -467,7 +475,7 @@ def create_system_restore_manager(dry_run: bool = False) -> SystemRestoreManager
 def create_restore_point_for_session(
     session_description: str,
     dry_run: bool = False,
-) -> Optional[int]:
+) -> int | None:
     """Convenience function to create a restore point for a debloat session.
 
     Args:

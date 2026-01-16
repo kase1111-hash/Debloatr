@@ -4,26 +4,22 @@ This module provides the RollbackManager class for rolling back
 actions using captured snapshots.
 """
 
-import json
+import logging
 import os
 import subprocess
 from dataclasses import dataclass, field
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
-import logging
-import shutil
+from typing import Any
 
+from src.core.config import Config, get_default_config
 from src.core.models import (
-    Snapshot,
-    Session,
     ActionResult,
     ActionType,
-    ComponentType,
+    Session,
+    Snapshot,
 )
-from src.core.snapshot import SnapshotManager, create_snapshot_manager
 from src.core.session import SessionManager, create_session_manager
-from src.core.config import Config, get_default_config
+from src.core.snapshot import SnapshotManager, create_snapshot_manager
 
 logger = logging.getLogger("debloatr.core.rollback")
 
@@ -47,11 +43,11 @@ class RollbackResult:
 
     success: bool
     action_id: str
-    snapshot_id: Optional[str]
+    snapshot_id: str | None
     component_id: str
     component_name: str
     original_action: str
-    error_message: Optional[str] = None
+    error_message: str | None = None
     requires_reboot: bool = False
     partial: bool = False
     details: dict[str, Any] = field(default_factory=dict)
@@ -104,9 +100,9 @@ class RollbackManager:
 
     def __init__(
         self,
-        config: Optional[Config] = None,
-        snapshot_manager: Optional[SnapshotManager] = None,
-        session_manager: Optional[SessionManager] = None,
+        config: Config | None = None,
+        snapshot_manager: SnapshotManager | None = None,
+        session_manager: SessionManager | None = None,
         dry_run: bool = False,
     ) -> None:
         """Initialize the rollback manager.
@@ -126,7 +122,7 @@ class RollbackManager:
     def rollback_action(
         self,
         action_result: ActionResult,
-        snapshot: Optional[Snapshot] = None,
+        snapshot: Snapshot | None = None,
         component_name: str = "Unknown",
     ) -> RollbackResult:
         """Rollback a single action.
@@ -150,7 +146,11 @@ class RollbackManager:
                 snapshot_id=action_result.snapshot_id,
                 component_id=action_result.component_id,
                 component_name=component_name,
-                original_action=action_result.action.value if isinstance(action_result.action, ActionType) else str(action_result.action),
+                original_action=(
+                    action_result.action.value
+                    if isinstance(action_result.action, ActionType)
+                    else str(action_result.action)
+                ),
                 error_message="Snapshot not found for rollback",
             )
 
@@ -195,15 +195,17 @@ class RollbackManager:
                 total_actions=0,
                 successful_rollbacks=0,
                 failed_rollbacks=0,
-                results=[RollbackResult(
-                    success=False,
-                    action_id="",
-                    snapshot_id=None,
-                    component_id="",
-                    component_name="",
-                    original_action="",
-                    error_message=f"Session not found: {session_id}",
-                )],
+                results=[
+                    RollbackResult(
+                        success=False,
+                        action_id="",
+                        snapshot_id=None,
+                        component_id="",
+                        component_name="",
+                        original_action="",
+                        error_message=f"Session not found: {session_id}",
+                    )
+                ],
             )
 
         # Get rollbackable actions
@@ -281,22 +283,22 @@ class RollbackManager:
                 total_actions=0,
                 successful_rollbacks=0,
                 failed_rollbacks=0,
-                results=[RollbackResult(
-                    success=False,
-                    action_id="",
-                    snapshot_id=None,
-                    component_id="",
-                    component_name="",
-                    original_action="",
-                    error_message="No sessions found",
-                )],
+                results=[
+                    RollbackResult(
+                        success=False,
+                        action_id="",
+                        snapshot_id=None,
+                        component_id="",
+                        component_name="",
+                        original_action="",
+                        error_message="No sessions found",
+                    )
+                ],
             )
 
         return self.rollback_session(last_session.session_id, stop_on_failure)
 
-    def _find_action_in_session(
-        self, session: Session, plan_id: str
-    ) -> Optional[ActionResult]:
+    def _find_action_in_session(self, session: Session, plan_id: str) -> ActionResult | None:
         """Find an action in a session by plan ID."""
         for action in session.actions:
             if action.plan_id == plan_id:
@@ -397,7 +399,9 @@ class RollbackManager:
                     f"Start-Service -Name '{service_name}' -ErrorAction SilentlyContinue"
                 )
                 if not start_result["success"]:
-                    logger.warning(f"Could not start service {service_name}: {start_result['error']}")
+                    logger.warning(
+                        f"Could not start service {service_name}: {start_result['error']}"
+                    )
 
             logger.info(f"Re-enabled service: {service_name}")
             return RollbackResult(
@@ -490,7 +494,9 @@ class RollbackManager:
                 # Get the original value from snapshot
                 reg_value = state.get("registry_value", {})
                 value_data = reg_value.get("Value")
-                value_type = reg_value.get("Type", "String")
+                _value_type = reg_value.get(
+                    "Type", "String"
+                )  # Reserved for typed registry restoration
 
                 if value_data is not None:
                     # Restore the registry value
@@ -676,7 +682,7 @@ class RollbackManager:
 
         # Restore ACLs
         executables = state.get("executables", [])
-        acls = state.get("acls", {})
+        _acls = state.get("acls", {})  # Reserved for detailed ACL restoration
 
         for exe_path in executables:
             if not Path(exe_path).exists():
@@ -788,7 +794,7 @@ class RollbackManager:
         result = self._run_powershell(
             f"Get-AppxPackage -AllUsers -Name '*{package_name}*' | "
             f"ForEach-Object {{ Add-AppxPackage -DisableDevelopmentMode -Register "
-            f"\"$($_.InstallLocation)\\AppXManifest.xml\" -ErrorAction SilentlyContinue }}"
+            f'"$($_.InstallLocation)\\AppXManifest.xml" -ErrorAction SilentlyContinue }}'
         )
 
         if result["success"]:
@@ -837,6 +843,7 @@ class RollbackManager:
 
         # Create temp file with XML
         import tempfile
+
         with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False) as f:
             f.write(task_xml)
             xml_path = f.name
@@ -926,7 +933,9 @@ class RollbackManager:
                 capture_output=True,
                 text=True,
                 timeout=60,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             return {
@@ -955,7 +964,9 @@ class RollbackManager:
                 capture_output=True,
                 text=True,
                 timeout=60,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             return {
@@ -971,7 +982,7 @@ class RollbackManager:
 
 
 def create_rollback_manager(
-    config: Optional[Config] = None,
+    config: Config | None = None,
     dry_run: bool = False,
 ) -> RollbackManager:
     """Create a rollback manager with default or provided configuration.

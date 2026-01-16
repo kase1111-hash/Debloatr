@@ -1,21 +1,19 @@
 """Tests for the startup entries scanner."""
 
-import pytest
 import sys
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+
+import pytest
 
 from src.core.models import ComponentType
 from src.discovery.startup import (
     StartupEntry,
-    StartupScanner,
     StartupEntryType,
+    StartupScanner,
     StartupScope,
-    get_entries_by_type,
-    get_entries_by_scope,
     get_disabled_entries,
-    REGISTRY_STARTUP_PATHS,
-    WINLOGON_VALUES,
+    get_entries_by_scope,
+    get_entries_by_type,
 )
 
 
@@ -90,7 +88,9 @@ class TestStartupEntry:
             entry_name="app.lnk",
             target_path=Path("C:/Program Files/App/app.exe"),
             scope=StartupScope.USER,
-            folder_path=Path("C:/Users/User/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup"),
+            folder_path=Path(
+                "C:/Users/User/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup"
+            ),
         )
 
         assert entry.entry_type == StartupEntryType.SHELL_FOLDER
@@ -109,7 +109,10 @@ class TestStartupEntry:
             arguments="--arg1 --arg2",
         )
 
-        assert '"C:\\app.exe" --arg1 --arg2' in entry.full_command or "C:\\app.exe --arg1 --arg2" in entry.full_command
+        assert (
+            '"C:\\app.exe" --arg1 --arg2' in entry.full_command
+            or "C:\\app.exe --arg1 --arg2" in entry.full_command
+        )
 
     def test_full_command_no_args(self):
         """Test full_command with no arguments."""
@@ -269,7 +272,9 @@ class TestStartupScanner:
         scanner = StartupScanner()
 
         assert scanner._is_default_winlogon_value("Shell", Path("explorer.exe")) is True
-        assert scanner._is_default_winlogon_value("Shell", Path("C:\\Windows\\explorer.exe")) is True
+        assert (
+            scanner._is_default_winlogon_value("Shell", Path("C:\\Windows\\explorer.exe")) is True
+        )
         assert scanner._is_default_winlogon_value("Shell", Path("malware.exe")) is False
 
     def test_is_default_winlogon_userinit(self):
@@ -277,7 +282,12 @@ class TestStartupScanner:
         scanner = StartupScanner()
 
         assert scanner._is_default_winlogon_value("Userinit", Path("userinit.exe")) is True
-        assert scanner._is_default_winlogon_value("Userinit", Path("C:\\Windows\\System32\\userinit.exe")) is True
+        assert (
+            scanner._is_default_winlogon_value(
+                "Userinit", Path("C:\\Windows\\System32\\userinit.exe")
+            )
+            is True
+        )
         assert scanner._is_default_winlogon_value("Userinit", Path("malware.exe")) is False
 
 
@@ -342,18 +352,27 @@ class TestStartupHelperFunctions:
         entries = [
             StartupEntry(
                 component_type=ComponentType.STARTUP,
-                name="run1", display_name="Run1", publisher="Test",
-                entry_type=StartupEntryType.RUN, entry_name="Run1",
+                name="run1",
+                display_name="Run1",
+                publisher="Test",
+                entry_type=StartupEntryType.RUN,
+                entry_name="Run1",
             ),
             StartupEntry(
                 component_type=ComponentType.STARTUP,
-                name="folder1", display_name="Folder1", publisher="Test",
-                entry_type=StartupEntryType.SHELL_FOLDER, entry_name="Folder1",
+                name="folder1",
+                display_name="Folder1",
+                publisher="Test",
+                entry_type=StartupEntryType.SHELL_FOLDER,
+                entry_name="Folder1",
             ),
             StartupEntry(
                 component_type=ComponentType.STARTUP,
-                name="run2", display_name="Run2", publisher="Test",
-                entry_type=StartupEntryType.RUN, entry_name="Run2",
+                name="run2",
+                display_name="Run2",
+                publisher="Test",
+                entry_type=StartupEntryType.RUN,
+                entry_name="Run2",
             ),
         ]
 
@@ -368,14 +387,20 @@ class TestStartupHelperFunctions:
         entries = [
             StartupEntry(
                 component_type=ComponentType.STARTUP,
-                name="machine", display_name="Machine", publisher="Test",
-                entry_type=StartupEntryType.RUN, entry_name="Machine",
+                name="machine",
+                display_name="Machine",
+                publisher="Test",
+                entry_type=StartupEntryType.RUN,
+                entry_name="Machine",
                 scope=StartupScope.MACHINE,
             ),
             StartupEntry(
                 component_type=ComponentType.STARTUP,
-                name="user", display_name="User", publisher="Test",
-                entry_type=StartupEntryType.RUN, entry_name="User",
+                name="user",
+                display_name="User",
+                publisher="Test",
+                entry_type=StartupEntryType.RUN,
+                entry_name="User",
                 scope=StartupScope.USER,
             ),
         ]
@@ -392,21 +417,33 @@ class TestStartupHelperFunctions:
         entries = [
             StartupEntry(
                 component_type=ComponentType.STARTUP,
-                name="enabled", display_name="Enabled", publisher="Test",
-                entry_type=StartupEntryType.RUN, entry_name="Enabled",
-                is_enabled=True, is_approved=True,
+                name="enabled",
+                display_name="Enabled",
+                publisher="Test",
+                entry_type=StartupEntryType.RUN,
+                entry_name="Enabled",
+                is_enabled=True,
+                is_approved=True,
             ),
             StartupEntry(
                 component_type=ComponentType.STARTUP,
-                name="disabled", display_name="Disabled", publisher="Test",
-                entry_type=StartupEntryType.RUN, entry_name="Disabled",
-                is_enabled=False, is_approved=True,
+                name="disabled",
+                display_name="Disabled",
+                publisher="Test",
+                entry_type=StartupEntryType.RUN,
+                entry_name="Disabled",
+                is_enabled=False,
+                is_approved=True,
             ),
             StartupEntry(
                 component_type=ComponentType.STARTUP,
-                name="not-approved", display_name="Not Approved", publisher="Test",
-                entry_type=StartupEntryType.RUN, entry_name="NotApproved",
-                is_enabled=True, is_approved=False,
+                name="not-approved",
+                display_name="Not Approved",
+                publisher="Test",
+                entry_type=StartupEntryType.RUN,
+                entry_name="NotApproved",
+                is_enabled=True,
+                is_approved=False,
             ),
         ]
 

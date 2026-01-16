@@ -6,9 +6,9 @@ This package contains the user interface components:
 """
 
 from .cli import (
+    JsonFormatter,
     OutputFormatter,
     TextFormatter,
-    JsonFormatter,
     format_component,
     format_component_list,
     format_session,

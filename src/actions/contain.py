@@ -4,19 +4,16 @@ This module provides handlers for containing components by blocking
 their network access and preventing execution.
 """
 
+import logging
 import os
 import subprocess
 from dataclasses import dataclass, field
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
-from uuid import uuid4
-import logging
+from typing import Any
 
 from src.core.models import (
-    Component,
-    ComponentType,
     ActionType,
+    Component,
     Snapshot,
 )
 
@@ -39,11 +36,11 @@ class ContainResult:
 
     success: bool
     component_id: str
-    firewall_rule_name: Optional[str] = None
+    firewall_rule_name: str | None = None
     acl_applied: bool = False
     previous_state: dict[str, Any] = field(default_factory=dict)
-    error_message: Optional[str] = None
-    snapshot: Optional[Snapshot] = None
+    error_message: str | None = None
+    snapshot: Snapshot | None = None
 
 
 class ContainHandler:
@@ -81,7 +78,7 @@ class ContainHandler:
     def contain_component(
         self,
         component: Component,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> ContainResult:
         """Contain a component using firewall and ACL restrictions.
 
@@ -168,7 +165,7 @@ class ContainHandler:
     def contain_with_firewall(
         self,
         component: Component,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> ContainResult:
         """Contain a component by blocking network access.
 
@@ -187,7 +184,7 @@ class ContainHandler:
     def contain_with_acl(
         self,
         component: Component,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> ContainResult:
         """Contain a component by blocking execution.
 
@@ -206,7 +203,7 @@ class ContainHandler:
     def remove_containment(
         self,
         component: Component,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> ContainResult:
         """Remove containment from a component.
 
@@ -348,6 +345,7 @@ class ContainHandler:
         if result["success"] and result["output"]:
             try:
                 import json
+
                 return {"access": json.loads(result["output"])}
             except Exception:
                 pass
@@ -484,7 +482,9 @@ class ContainHandler:
                 capture_output=True,
                 text=True,
                 timeout=60,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             return {

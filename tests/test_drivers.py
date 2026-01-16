@@ -1,20 +1,18 @@
 """Tests for the drivers scanner."""
 
-import pytest
 import sys
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+
+import pytest
 
 from src.core.models import ComponentType
 from src.discovery.drivers import (
-    SystemDriver,
     DriversScanner,
     DriverType,
     SignatureStatus,
+    SystemDriver,
     get_drivers_by_type,
     get_third_party_drivers,
-    OVERLAY_INJECTOR_PATTERNS,
-    PROBLEMATIC_PUBLISHERS,
 )
 
 
@@ -333,13 +331,17 @@ class TestDriversScannerMocked:
         drivers = [
             SystemDriver(
                 component_type=ComponentType.DRIVER,
-                name="signed", display_name="Signed", publisher="Test",
+                name="signed",
+                display_name="Signed",
+                publisher="Test",
                 driver_name="signed",
                 signature_status=SignatureStatus.VALID,
             ),
             SystemDriver(
                 component_type=ComponentType.DRIVER,
-                name="unsigned", display_name="Unsigned", publisher="Test",
+                name="unsigned",
+                display_name="Unsigned",
+                publisher="Test",
                 driver_name="unsigned",
                 signature_status=SignatureStatus.UNSIGNED,
             ),
@@ -356,13 +358,17 @@ class TestDriversScannerMocked:
         drivers = [
             SystemDriver(
                 component_type=ComponentType.DRIVER,
-                name="normal", display_name="Normal", publisher="Test",
+                name="normal",
+                display_name="Normal",
+                publisher="Test",
                 driver_name="normal",
                 is_overlay_injector=False,
             ),
             SystemDriver(
                 component_type=ComponentType.DRIVER,
-                name="overlay", display_name="Overlay", publisher="Test",
+                name="overlay",
+                display_name="Overlay",
+                publisher="Test",
                 driver_name="overlay",
                 is_overlay_injector=True,
             ),
@@ -381,19 +387,25 @@ class TestDriverHelperFunctions:
         drivers = [
             SystemDriver(
                 component_type=ComponentType.DRIVER,
-                name="kernel1", display_name="Kernel1", publisher="Test",
+                name="kernel1",
+                display_name="Kernel1",
+                publisher="Test",
                 driver_name="kernel1",
                 driver_type=DriverType.KERNEL,
             ),
             SystemDriver(
                 component_type=ComponentType.DRIVER,
-                name="fs", display_name="FS", publisher="Test",
+                name="fs",
+                display_name="FS",
+                publisher="Test",
                 driver_name="fs",
                 driver_type=DriverType.FILESYSTEM,
             ),
             SystemDriver(
                 component_type=ComponentType.DRIVER,
-                name="kernel2", display_name="Kernel2", publisher="Test",
+                name="kernel2",
+                display_name="Kernel2",
+                publisher="Test",
                 driver_name="kernel2",
                 driver_type=DriverType.KERNEL,
             ),
@@ -410,14 +422,18 @@ class TestDriverHelperFunctions:
         drivers = [
             SystemDriver(
                 component_type=ComponentType.DRIVER,
-                name="ms", display_name="MS", publisher="Microsoft",
+                name="ms",
+                display_name="MS",
+                publisher="Microsoft",
                 driver_name="ms",
                 is_microsoft_signed=True,
                 is_inbox_driver=True,
             ),
             SystemDriver(
                 component_type=ComponentType.DRIVER,
-                name="third", display_name="Third", publisher="Third Corp",
+                name="third",
+                display_name="Third",
+                publisher="Third Corp",
                 driver_name="third",
                 is_microsoft_signed=False,
                 is_inbox_driver=False,

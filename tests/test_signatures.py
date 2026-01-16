@@ -1,20 +1,20 @@
 """Unit tests for signature database module."""
 
 import json
-import tempfile
 from pathlib import Path
+
 import pytest
 
+from src.classification.signatures import SignatureDatabase, SignatureMatch
 from src.core.models import (
+    ActionType,
+    Classification,
     Component,
     ComponentType,
-    Classification,
-    ActionType,
+    ReinstallBehavior,
     Signature,
     SignatureMatchRule,
-    ReinstallBehavior,
 )
-from src.classification.signatures import SignatureDatabase, SignatureMatch
 
 
 class TestSignatureDatabase:
@@ -35,9 +35,7 @@ class TestSignatureDatabase:
                 "publisher": "Test Publisher",
                 "component_name": "Test App",
                 "component_type": "program",
-                "match_rules": {
-                    "name_pattern": "^Test.*App$"
-                },
+                "match_rules": {"name_pattern": "^Test.*App$"},
                 "classification": "BLOAT",
                 "safe_actions": ["disable"],
                 "unsafe_actions": ["remove"],
@@ -63,12 +61,10 @@ class TestSignatureDatabase:
                     "publisher": "Another Publisher",
                     "component_name": "Another App",
                     "component_type": "service",
-                    "match_rules": {
-                        "name_pattern": "^Another.*$"
-                    },
+                    "match_rules": {"name_pattern": "^Another.*$"},
                     "classification": "AGGRESSIVE",
                 }
-            ]
+            ],
         }
         sig_file.write_text(json.dumps(sig_data))
 
@@ -103,6 +99,7 @@ class TestSignatureDatabase:
         sig_file.write_text(content)
 
         import hashlib
+
         expected_hash = hashlib.sha256(content.encode()).hexdigest()
 
         db = SignatureDatabase()
@@ -138,13 +135,15 @@ class TestSignatureDatabase:
     def test_match_component_by_name(self, tmp_path: Path) -> None:
         """Test matching component by name pattern."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "cortana-001",
-            "component_name": "Cortana",
-            "component_type": "program",
-            "match_rules": {"name_pattern": ".*[Cc]ortana.*"},
-            "classification": "BLOAT",
-        }]
+        sig_data = [
+            {
+                "signature_id": "cortana-001",
+                "component_name": "Cortana",
+                "component_type": "program",
+                "match_rules": {"name_pattern": ".*[Cc]ortana.*"},
+                "classification": "BLOAT",
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         db = SignatureDatabase()
@@ -166,13 +165,15 @@ class TestSignatureDatabase:
     def test_match_component_by_publisher(self, tmp_path: Path) -> None:
         """Test matching component by publisher pattern."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "mcafee-001",
-            "component_name": "McAfee Security",
-            "component_type": "program",
-            "match_rules": {"publisher_pattern": ".*McAfee.*"},
-            "classification": "AGGRESSIVE",
-        }]
+        sig_data = [
+            {
+                "signature_id": "mcafee-001",
+                "component_name": "McAfee Security",
+                "component_type": "program",
+                "match_rules": {"publisher_pattern": ".*McAfee.*"},
+                "classification": "AGGRESSIVE",
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         db = SignatureDatabase()
@@ -193,13 +194,15 @@ class TestSignatureDatabase:
     def test_match_component_by_path(self, tmp_path: Path) -> None:
         """Test matching component by path pattern."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "nvidia-telem-001",
-            "component_name": "NVIDIA Telemetry",
-            "component_type": "service",
-            "match_rules": {"path_pattern": ".*NVIDIA.*NvTelemetry.*"},
-            "classification": "BLOAT",
-        }]
+        sig_data = [
+            {
+                "signature_id": "nvidia-telem-001",
+                "component_name": "NVIDIA Telemetry",
+                "component_type": "service",
+                "match_rules": {"path_pattern": ".*NVIDIA.*NvTelemetry.*"},
+                "classification": "BLOAT",
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         db = SignatureDatabase()
@@ -210,7 +213,9 @@ class TestSignatureDatabase:
             name="NvTelemetryContainer",
             display_name="NVIDIA Telemetry Container",
             publisher="NVIDIA",
-            install_path=Path("C:/Program Files/NVIDIA Corporation/NvTelemetry/NvTelemetryContainer.exe"),
+            install_path=Path(
+                "C:/Program Files/NVIDIA Corporation/NvTelemetry/NvTelemetryContainer.exe"
+            ),
         )
 
         match = db.match_component(component)
@@ -221,13 +226,15 @@ class TestSignatureDatabase:
     def test_match_component_no_match(self, tmp_path: Path) -> None:
         """Test no match returns None."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "specific-001",
-            "component_name": "Specific App",
-            "component_type": "program",
-            "match_rules": {"name_pattern": "^VerySpecificAppName$"},
-            "classification": "BLOAT",
-        }]
+        sig_data = [
+            {
+                "signature_id": "specific-001",
+                "component_name": "Specific App",
+                "component_type": "program",
+                "match_rules": {"name_pattern": "^VerySpecificAppName$"},
+                "classification": "BLOAT",
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         db = SignatureDatabase()
@@ -246,13 +253,15 @@ class TestSignatureDatabase:
     def test_match_component_type_mismatch(self, tmp_path: Path) -> None:
         """Test that component type must match for signature to apply."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "service-only-001",
-            "component_name": "Service Only",
-            "component_type": "service",
-            "match_rules": {"name_pattern": ".*TestService.*"},
-            "classification": "BLOAT",
-        }]
+        sig_data = [
+            {
+                "signature_id": "service-only-001",
+                "component_name": "Service Only",
+                "component_type": "service",
+                "match_rules": {"name_pattern": ".*TestService.*"},
+                "classification": "BLOAT",
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         db = SignatureDatabase()
@@ -370,14 +379,16 @@ class TestSignatureDatabase:
     def test_export_to_file(self, tmp_path: Path) -> None:
         """Test exporting signatures to JSON file."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "export-001",
-            "publisher": "Export Test",
-            "component_name": "Exportable App",
-            "component_type": "program",
-            "classification": "OPTIONAL",
-            "safe_actions": ["disable"],
-        }]
+        sig_data = [
+            {
+                "signature_id": "export-001",
+                "publisher": "Export Test",
+                "component_name": "Exportable App",
+                "component_type": "program",
+                "classification": "OPTIONAL",
+                "safe_actions": ["disable"],
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         db = SignatureDatabase()
@@ -411,12 +422,14 @@ class TestSignatureDatabase:
     def test_parse_safe_unsafe_actions(self, tmp_path: Path) -> None:
         """Test parsing safe and unsafe action types."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "actions-001",
-            "component_name": "Actions Test",
-            "safe_actions": ["disable", "contain"],
-            "unsafe_actions": ["remove"],
-        }]
+        sig_data = [
+            {
+                "signature_id": "actions-001",
+                "component_name": "Actions Test",
+                "safe_actions": ["disable", "contain"],
+                "unsafe_actions": ["remove"],
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         db = SignatureDatabase()
@@ -430,11 +443,13 @@ class TestSignatureDatabase:
     def test_parse_reinstall_behavior(self, tmp_path: Path) -> None:
         """Test parsing reinstall behavior."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "reinstall-001",
-            "component_name": "Self Healing App",
-            "reinstall_behavior": "self_healing",
-        }]
+        sig_data = [
+            {
+                "signature_id": "reinstall-001",
+                "component_name": "Self Healing App",
+                "reinstall_behavior": "self_healing",
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         db = SignatureDatabase()
@@ -446,12 +461,14 @@ class TestSignatureDatabase:
     def test_invalid_regex_pattern(self, tmp_path: Path) -> None:
         """Test handling of invalid regex patterns."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "bad-regex-001",
-            "component_type": "program",
-            "match_rules": {"name_pattern": "[invalid(regex"},
-            "classification": "BLOAT",
-        }]
+        sig_data = [
+            {
+                "signature_id": "bad-regex-001",
+                "component_type": "program",
+                "match_rules": {"name_pattern": "[invalid(regex"},
+                "classification": "BLOAT",
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         db = SignatureDatabase()

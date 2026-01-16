@@ -1,8 +1,9 @@
 """Pytest configuration and shared fixtures."""
 
-import pytest
 import sys
 from pathlib import Path
+
+import pytest
 
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -25,7 +26,7 @@ def sample_component():
 @pytest.fixture
 def sample_components():
     """Create a list of sample components for testing."""
-    from src.core.models import Component, ComponentType, Classification
+    from src.core.models import Classification, Component, ComponentType
 
     return [
         Component(

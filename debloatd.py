@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 from src.core.config import Config, load_config, save_config
-from src.core.logging_config import setup_logging, get_logger
+from src.core.logging_config import get_logger, setup_logging
 from src.core.orchestrator import ScanOrchestrator
 
 
@@ -36,14 +36,16 @@ def create_argument_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
-        "--verbose", "-v",
+        "--verbose",
+        "-v",
         action="count",
         default=0,
         help="Increase verbosity (use -vv for debug)",
     )
 
     parser.add_argument(
-        "--quiet", "-q",
+        "--quiet",
+        "-q",
         action="store_true",
         help="Suppress console output",
     )
@@ -71,12 +73,14 @@ def create_argument_parser() -> argparse.ArgumentParser:
         help="Output results as JSON",
     )
     scan_parser.add_argument(
-        "--output", "-o",
+        "--output",
+        "-o",
         type=Path,
         help="Write results to file",
     )
     scan_parser.add_argument(
-        "--type", "-t",
+        "--type",
+        "-t",
         choices=["programs", "services", "tasks", "startup", "drivers", "telemetry", "uwp"],
         action="append",
         help="Scan specific component types (can be repeated)",
@@ -90,12 +94,14 @@ def create_argument_parser() -> argparse.ArgumentParser:
         help="Output as JSON",
     )
     list_parser.add_argument(
-        "--filter", "-f",
+        "--filter",
+        "-f",
         choices=["core", "essential", "optional", "bloat", "aggressive", "unknown"],
         help="Filter by classification",
     )
     list_parser.add_argument(
-        "--risk", "-r",
+        "--risk",
+        "-r",
         choices=["none", "low", "medium", "high", "critical"],
         help="Filter by risk level",
     )
@@ -113,7 +119,8 @@ def create_argument_parser() -> argparse.ArgumentParser:
     disable_parser = subparsers.add_parser("disable", help="Disable a component")
     disable_parser.add_argument("component_id", help="Component ID to disable")
     disable_parser.add_argument(
-        "--yes", "-y",
+        "--yes",
+        "-y",
         action="store_true",
         help="Skip confirmation prompt",
     )
@@ -121,7 +128,8 @@ def create_argument_parser() -> argparse.ArgumentParser:
     remove_parser = subparsers.add_parser("remove", help="Remove a component")
     remove_parser.add_argument("component_id", help="Component ID to remove")
     remove_parser.add_argument(
-        "--yes", "-y",
+        "--yes",
+        "-y",
         action="store_true",
         help="Skip confirmation prompt (still requires typing REMOVE)",
     )
@@ -146,7 +154,8 @@ def create_argument_parser() -> argparse.ArgumentParser:
         help="Undo the last session",
     )
     undo_parser.add_argument(
-        "--yes", "-y",
+        "--yes",
+        "-y",
         action="store_true",
         help="Skip confirmation prompt",
     )
@@ -254,6 +263,7 @@ def run_gui(config: Config) -> int:
     """Launch the graphical user interface."""
     try:
         from src.ui.gui.main import run_gui_app
+
         return run_gui_app(config)
     except ImportError as e:
         print(f"Error: GUI dependencies not installed: {e}")
@@ -286,13 +296,13 @@ def main() -> int:
 
     # Import CLI commands
     from src.ui.cli.commands import (
+        run_disable_command,
         run_list_command,
         run_plan_command,
-        run_disable_command,
+        run_recovery_command,
         run_remove_command,
         run_sessions_command,
         run_undo_command,
-        run_recovery_command,
     )
 
     # Execute command

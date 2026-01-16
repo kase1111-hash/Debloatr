@@ -5,24 +5,22 @@ and results in various formats (text, JSON, tables).
 """
 
 import json
+import sys
 from abc import ABC, abstractmethod
 from dataclasses import asdict
 from datetime import datetime
-from typing import Any, Optional
-import sys
+from typing import Any
 
 from src.core.models import (
-    Component,
-    ComponentType,
-    Classification,
-    RiskLevel,
-    ActionType,
     ActionPlan,
     ActionResult,
-    Session,
+    ActionType,
+    Classification,
+    Component,
+    RiskLevel,
 )
-from src.core.session import SessionSummary, ActionSummary
 from src.core.rollback import RollbackResult, SessionRollbackResult
+from src.core.session import SessionSummary
 
 
 # ANSI color codes for terminal output
@@ -34,25 +32,25 @@ class Colors:
     DIM = "\033[2m"
 
     # Classification colors
-    CORE = "\033[94m"      # Blue
+    CORE = "\033[94m"  # Blue
     ESSENTIAL = "\033[96m"  # Cyan
-    OPTIONAL = "\033[92m"   # Green
-    BLOAT = "\033[93m"      # Yellow
-    AGGRESSIVE = "\033[91m" # Red
-    UNKNOWN = "\033[90m"    # Gray
+    OPTIONAL = "\033[92m"  # Green
+    BLOAT = "\033[93m"  # Yellow
+    AGGRESSIVE = "\033[91m"  # Red
+    UNKNOWN = "\033[90m"  # Gray
 
     # Risk colors
-    RISK_NONE = "\033[92m"     # Green
-    RISK_LOW = "\033[96m"      # Cyan
-    RISK_MEDIUM = "\033[93m"   # Yellow
-    RISK_HIGH = "\033[91m"     # Red
-    RISK_CRITICAL = "\033[95m" # Magenta
+    RISK_NONE = "\033[92m"  # Green
+    RISK_LOW = "\033[96m"  # Cyan
+    RISK_MEDIUM = "\033[93m"  # Yellow
+    RISK_HIGH = "\033[91m"  # Red
+    RISK_CRITICAL = "\033[95m"  # Magenta
 
     # Status colors
     SUCCESS = "\033[92m"  # Green
     FAILURE = "\033[91m"  # Red
     WARNING = "\033[93m"  # Yellow
-    INFO = "\033[94m"     # Blue
+    INFO = "\033[94m"  # Blue
 
     @classmethod
     def is_supported(cls) -> bool:
@@ -225,7 +223,9 @@ class TextFormatter(OutputFormatter):
         # Action counts
         success_text = self._colorize(str(session.successful_actions), Colors.SUCCESS)
         failed_text = self._colorize(str(session.failed_actions), Colors.FAILURE)
-        lines.append(f"  Actions: {session.total_actions} total ({success_text} succeeded, {failed_text} failed)")
+        lines.append(
+            f"  Actions: {session.total_actions} total ({success_text} succeeded, {failed_text} failed)"
+        )
 
         if session.restore_point_id:
             lines.append(f"  Restore Point: #{session.restore_point_id}")
@@ -265,7 +265,7 @@ class TextFormatter(OutputFormatter):
             lines.append(f"  Error: {error}")
 
         if result.rollback_available:
-            lines.append(f"  Rollback: Available")
+            lines.append("  Rollback: Available")
 
         return "\n".join(lines)
 
@@ -445,11 +445,17 @@ class JsonFormatter(OutputFormatter):
         data = {
             "plan_id": result.plan_id,
             "success": result.success,
-            "action": result.action.value if isinstance(result.action, ActionType) else str(result.action),
+            "action": (
+                result.action.value if isinstance(result.action, ActionType) else str(result.action)
+            ),
             "component_id": result.component_id,
             "snapshot_id": result.snapshot_id,
             "error_message": result.error_message,
-            "executed_at": result.executed_at.isoformat() if isinstance(result.executed_at, datetime) else str(result.executed_at),
+            "executed_at": (
+                result.executed_at.isoformat()
+                if isinstance(result.executed_at, datetime)
+                else str(result.executed_at)
+            ),
             "rollback_available": result.rollback_available,
         }
         return json.dumps(data, indent=self.indent, default=self._serialize)
@@ -470,7 +476,7 @@ class TableFormatter:
         self,
         headers: list[str],
         rows: list[list[str]],
-        column_widths: Optional[list[int]] = None,
+        column_widths: list[int] | None = None,
     ) -> str:
         """Format data as a table.
 
@@ -522,6 +528,7 @@ class TableFormatter:
 
 
 # Convenience functions
+
 
 def format_component(component: Component, as_json: bool = False) -> str:
     """Format a component.
@@ -617,7 +624,6 @@ def format_scan_result(result: Any, as_json: bool = False) -> str:
         }
         return json.dumps(data, indent=2)
 
-    formatter = TextFormatter()
     lines = [
         f"Scan completed in {result.scan_time_ms:.1f}ms",
         f"Total components: {result.total_count}",

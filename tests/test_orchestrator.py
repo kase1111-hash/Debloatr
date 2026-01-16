@@ -1,13 +1,13 @@
 """Tests for the scan orchestrator."""
 
-import pytest
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import List
+
+import pytest
 
 from src.core.config import Config
-from src.core.models import Component, ComponentType, Classification
-from src.core.orchestrator import ScanOrchestrator, ScanResult, ModuleScanResult
+from src.core.models import Classification, Component, ComponentType
+from src.core.orchestrator import ModuleScanResult, ScanOrchestrator, ScanResult
 from src.discovery.base import BaseDiscoveryModule
 
 
@@ -17,7 +17,7 @@ class MockDiscoveryModule(BaseDiscoveryModule):
     def __init__(
         self,
         name: str = "mock",
-        components: List[Component] = None,
+        components: list[Component] = None,
         should_fail: bool = False,
         available: bool = True,
     ):
@@ -29,7 +29,7 @@ class MockDiscoveryModule(BaseDiscoveryModule):
     def get_module_name(self) -> str:
         return self._name
 
-    def scan(self) -> List[Component]:
+    def scan(self) -> list[Component]:
         if self._should_fail:
             raise OSError("Mock scan failure")
         return self._components
@@ -200,10 +200,12 @@ class TestScanOrchestrator:
         ]
 
         orchestrator = ScanOrchestrator(config)
-        orchestrator.register_module(MockDiscoveryModule(
-            name="programs",
-            components=components,
-        ))
+        orchestrator.register_module(
+            MockDiscoveryModule(
+                name="programs",
+                components=components,
+            )
+        )
 
         result = orchestrator.run_scan()
 
@@ -214,10 +216,12 @@ class TestScanOrchestrator:
     def test_run_scan_with_failing_module(self, config):
         """Test scan with a failing module."""
         orchestrator = ScanOrchestrator(config)
-        orchestrator.register_module(MockDiscoveryModule(
-            name="failing",
-            should_fail=True,
-        ))
+        orchestrator.register_module(
+            MockDiscoveryModule(
+                name="failing",
+                should_fail=True,
+            )
+        )
 
         result = orchestrator.run_scan()
 
@@ -251,10 +255,12 @@ class TestScanOrchestrator:
         ]
 
         orchestrator = ScanOrchestrator(config)
-        orchestrator.register_module(MockDiscoveryModule(
-            name="services",
-            components=components,
-        ))
+        orchestrator.register_module(
+            MockDiscoveryModule(
+                name="services",
+                components=components,
+            )
+        )
 
         result = orchestrator.run_single_module("services")
 

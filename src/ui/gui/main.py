@@ -8,62 +8,61 @@ The gui/__init__.py handles this gracefully.
 """
 
 import sys
-from typing import Optional
+
+from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtGui import QAction, QColor, QFont
 
 # PySide6 imports - will raise ImportError if not available
 from PySide6.QtWidgets import (
     QApplication,
-    QMainWindow,
-    QWidget,
-    QVBoxLayout,
-    QHBoxLayout,
-    QTabWidget,
-    QTreeWidget,
-    QTreeWidgetItem,
-    QTableWidget,
-    QTableWidgetItem,
-    QLabel,
-    QPushButton,
-    QProgressBar,
-    QStatusBar,
-    QToolBar,
-    QSplitter,
-    QFrame,
-    QGroupBox,
-    QMessageBox,
+    QComboBox,
     QDialog,
     QDialogButtonBox,
-    QTextEdit,
-    QComboBox,
-    QLineEdit,
+    QFrame,
+    QGroupBox,
+    QHBoxLayout,
     QHeaderView,
+    QLabel,
+    QLineEdit,
+    QMainWindow,
     QMenu,
+    QMessageBox,
+    QProgressBar,
+    QPushButton,
+    QSplitter,
+    QStatusBar,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QTextEdit,
+    QToolBar,
+    QTreeWidget,
+    QTreeWidgetItem,
+    QVBoxLayout,
+    QWidget,
 )
-from PySide6.QtCore import Qt, QThread, Signal, QSize
-from PySide6.QtGui import QAction, QIcon, QColor, QFont
 
 from src.core.config import Config
-from src.core.models import Component, Classification, RiskLevel, ComponentType
+from src.core.models import Classification, Component, ComponentType, RiskLevel
 from src.core.orchestrator import ScanOrchestrator
-from src.core.session import SessionManager, create_session_manager
-from src.core.rollback import RollbackManager, create_rollback_manager
-
+from src.core.rollback import create_rollback_manager
+from src.core.session import create_session_manager
 
 # Color definitions for classifications
 CLASSIFICATION_COLORS = {
-    Classification.CORE: "#3498db",      # Blue
+    Classification.CORE: "#3498db",  # Blue
     Classification.ESSENTIAL: "#1abc9c",  # Teal
-    Classification.OPTIONAL: "#2ecc71",   # Green
-    Classification.BLOAT: "#f39c12",      # Orange
-    Classification.AGGRESSIVE: "#e74c3c", # Red
-    Classification.UNKNOWN: "#95a5a6",    # Gray
+    Classification.OPTIONAL: "#2ecc71",  # Green
+    Classification.BLOAT: "#f39c12",  # Orange
+    Classification.AGGRESSIVE: "#e74c3c",  # Red
+    Classification.UNKNOWN: "#95a5a6",  # Gray
 }
 
 RISK_COLORS = {
-    RiskLevel.NONE: "#2ecc71",      # Green
-    RiskLevel.LOW: "#3498db",       # Blue
-    RiskLevel.MEDIUM: "#f39c12",    # Orange
-    RiskLevel.HIGH: "#e74c3c",      # Red
+    RiskLevel.NONE: "#2ecc71",  # Green
+    RiskLevel.LOW: "#3498db",  # Blue
+    RiskLevel.MEDIUM: "#f39c12",  # Orange
+    RiskLevel.HIGH: "#e74c3c",  # Red
     RiskLevel.CRITICAL: "#9b59b6",  # Purple
 }
 
@@ -72,10 +71,10 @@ class ScanWorker(QThread):
     """Worker thread for running scans."""
 
     progress = Signal(str, int)  # message, percent
-    finished = Signal(object)    # result
-    error = Signal(str)          # error message
+    finished = Signal(object)  # result
+    error = Signal(str)  # error message
 
-    def __init__(self, config: Config, modules: Optional[list[str]] = None):
+    def __init__(self, config: Config, modules: list[str] | None = None):
         super().__init__()
         self.config = config
         self.modules = modules
@@ -132,8 +131,12 @@ class DashboardWidget(QWidget):
         self.classification_table = QTableWidget(6, 3)
         self.classification_table.setHorizontalHeaderLabels(["Classification", "Count", ""])
         self.classification_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-        self.classification_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
-        self.classification_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        self.classification_table.horizontalHeader().setSectionResizeMode(
+            1, QHeaderView.ResizeToContents
+        )
+        self.classification_table.horizontalHeader().setSectionResizeMode(
+            2, QHeaderView.ResizeToContents
+        )
         self.classification_table.verticalHeader().setVisible(False)
 
         breakdown_layout.addWidget(self.classification_table)
@@ -159,7 +162,8 @@ class DashboardWidget(QWidget):
         """Create a stat display box."""
         frame = QFrame()
         frame.setFrameStyle(QFrame.Box | QFrame.Raised)
-        frame.setStyleSheet(f"""
+        frame.setStyleSheet(
+            f"""
             QFrame {{
                 background-color: {color};
                 border-radius: 8px;
@@ -168,7 +172,8 @@ class DashboardWidget(QWidget):
             QLabel {{
                 color: white;
             }}
-        """)
+        """
+        )
 
         layout = QVBoxLayout(frame)
 
@@ -198,8 +203,12 @@ class DashboardWidget(QWidget):
 
         # Update stat boxes
         self.total_label.findChild(QLabel, "value").setText(str(total))
-        self.bloat_label.findChild(QLabel, "value").setText(str(counts.get(Classification.BLOAT, 0)))
-        self.aggressive_label.findChild(QLabel, "value").setText(str(counts.get(Classification.AGGRESSIVE, 0)))
+        self.bloat_label.findChild(QLabel, "value").setText(
+            str(counts.get(Classification.BLOAT, 0))
+        )
+        self.aggressive_label.findChild(QLabel, "value").setText(
+            str(counts.get(Classification.AGGRESSIVE, 0))
+        )
 
         # Safe to remove = BLOAT + AGGRESSIVE
         safe = counts.get(Classification.BLOAT, 0) + counts.get(Classification.AGGRESSIVE, 0)
@@ -307,7 +316,11 @@ class ComponentTreeWidget(QWidget):
         by_type: dict[ComponentType, list[Component]] = {}
         for comp in self.components:
             # Apply filters
-            if search and search not in comp.display_name.lower() and search not in comp.name.lower():
+            if (
+                search
+                and search not in comp.display_name.lower()
+                and search not in comp.name.lower()
+            ):
                 continue
             if type_filter and comp.component_type != type_filter:
                 continue
@@ -327,13 +340,15 @@ class ComponentTreeWidget(QWidget):
                 class_color = CLASSIFICATION_COLORS.get(comp.classification, "#666")
                 risk_color = RISK_COLORS.get(comp.risk_level, "#666")
 
-                item = QTreeWidgetItem([
-                    comp.display_name,
-                    comp.component_type.name,
-                    comp.classification.value,
-                    comp.risk_level.name,
-                    comp.publisher or "",
-                ])
+                item = QTreeWidgetItem(
+                    [
+                        comp.display_name,
+                        comp.component_type.name,
+                        comp.classification.value,
+                        comp.risk_level.name,
+                        comp.publisher or "",
+                    ]
+                )
                 item.setData(0, Qt.UserRole, comp)
 
                 # Set colors
@@ -411,9 +426,9 @@ class SessionHistoryWidget(QWidget):
         # Session table
         self.table = QTableWidget()
         self.table.setColumnCount(5)
-        self.table.setHorizontalHeaderLabels([
-            "Session ID", "Description", "Started", "Actions", "Status"
-        ])
+        self.table.setHorizontalHeaderLabels(
+            ["Session ID", "Description", "Started", "Actions", "Status"]
+        )
         self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
@@ -491,7 +506,7 @@ class SessionHistoryWidget(QWidget):
                     self,
                     "Success",
                     f"Session rolled back successfully.\n"
-                    f"Actions: {result.successful_rollbacks}/{result.total_actions}"
+                    f"Actions: {result.successful_rollbacks}/{result.total_actions}",
                 )
             else:
                 QMessageBox.warning(
@@ -499,7 +514,7 @@ class SessionHistoryWidget(QWidget):
                     "Partial Failure",
                     f"Some actions could not be rolled back.\n"
                     f"Successful: {result.successful_rollbacks}\n"
-                    f"Failed: {result.failed_rollbacks}"
+                    f"Failed: {result.failed_rollbacks}",
                 )
 
             self.refresh()
@@ -532,7 +547,9 @@ class SessionHistoryWidget(QWidget):
             content += f"\n{status} {action.action}: {action.component_name}\n"
             if action.error_message:
                 content += f"   Error: {action.error_message}\n"
-            content += f"   Rollback: {'Available' if action.rollback_available else 'Not available'}\n"
+            content += (
+                f"   Rollback: {'Available' if action.rollback_available else 'Not available'}\n"
+            )
 
         text.setPlainText(content)
         layout.addWidget(text)
@@ -549,7 +566,7 @@ class ComponentDetailWidget(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.current_component: Optional[Component] = None
+        self.current_component: Component | None = None
         self.setup_ui()
 
     def setup_ui(self):
@@ -611,8 +628,15 @@ class ComponentDetailWidget(QWidget):
         self.details_text.setHtml(details)
 
         # Enable/disable buttons based on classification
-        is_safe = component.classification in [Classification.BLOAT, Classification.AGGRESSIVE, Classification.OPTIONAL]
-        is_critical = component.classification == Classification.CORE or component.risk_level == RiskLevel.CRITICAL
+        is_safe = component.classification in [
+            Classification.BLOAT,
+            Classification.AGGRESSIVE,
+            Classification.OPTIONAL,
+        ]
+        is_critical = (
+            component.classification == Classification.CORE
+            or component.risk_level == RiskLevel.CRITICAL
+        )
 
         self.disable_btn.setEnabled(not is_critical)
         self.contain_btn.setEnabled(not is_critical)
@@ -767,8 +791,11 @@ class MainWindow(QMainWindow):
 
     def safe_debloat(self):
         """Perform safe debloat on BLOAT and AGGRESSIVE components."""
-        bloat = [c for c in self.components
-                 if c.classification in [Classification.BLOAT, Classification.AGGRESSIVE]]
+        bloat = [
+            c
+            for c in self.components
+            if c.classification in [Classification.BLOAT, Classification.AGGRESSIVE]
+        ]
 
         if not bloat:
             QMessageBox.information(self, "Info", "No bloatware components found to disable.")
@@ -820,7 +847,7 @@ class MainWindow(QMainWindow):
                     "Partial Failure",
                     f"Some actions could not be rolled back.\n"
                     f"Successful: {result.successful_rollbacks}\n"
-                    f"Failed: {result.failed_rollbacks}"
+                    f"Failed: {result.failed_rollbacks}",
                 )
 
             self.session_history.refresh()
@@ -828,6 +855,7 @@ class MainWindow(QMainWindow):
     def open_recovery(self):
         """Open recovery mode dialog."""
         from src.core.recovery import RecoveryMode
+
         recovery = RecoveryMode(self.config)
         status = recovery.get_status()
 
@@ -839,7 +867,8 @@ class MainWindow(QMainWindow):
 
         info = QTextEdit()
         info.setReadOnly(True)
-        info.setHtml(f"""
+        info.setHtml(
+            f"""
 <h2>Recovery Status</h2>
 <table>
 <tr><td><b>Sessions available:</b></td><td>{status.has_sessions}</td></tr>
@@ -851,7 +880,8 @@ class MainWindow(QMainWindow):
 
 <h3>Recovery Options</h3>
 <p>Use the buttons below to recover your system.</p>
-""")
+"""
+        )
         layout.addWidget(info)
 
         btn_layout = QHBoxLayout()
@@ -877,6 +907,7 @@ class MainWindow(QMainWindow):
     def _recovery_rollback_last(self, dialog: QDialog):
         """Rollback last session from recovery dialog."""
         from src.core.recovery import RecoveryMode
+
         recovery = RecoveryMode(self.config)
         result = recovery.rollback_last_session()
 
@@ -891,6 +922,7 @@ class MainWindow(QMainWindow):
     def _open_system_restore(self):
         """Open Windows System Restore."""
         import subprocess
+
         try:
             subprocess.Popen(["rstrui.exe"])
         except Exception as e:
@@ -906,11 +938,8 @@ def run_gui_app(config: Config) -> int:
     Returns:
         Exit code
     """
-    if not PYSIDE6_AVAILABLE:
-        print("Error: PySide6 is not installed.")
-        print("Install with: pip install PySide6")
-        return 1
-
+    # Note: If PySide6 is not installed, this module won't load at all
+    # (ImportError will be raised at import time)
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
 

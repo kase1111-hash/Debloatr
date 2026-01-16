@@ -1,32 +1,34 @@
 """Tests for Phase 9: Rollback & Recovery System."""
 
 import json
-import pytest
 import tempfile
-from datetime import datetime, timedelta
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
+import pytest
+
+from src.core.config import Config
 from src.core.models import (
+    ActionResult,
+    ActionType,
+    Classification,
     Component,
     ComponentType,
-    ActionType,
-    ActionResult,
     Snapshot,
-    Session,
-    Classification,
 )
-from src.core.config import Config
-from src.core.snapshot import SnapshotManager, SnapshotMetadata, create_snapshot_manager
-from src.core.session import SessionManager, SessionSummary, ActionSummary, create_session_manager
-from src.core.rollback import RollbackManager, RollbackResult, SessionRollbackResult, create_rollback_manager
-from src.core.restore import SystemRestoreManager, RestorePoint, create_system_restore_manager
-from src.core.recovery import RecoveryMode, RecoveryStatus, RecoveryResult, create_recovery_mode
-
+from src.core.recovery import RecoveryMode, create_recovery_mode
+from src.core.restore import SystemRestoreManager, create_system_restore_manager
+from src.core.rollback import (
+    RollbackManager,
+    create_rollback_manager,
+)
+from src.core.session import SessionManager, create_session_manager
+from src.core.snapshot import SnapshotManager, create_snapshot_manager
 
 # ============================================================================
 # Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 def temp_dir():
@@ -92,6 +94,7 @@ def sample_action_result(sample_component, sample_snapshot):
 # ============================================================================
 # SnapshotManager Tests
 # ============================================================================
+
 
 class TestSnapshotManager:
     """Tests for SnapshotManager."""
@@ -206,6 +209,7 @@ class TestSnapshotManager:
 # ============================================================================
 # SessionManager Tests
 # ============================================================================
+
 
 class TestSessionManager:
     """Tests for SessionManager."""
@@ -325,6 +329,7 @@ class TestSessionManager:
 # RollbackManager Tests
 # ============================================================================
 
+
 class TestRollbackManager:
     """Tests for RollbackManager."""
 
@@ -366,7 +371,7 @@ class TestRollbackManager:
         assert result.success is False
         assert "Snapshot not found" in result.error_message
 
-    @patch('src.core.rollback.RollbackManager._run_powershell')
+    @patch("src.core.rollback.RollbackManager._run_powershell")
     def test_rollback_service_disable(self, mock_ps, test_config):
         """Test rolling back a disabled service."""
         mock_ps.return_value = {"success": True, "output": "", "error": ""}
@@ -435,6 +440,7 @@ class TestRollbackManager:
 # SystemRestoreManager Tests
 # ============================================================================
 
+
 class TestSystemRestoreManager:
     """Tests for SystemRestoreManager."""
 
@@ -452,20 +458,22 @@ class TestSystemRestoreManager:
         # In dry run, returns 0
         assert result == 0
 
-    @patch('src.core.restore.SystemRestoreManager._run_powershell')
+    @patch("src.core.restore.SystemRestoreManager._run_powershell")
     def test_list_restore_points(self, mock_ps):
         """Test listing restore points."""
         mock_ps.return_value = {
             "success": True,
-            "output": json.dumps([
-                {
-                    "SequenceNumber": 1,
-                    "Description": "Test Point",
-                    "CreationTime": "/Date(1704067200000)/",
-                    "RestorePointType": 12,
-                    "EventType": 102,
-                }
-            ]),
+            "output": json.dumps(
+                [
+                    {
+                        "SequenceNumber": 1,
+                        "Description": "Test Point",
+                        "CreationTime": "/Date(1704067200000)/",
+                        "RestorePointType": 12,
+                        "EventType": 102,
+                    }
+                ]
+            ),
             "error": "",
         }
 
@@ -481,6 +489,7 @@ class TestSystemRestoreManager:
 # ============================================================================
 # RecoveryMode Tests
 # ============================================================================
+
 
 class TestRecoveryMode:
     """Tests for RecoveryMode."""
@@ -544,7 +553,9 @@ class TestRecoveryMode:
         assert "recommendations" in options
         assert len(options["sessions"]) >= 1
 
-    def test_rollback_last_session_dry_run(self, test_config, sample_action_result, sample_snapshot):
+    def test_rollback_last_session_dry_run(
+        self, test_config, sample_action_result, sample_snapshot
+    ):
         """Test rolling back last session in dry-run mode."""
         # Set up session
         snapshot_manager = SnapshotManager(config=test_config)
@@ -583,6 +594,7 @@ class TestRecoveryMode:
 # ============================================================================
 # Integration Tests
 # ============================================================================
+
 
 class TestRollbackIntegration:
     """Integration tests for the rollback system."""
