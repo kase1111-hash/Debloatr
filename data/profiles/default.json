@@ -1,0 +1,9 @@
+{
+  "profile_name": "Default",
+  "description": "Balanced debloat profile suitable for most users",
+  "auto_classify_unknown_as": "UNKNOWN",
+  "allowed_actions": ["DISABLE", "CONTAIN", "REMOVE"],
+  "blocked_publishers": [],
+  "protected_components": [],
+  "require_approval_above_risk": "LOW"
+}
