@@ -1,13 +1,13 @@
 {
-  "$schema": "./schema.json",
   "version": "1.0.0",
   "last_updated": "2025-01-16",
+  "signature_count": 55,
   "signatures": [
     {
       "signature_id": "microsoft-cortana-001",
       "publisher": "Microsoft Corporation",
       "component_name": "Cortana",
-      "component_type": "UWP",
+      "component_type": "uwp",
       "match_rules": {
         "name_pattern": "^Microsoft\\.549981C3F5F10.*",
         "publisher_pattern": "Microsoft",
@@ -20,14 +20,14 @@
       "unsafe_actions": ["REMOVE"],
       "reinstall_behavior": "update_restored",
       "breakage_notes": "May be restored by Windows updates. Search functionality unaffected.",
-      "evidence_url": "https://support.microsoft.com/cortana",
+      "evidence_url": "",
       "last_updated": "2025-01-16"
     },
     {
       "signature_id": "microsoft-xbox-gamebar-001",
       "publisher": "Microsoft Corporation",
       "component_name": "Xbox Game Bar",
-      "component_type": "UWP",
+      "component_type": "uwp",
       "match_rules": {
         "name_pattern": "^Microsoft\\.XboxGamingOverlay.*",
         "publisher_pattern": "Microsoft",
@@ -44,10 +44,30 @@
       "last_updated": "2025-01-16"
     },
     {
+      "signature_id": "microsoft-xbox-identity-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Xbox Identity Provider",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.XboxIdentityProvider.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": ["microsoft-xbox-gamebar-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Required for Xbox Game Bar and Xbox app sign-in.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
       "signature_id": "microsoft-onedrive-001",
       "publisher": "Microsoft Corporation",
       "component_name": "OneDrive",
-      "component_type": "PROGRAM",
+      "component_type": "program",
       "match_rules": {
         "name_pattern": "^OneDrive$",
         "publisher_pattern": "Microsoft",
@@ -67,7 +87,7 @@
       "signature_id": "microsoft-teams-personal-001",
       "publisher": "Microsoft Corporation",
       "component_name": "Microsoft Teams (personal)",
-      "component_type": "PROGRAM",
+      "component_type": "program",
       "match_rules": {
         "name_pattern": "^Microsoft Teams$",
         "publisher_pattern": "Microsoft",
@@ -84,10 +104,170 @@
       "last_updated": "2025-01-16"
     },
     {
+      "signature_id": "microsoft-skype-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Skype",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.SkypeApp.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Can be reinstalled from Microsoft Store if needed.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "microsoft-getstarted-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Get Started / Tips",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.Getstarted.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Windows tips app. Not essential.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "microsoft-feedback-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Feedback Hub",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.WindowsFeedbackHub.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Used for sending feedback to Microsoft.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "microsoft-mixedreality-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Mixed Reality Portal",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.MixedReality.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Only needed for VR headsets.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "microsoft-3dviewer-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "3D Viewer",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.Microsoft3DViewer.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "3D model viewer. Rarely used.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "microsoft-solitaire-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Microsoft Solitaire Collection",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.MicrosoftSolitaireCollection.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Contains ads. Can be reinstalled from Store.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "microsoft-diagtrack-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Connected User Experiences and Telemetry",
+      "component_type": "service",
+      "match_rules": {
+        "name_pattern": "^DiagTrack$",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": ".*\\\\diagtrack\\.dll.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Main Windows telemetry service. Disable to reduce data collection.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "microsoft-dmwappush-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Device Management WAP Push",
+      "component_type": "service",
+      "match_rules": {
+        "name_pattern": "^dmwappushservice$",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["microsoft-diagtrack-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Related to telemetry. Safe to disable.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
       "signature_id": "nvidia-telemetry-001",
       "publisher": "NVIDIA Corporation",
       "component_name": "NVIDIA Telemetry Container",
-      "component_type": "SERVICE",
+      "component_type": "service",
       "match_rules": {
         "name_pattern": "^NvTelemetry.*",
         "publisher_pattern": "NVIDIA",
@@ -95,7 +275,7 @@
         "hash_sha256": []
       },
       "classification": "BLOAT",
-      "related_components": ["nvidia-driver-core"],
+      "related_components": [],
       "safe_actions": ["DISABLE"],
       "unsafe_actions": ["REMOVE"],
       "reinstall_behavior": "update_restored",
@@ -104,10 +284,50 @@
       "last_updated": "2025-01-16"
     },
     {
+      "signature_id": "nvidia-container-001",
+      "publisher": "NVIDIA Corporation",
+      "component_name": "NVIDIA Container",
+      "component_type": "service",
+      "match_rules": {
+        "name_pattern": "^NvContainer.*",
+        "publisher_pattern": "NVIDIA",
+        "path_pattern": ".*\\\\NVIDIA Corporation\\\\NvContainer\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": ["nvidia-telemetry-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Required for some GeForce Experience features.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "nvidia-geforce-experience-001",
+      "publisher": "NVIDIA Corporation",
+      "component_name": "NVIDIA GeForce Experience",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^NVIDIA GeForce Experience.*",
+        "publisher_pattern": "NVIDIA",
+        "path_pattern": ".*\\\\NVIDIA Corporation\\\\NVIDIA GeForce Experience\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": ["nvidia-telemetry-001", "nvidia-container-001"],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Game optimization and driver updates. Drivers work without it.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
       "signature_id": "hp-support-assistant-001",
       "publisher": "HP Inc.",
       "component_name": "HP Support Assistant",
-      "component_type": "PROGRAM",
+      "component_type": "program",
       "match_rules": {
         "name_pattern": "^HP Support Assistant.*",
         "publisher_pattern": "HP",
@@ -124,10 +344,50 @@
       "last_updated": "2025-01-16"
     },
     {
+      "signature_id": "hp-touchpoint-001",
+      "publisher": "HP Inc.",
+      "component_name": "HP Touchpoint Analytics",
+      "component_type": "service",
+      "match_rules": {
+        "name_pattern": "^TouchpointAnalytics.*",
+        "publisher_pattern": "HP",
+        "path_pattern": ".*\\\\HP\\\\.*Touchpoint.*",
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": ["hp-support-assistant-001"],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Telemetry service. Known for high resource usage.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "hp-jumpstart-001",
+      "publisher": "HP Inc.",
+      "component_name": "HP JumpStart",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^HP JumpStart.*",
+        "publisher_pattern": "HP",
+        "path_pattern": ".*\\\\HP\\\\.*JumpStart.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "First-run experience app. Not needed after initial setup.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
       "signature_id": "dell-supportassist-001",
       "publisher": "Dell Inc.",
       "component_name": "Dell SupportAssist",
-      "component_type": "PROGRAM",
+      "component_type": "program",
       "match_rules": {
         "name_pattern": "^Dell SupportAssist.*",
         "publisher_pattern": "Dell",
@@ -144,10 +404,50 @@
       "last_updated": "2025-01-16"
     },
     {
+      "signature_id": "dell-digital-delivery-001",
+      "publisher": "Dell Inc.",
+      "component_name": "Dell Digital Delivery",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Dell Digital Delivery.*",
+        "publisher_pattern": "Dell",
+        "path_pattern": ".*\\\\Dell\\\\.*Digital.*Delivery.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Pre-installed software delivery. Not needed after setup.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "dell-update-001",
+      "publisher": "Dell Inc.",
+      "component_name": "Dell Update",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Dell Update.*",
+        "publisher_pattern": "Dell",
+        "path_pattern": ".*\\\\Dell\\\\Update.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Provides driver updates. Can use Dell website instead.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
       "signature_id": "lenovo-vantage-001",
       "publisher": "Lenovo",
       "component_name": "Lenovo Vantage",
-      "component_type": "UWP",
+      "component_type": "uwp",
       "match_rules": {
         "name_pattern": "^E046963F\\.LenovoCompanion.*",
         "publisher_pattern": "Lenovo",
@@ -164,10 +464,30 @@
       "last_updated": "2025-01-16"
     },
     {
+      "signature_id": "lenovo-system-update-001",
+      "publisher": "Lenovo",
+      "component_name": "Lenovo System Update",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Lenovo System Update.*",
+        "publisher_pattern": "Lenovo",
+        "path_pattern": ".*\\\\Lenovo\\\\System Update.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Provides driver and BIOS updates.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
       "signature_id": "mcafee-livesafe-001",
       "publisher": "McAfee, Inc.",
       "component_name": "McAfee LiveSafe",
-      "component_type": "PROGRAM",
+      "component_type": "program",
       "match_rules": {
         "name_pattern": "^McAfee.*",
         "publisher_pattern": "McAfee",
@@ -187,7 +507,7 @@
       "signature_id": "norton-security-001",
       "publisher": "NortonLifeLock Inc.",
       "component_name": "Norton Security",
-      "component_type": "PROGRAM",
+      "component_type": "program",
       "match_rules": {
         "name_pattern": "^Norton.*",
         "publisher_pattern": "Norton|Symantec|NortonLifeLock",
@@ -204,10 +524,50 @@
       "last_updated": "2025-01-16"
     },
     {
+      "signature_id": "avast-001",
+      "publisher": "Avast Software",
+      "component_name": "Avast Free Antivirus",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Avast.*",
+        "publisher_pattern": "Avast",
+        "path_pattern": ".*\\\\AVAST Software\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Known for data collection. Windows Defender is sufficient.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "avg-001",
+      "publisher": "AVG Technologies",
+      "component_name": "AVG Antivirus",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^AVG.*",
+        "publisher_pattern": "AVG",
+        "path_pattern": ".*\\\\AVG\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Known for data collection. Windows Defender is sufficient.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
       "signature_id": "intel-driver-update-001",
       "publisher": "Intel Corporation",
       "component_name": "Intel Driver & Support Assistant",
-      "component_type": "PROGRAM",
+      "component_type": "program",
       "match_rules": {
         "name_pattern": "^Intel.*Driver.*",
         "publisher_pattern": "Intel",
@@ -220,6 +580,446 @@
       "unsafe_actions": [],
       "reinstall_behavior": "none",
       "breakage_notes": "Drivers can be updated via Intel website or Windows Update.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "adobe-acrobat-reader-001",
+      "publisher": "Adobe Inc.",
+      "component_name": "Adobe Acrobat Reader DC",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Adobe Acrobat Reader.*",
+        "publisher_pattern": "Adobe",
+        "path_pattern": ".*\\\\Adobe\\\\Acrobat Reader.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": ["adobe-arm-001"],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Windows has built-in PDF viewer. Keep if needed for forms.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "adobe-arm-001",
+      "publisher": "Adobe Inc.",
+      "component_name": "Adobe ARM",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": "^Adobe Acrobat Update.*",
+        "publisher_pattern": "Adobe",
+        "path_pattern": ".*\\\\Adobe\\\\ARM\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["adobe-acrobat-reader-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Auto-update task. Reinstalls itself after removal.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "adobe-creative-cloud-001",
+      "publisher": "Adobe Inc.",
+      "component_name": "Adobe Creative Cloud",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Adobe Creative Cloud.*",
+        "publisher_pattern": "Adobe",
+        "path_pattern": ".*\\\\Adobe\\\\Creative Cloud\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Required for Adobe CC apps. Only remove if not using Adobe products.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "google-update-001",
+      "publisher": "Google LLC",
+      "component_name": "Google Update",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": "^GoogleUpdate.*",
+        "publisher_pattern": "Google",
+        "path_pattern": ".*\\\\Google\\\\Update\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Required for Chrome/Google product updates.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "google-chrome-telemetry-001",
+      "publisher": "Google LLC",
+      "component_name": "Google Chrome Software Reporter",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": "^Software Reporter.*",
+        "publisher_pattern": "Google",
+        "path_pattern": ".*\\\\Google\\\\Chrome\\\\.*software_reporter.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Scans for potentially unwanted software. High CPU usage.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "dropbox-001",
+      "publisher": "Dropbox, Inc.",
+      "component_name": "Dropbox",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Dropbox$",
+        "publisher_pattern": "Dropbox",
+        "path_pattern": ".*\\\\Dropbox\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Cloud storage. Remove if not using Dropbox.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "spotify-001",
+      "publisher": "Spotify AB",
+      "component_name": "Spotify",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^SpotifyAB\\.SpotifyMusic.*",
+        "publisher_pattern": "Spotify",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Pre-installed music app. Can be reinstalled from Store.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "candy-crush-001",
+      "publisher": "King.com Ltd",
+      "component_name": "Candy Crush Saga",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^king\\.com\\.CandyCrush.*",
+        "publisher_pattern": "King",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Advertising bloatware. May be reinstalled by Windows updates.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "disney-magic-kingdoms-001",
+      "publisher": "Gameloft SE",
+      "component_name": "Disney Magic Kingdoms",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Disney.*",
+        "publisher_pattern": "Gameloft|Disney",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Advertising bloatware.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "bubble-witch-001",
+      "publisher": "King.com Ltd",
+      "component_name": "Bubble Witch Saga",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^king\\.com\\.BubbleWitch.*",
+        "publisher_pattern": "King",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Advertising bloatware.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "facebook-001",
+      "publisher": "Meta Platforms, Inc.",
+      "component_name": "Facebook",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Facebook\\.Facebook.*",
+        "publisher_pattern": "Facebook|Meta",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Use web version instead.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "instagram-001",
+      "publisher": "Meta Platforms, Inc.",
+      "component_name": "Instagram",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Facebook\\.Instagram.*",
+        "publisher_pattern": "Facebook|Meta|Instagram",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Use web version instead.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "twitter-001",
+      "publisher": "X Corp.",
+      "component_name": "Twitter/X",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^.*Twitter.*|^.*9E2F88E3\\.Twitter.*",
+        "publisher_pattern": "Twitter|X Corp",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Use web version instead.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "tiktok-001",
+      "publisher": "TikTok Pte. Ltd.",
+      "component_name": "TikTok",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^.*TikTok.*",
+        "publisher_pattern": "TikTok|ByteDance",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Use web version instead.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "realtek-audio-console-001",
+      "publisher": "Realtek Semiconductor",
+      "component_name": "Realtek Audio Console",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^RealtekSemiconductorCorp\\.RealtekAudioControl.*",
+        "publisher_pattern": "Realtek",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Audio configuration. May be needed for audio settings.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "dolby-access-001",
+      "publisher": "Dolby Laboratories",
+      "component_name": "Dolby Access",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^DolbyLaboratories\\.DolbyAccess.*",
+        "publisher_pattern": "Dolby",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Required for Dolby Atmos. Remove only if not using Dolby features.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "bonjour-001",
+      "publisher": "Apple Inc.",
+      "component_name": "Bonjour",
+      "component_type": "service",
+      "match_rules": {
+        "name_pattern": "^Bonjour.*",
+        "publisher_pattern": "Apple",
+        "path_pattern": ".*\\\\Bonjour\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["itunes-001"],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Network discovery service. Only needed for Apple devices.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "itunes-001",
+      "publisher": "Apple Inc.",
+      "component_name": "iTunes",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^iTunes$",
+        "publisher_pattern": "Apple",
+        "path_pattern": ".*\\\\iTunes\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": ["bonjour-001"],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Only needed for iOS device sync.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "quicktime-001",
+      "publisher": "Apple Inc.",
+      "component_name": "QuickTime",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^QuickTime.*",
+        "publisher_pattern": "Apple",
+        "path_pattern": ".*\\\\QuickTime\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Discontinued and has security vulnerabilities. Remove immediately.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "java-update-001",
+      "publisher": "Oracle Corporation",
+      "component_name": "Java Update Scheduler",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": "^Java.*Update.*",
+        "publisher_pattern": "Oracle|Java",
+        "path_pattern": ".*\\\\Java\\\\.*jusched.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Runs at startup. Java can be updated manually.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "ccleaner-001",
+      "publisher": "Piriform Software Ltd",
+      "component_name": "CCleaner",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^CCleaner.*",
+        "publisher_pattern": "Piriform",
+        "path_pattern": ".*\\\\CCleaner\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Registry cleaners can cause more harm than good.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "wps-office-001",
+      "publisher": "Kingsoft Corp.",
+      "component_name": "WPS Office",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^WPS Office.*",
+        "publisher_pattern": "Kingsoft|WPS",
+        "path_pattern": ".*\\\\Kingsoft\\\\WPS.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Often pre-installed. Contains ads in free version.",
       "evidence_url": "",
       "last_updated": "2025-01-16"
     }
