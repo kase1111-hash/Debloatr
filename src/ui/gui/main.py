@@ -1,46 +1,46 @@
 """Main GUI window for Debloatr.
 
 This module provides the main application window using PySide6 (Qt6).
+Requires PySide6 to be installed: pip install PySide6
+
+This module will raise ImportError if PySide6 is not available.
+The gui/__init__.py handles this gracefully.
 """
 
 import sys
 from typing import Optional
 
-try:
-    from PySide6.QtWidgets import (
-        QApplication,
-        QMainWindow,
-        QWidget,
-        QVBoxLayout,
-        QHBoxLayout,
-        QTabWidget,
-        QTreeWidget,
-        QTreeWidgetItem,
-        QTableWidget,
-        QTableWidgetItem,
-        QLabel,
-        QPushButton,
-        QProgressBar,
-        QStatusBar,
-        QToolBar,
-        QSplitter,
-        QFrame,
-        QGroupBox,
-        QMessageBox,
-        QDialog,
-        QDialogButtonBox,
-        QTextEdit,
-        QComboBox,
-        QLineEdit,
-        QHeaderView,
-        QMenu,
-    )
-    from PySide6.QtCore import Qt, QThread, Signal, QSize
-    from PySide6.QtGui import QAction, QIcon, QColor, QFont
-
-    PYSIDE6_AVAILABLE = True
-except ImportError:
-    PYSIDE6_AVAILABLE = False
+# PySide6 imports - will raise ImportError if not available
+from PySide6.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QTabWidget,
+    QTreeWidget,
+    QTreeWidgetItem,
+    QTableWidget,
+    QTableWidgetItem,
+    QLabel,
+    QPushButton,
+    QProgressBar,
+    QStatusBar,
+    QToolBar,
+    QSplitter,
+    QFrame,
+    QGroupBox,
+    QMessageBox,
+    QDialog,
+    QDialogButtonBox,
+    QTextEdit,
+    QComboBox,
+    QLineEdit,
+    QHeaderView,
+    QMenu,
+)
+from PySide6.QtCore import Qt, QThread, Signal, QSize
+from PySide6.QtGui import QAction, QIcon, QColor, QFont
 
 from src.core.config import Config
 from src.core.models import Component, Classification, RiskLevel, ComponentType

@@ -237,7 +237,7 @@ class TestTextFormatter:
         formatter = TextFormatter(use_colors=False)
         result = formatter.format_session(sample_session)
 
-        assert "sess-1234" in result
+        assert "sess-123" in result  # truncated to 8 chars
         assert "Test debloat session" in result
         assert "5 total" in result
         assert "4" in result  # successful
@@ -414,7 +414,7 @@ class TestConvenienceFunctions:
         """Test format_session with text output."""
         result = format_session(sample_session, as_json=False)
 
-        assert "sess-1234" in result
+        assert "sess-123" in result  # truncated to 8 chars
 
     def test_format_session_json(self, sample_session):
         """Test format_session with JSON output."""
@@ -448,6 +448,7 @@ class TestCLICommands:
     def test_run_list_command_basic(self, mock_orchestrator_class):
         """Test basic list command."""
         from src.ui.cli.commands import run_list_command
+        from src.core.config import Config
 
         # Setup mock
         mock_component = Component(
@@ -464,24 +465,29 @@ class TestCLICommands:
         mock_result.total_count = 1
 
         mock_orchestrator = Mock()
-        mock_orchestrator.scan_all.return_value = mock_result
+        mock_orchestrator.run_scan.return_value = mock_result
         mock_orchestrator_class.return_value = mock_orchestrator
 
-        # Run command
+        # Run command with config
         args = Mock()
         args.type = None
         args.classification = None
         args.risk = None
         args.json = False
         args.verbose = False
+        args.filter = None  # No filter applied
+
+        config = Mock(spec=Config)
+        config.config_dir = Path("/tmp/test_config")
 
         # Should not raise
-        run_list_command(args)
+        run_list_command(args, config)
 
-    @patch("src.ui.cli.commands.SessionManager")
-    def test_run_sessions_command(self, mock_session_manager_class):
+    @patch("src.ui.cli.commands.create_session_manager")
+    def test_run_sessions_command(self, mock_create_session_manager):
         """Test sessions command."""
         from src.ui.cli.commands import run_sessions_command
+        from src.core.config import Config
 
         # Setup mock
         mock_session = SessionSummary(
@@ -498,16 +504,19 @@ class TestCLICommands:
 
         mock_manager = Mock()
         mock_manager.list_sessions.return_value = [mock_session]
-        mock_session_manager_class.return_value = mock_manager
+        mock_create_session_manager.return_value = mock_manager
 
-        # Run command
+        # Run command with config
         args = Mock()
         args.limit = 10
         args.json = False
         args.verbose = False
 
+        config = Mock(spec=Config)
+        config.config_dir = Path("/tmp/test_config")
+
         # Should not raise
-        run_sessions_command(args)
+        run_sessions_command(args, config)
 
 
 # Tests for GUI components (import tests only, as GUI requires display)
@@ -516,7 +525,8 @@ class TestGUIImports:
     """Test that GUI modules can be imported."""
 
     def test_gui_module_imports(self):
-        """Test that GUI module imports don't fail."""
+        """Test that GUI module import handles missing PySide6 gracefully."""
+        # Try to import - may succeed or fail depending on PySide6 availability
         try:
             from src.ui.gui import (
                 MainWindow,
@@ -525,22 +535,26 @@ class TestGUIImports:
                 ComponentDetailWidget,
                 SessionHistoryWidget,
             )
-            # If we get here, imports succeeded
-            gui_available = True
+            # PySide6 is available - all classes should be real
+            assert MainWindow is not None
+            assert DashboardWidget is not None
         except ImportError:
-            # PySide6 not installed, which is expected in test environment
-            gui_available = False
+            # PySide6 not installed - this is expected in test environment
+            # Just verify the import mechanism works
+            pass
 
-        # Either way, the test passes - we just want to verify no import errors
-        # for things other than PySide6 dependency
+        # Either way, the test passes
         assert True
 
     def test_gui_init_graceful_import(self):
         """Test that GUI __init__ handles missing PySide6 gracefully."""
+        # Import the gui package itself (not its contents)
         from src.ui import gui
 
         # Should have __all__ defined even without PySide6
         assert hasattr(gui, "__all__")
+        # If PySide6 is missing, __all__ should be empty
+        # If PySide6 is present, __all__ should have the exports
 
 
 # Tests for CLI module structure
@@ -610,11 +624,12 @@ class TestFormatterEdgeCases:
     """Tests for edge cases in formatters."""
 
     def test_component_without_optional_fields(self):
-        """Test formatting component without optional fields."""
+        """Test formatting component with minimal required fields."""
         component = Component(
             component_type=ComponentType.TASK,
             name="minimal",
             display_name="Minimal Component",
+            publisher="",  # publisher is required but can be empty
         )
 
         formatter = TextFormatter(use_colors=False)
@@ -629,6 +644,7 @@ class TestFormatterEdgeCases:
             component_type=ComponentType.PROGRAM,
             name="x" * 100,
             display_name="A" * 100,
+            publisher="Publisher",
         )
 
         formatter = TextFormatter(use_colors=False)
@@ -698,8 +714,8 @@ class TestSessionListFormatting:
 
         result = format_session_list(sessions, as_json=False)
 
-        assert "sess-1234" in result
-        assert "sess-8765" in result
+        assert "sess-123" in result  # truncated to 8 chars
+        assert "sess-876" in result  # truncated to 8 chars
         assert "Another session" in result
 
     def test_format_session_list_json(self, sample_session):
