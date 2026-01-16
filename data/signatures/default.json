@@ -1,0 +1,227 @@
+{
+  "$schema": "./schema.json",
+  "version": "1.0.0",
+  "last_updated": "2025-01-16",
+  "signatures": [
+    {
+      "signature_id": "microsoft-cortana-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Cortana",
+      "component_type": "UWP",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.549981C3F5F10.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "May be restored by Windows updates. Search functionality unaffected.",
+      "evidence_url": "https://support.microsoft.com/cortana",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "microsoft-xbox-gamebar-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Xbox Game Bar",
+      "component_type": "UWP",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.XboxGamingOverlay.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": ["microsoft-xbox-identity-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Disabling removes game recording and screenshot features.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "microsoft-onedrive-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "OneDrive",
+      "component_type": "PROGRAM",
+      "match_rules": {
+        "name_pattern": "^OneDrive$",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": ".*\\\\OneDrive\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Cloud sync will stop. Local files remain accessible.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "microsoft-teams-personal-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Microsoft Teams (personal)",
+      "component_type": "PROGRAM",
+      "match_rules": {
+        "name_pattern": "^Microsoft Teams$",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": ".*\\\\Teams\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "May be restored by Windows updates or Office.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "nvidia-telemetry-001",
+      "publisher": "NVIDIA Corporation",
+      "component_name": "NVIDIA Telemetry Container",
+      "component_type": "SERVICE",
+      "match_rules": {
+        "name_pattern": "^NvTelemetry.*",
+        "publisher_pattern": "NVIDIA",
+        "path_pattern": ".*\\\\NVIDIA Corporation\\\\NvTelemetry\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["nvidia-driver-core"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Removing may break driver update process. Disable only.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "hp-support-assistant-001",
+      "publisher": "HP Inc.",
+      "component_name": "HP Support Assistant",
+      "component_type": "PROGRAM",
+      "match_rules": {
+        "name_pattern": "^HP Support Assistant.*",
+        "publisher_pattern": "HP",
+        "path_pattern": ".*\\\\HP\\\\.*Support.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Driver updates can be done manually via HP website.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "dell-supportassist-001",
+      "publisher": "Dell Inc.",
+      "component_name": "Dell SupportAssist",
+      "component_type": "PROGRAM",
+      "match_rules": {
+        "name_pattern": "^Dell SupportAssist.*",
+        "publisher_pattern": "Dell",
+        "path_pattern": ".*\\\\Dell\\\\SupportAssist.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Known for high resource usage. Updates available via Dell website.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "lenovo-vantage-001",
+      "publisher": "Lenovo",
+      "component_name": "Lenovo Vantage",
+      "component_type": "UWP",
+      "match_rules": {
+        "name_pattern": "^E046963F\\.LenovoCompanion.*",
+        "publisher_pattern": "Lenovo",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Provides battery management and hardware settings. Consider keeping on laptops.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "mcafee-livesafe-001",
+      "publisher": "McAfee, Inc.",
+      "component_name": "McAfee LiveSafe",
+      "component_type": "PROGRAM",
+      "match_rules": {
+        "name_pattern": "^McAfee.*",
+        "publisher_pattern": "McAfee",
+        "path_pattern": ".*\\\\McAfee\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Trial bloatware. Windows Defender provides adequate protection.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "norton-security-001",
+      "publisher": "NortonLifeLock Inc.",
+      "component_name": "Norton Security",
+      "component_type": "PROGRAM",
+      "match_rules": {
+        "name_pattern": "^Norton.*",
+        "publisher_pattern": "Norton|Symantec|NortonLifeLock",
+        "path_pattern": ".*\\\\Norton.*",
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Trial bloatware. Use official Norton removal tool for clean uninstall.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    },
+    {
+      "signature_id": "intel-driver-update-001",
+      "publisher": "Intel Corporation",
+      "component_name": "Intel Driver & Support Assistant",
+      "component_type": "PROGRAM",
+      "match_rules": {
+        "name_pattern": "^Intel.*Driver.*",
+        "publisher_pattern": "Intel",
+        "path_pattern": ".*\\\\Intel\\\\Driver.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Drivers can be updated via Intel website or Windows Update.",
+      "evidence_url": "",
+      "last_updated": "2025-01-16"
+    }
+  ]
+}
