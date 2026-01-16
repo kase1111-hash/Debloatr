@@ -24,6 +24,19 @@ from .startup import (
     StartupEntryType,
     StartupScope,
 )
+from .drivers import (
+    DriversScanner,
+    SystemDriver,
+    DriverType,
+    SignatureStatus,
+)
+from .telemetry import (
+    TelemetryScanner,
+    TelemetryComponent,
+    ConnectionType,
+    EndpointCategory,
+    NetworkEndpoint,
+)
 
 __all__ = [
     "BaseDiscoveryModule",
@@ -49,4 +62,15 @@ __all__ = [
     "StartupEntry",
     "StartupEntryType",
     "StartupScope",
+    # Drivers
+    "DriversScanner",
+    "SystemDriver",
+    "DriverType",
+    "SignatureStatus",
+    # Telemetry
+    "TelemetryScanner",
+    "TelemetryComponent",
+    "ConnectionType",
+    "EndpointCategory",
+    "NetworkEndpoint",
 ]
