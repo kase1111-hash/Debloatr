@@ -1,17 +1,14 @@
 """Unit tests for heuristics engine module."""
 
-import pytest
-from pathlib import Path
-
-from src.core.models import Component, ComponentType, Classification
 from src.classification.heuristics import (
-    HeuristicsEngine,
-    HeuristicRule,
-    HeuristicResult,
-    HeuristicCategory,
     HEURISTIC_RULES,
+    HeuristicCategory,
+    HeuristicResult,
+    HeuristicRule,
+    HeuristicsEngine,
     create_checker_for_engine,
 )
+from src.core.models import Classification, Component, ComponentType
 
 
 class TestHeuristicRule:
@@ -78,7 +75,7 @@ class TestHeuristicRules:
 
     def test_rule_categories_valid(self) -> None:
         """Test that all rules have valid categories."""
-        for rule_id, rule in HEURISTIC_RULES.items():
+        for _rule_id, rule in HEURISTIC_RULES.items():
             assert isinstance(rule.category, HeuristicCategory)
 
 

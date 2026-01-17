@@ -6,7 +6,6 @@ separate logs for different concerns (main, actions, LLM).
 
 import logging
 import sys
-from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Optional
@@ -44,7 +43,7 @@ class DebloatrLogger:
         if self._initialized:
             return
 
-        self.logs_dir: Optional[Path] = None
+        self.logs_dir: Path | None = None
         self.log_level: int = DEFAULT_LOG_LEVEL
         self.loggers: dict[str, logging.Logger] = {}
         self._initialized = True

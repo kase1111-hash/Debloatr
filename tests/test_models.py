@@ -1,24 +1,19 @@
 """Tests for core data models."""
 
-import pytest
-from datetime import datetime
 from pathlib import Path
 
 from src.core.models import (
-    ComponentType,
-    Classification,
-    RiskLevel,
-    ActionType,
-    ExecutionMode,
-    ReinstallBehavior,
-    Component,
-    ClassificationResult,
     ActionPlan,
-    ActionResult,
-    Snapshot,
+    ActionType,
+    Classification,
+    ClassificationResult,
+    Component,
+    ComponentType,
+    ExecutionMode,
+    RiskLevel,
     Session,
-    SignatureMatchRule,
     Signature,
+    SignatureMatchRule,
 )
 
 

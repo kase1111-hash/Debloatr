@@ -1,17 +1,16 @@
 """Tests for the installed programs scanner."""
 
-import pytest
 import sys
-from pathlib import Path
 from datetime import datetime
-from unittest.mock import Mock, patch, MagicMock
-import json
+from pathlib import Path
+from unittest.mock import MagicMock
 
-from src.core.models import ComponentType, Classification
+import pytest
+
+from src.core.models import ComponentType
 from src.discovery.programs import (
     InstalledProgram,
     ProgramsScanner,
-    UNINSTALL_REGISTRY_PATHS,
 )
 
 
@@ -151,7 +150,9 @@ class TestProgramsScanner:
         """Test UWP display name formatting."""
         scanner = ProgramsScanner()
 
-        assert scanner._format_uwp_display_name("Microsoft.WindowsCalculator") == "Windows Calculator"
+        assert (
+            scanner._format_uwp_display_name("Microsoft.WindowsCalculator") == "Windows Calculator"
+        )
         assert scanner._format_uwp_display_name("Microsoft.Paint") == "Paint"
         assert scanner._format_uwp_display_name("CompanyName.AppName") == "App Name"
 
@@ -168,8 +169,14 @@ class TestProgramsScanner:
         scanner = ProgramsScanner()
 
         assert scanner._detect_update_mechanism("Google Chrome", "Google", None) == "Google Update"
-        assert scanner._detect_update_mechanism("Firefox", "Mozilla", None) == "Mozilla Maintenance Service"
-        assert scanner._detect_update_mechanism("Adobe Reader", "Adobe", None) == "Adobe Update Manager"
+        assert (
+            scanner._detect_update_mechanism("Firefox", "Mozilla", None)
+            == "Mozilla Maintenance Service"
+        )
+        assert (
+            scanner._detect_update_mechanism("Adobe Reader", "Adobe", None)
+            == "Adobe Update Manager"
+        )
         assert scanner._detect_update_mechanism("Notepad++", "Don Ho", None) is None
 
 

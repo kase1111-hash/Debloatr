@@ -2,22 +2,18 @@
 
 import json
 from pathlib import Path
-import pytest
 
-from src.core.models import (
-    Component,
-    ComponentType,
-    Classification,
-    ActionType,
-    Signature,
-    SignatureMatchRule,
-)
-from src.classification.signatures import SignatureDatabase
 from src.classification.engine import (
+    ClassificationDecision,
     ClassificationEngine,
     ClassificationSource,
-    ClassificationDecision,
     create_default_engine,
+)
+from src.core.models import (
+    ActionType,
+    Classification,
+    Component,
+    ComponentType,
 )
 
 
@@ -134,17 +130,19 @@ class TestClassificationEngine:
     def test_classify_by_signature(self, tmp_path: Path) -> None:
         """Test classification by signature match."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "cortana-001",
-            "publisher": "Microsoft",
-            "component_name": "Cortana",
-            "component_type": "program",
-            "match_rules": {"name_pattern": ".*[Cc]ortana.*"},
-            "classification": "BLOAT",
-            "safe_actions": ["disable"],
-            "unsafe_actions": ["remove"],
-            "breakage_notes": "May affect Windows Search",
-        }]
+        sig_data = [
+            {
+                "signature_id": "cortana-001",
+                "publisher": "Microsoft",
+                "component_name": "Cortana",
+                "component_type": "program",
+                "match_rules": {"name_pattern": ".*[Cc]ortana.*"},
+                "classification": "BLOAT",
+                "safe_actions": ["disable"],
+                "unsafe_actions": ["remove"],
+                "breakage_notes": "May affect Windows Search",
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         engine = ClassificationEngine()
@@ -171,12 +169,14 @@ class TestClassificationEngine:
     def test_classify_no_match_returns_unknown(self, tmp_path: Path) -> None:
         """Test classification returns UNKNOWN when no match."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "specific-001",
-            "component_type": "program",
-            "match_rules": {"name_pattern": "^VerySpecificName$"},
-            "classification": "BLOAT",
-        }]
+        sig_data = [
+            {
+                "signature_id": "specific-001",
+                "component_type": "program",
+                "match_rules": {"name_pattern": "^VerySpecificName$"},
+                "classification": "BLOAT",
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         engine = ClassificationEngine()
@@ -198,12 +198,14 @@ class TestClassificationEngine:
     def test_classify_updates_component(self, tmp_path: Path) -> None:
         """Test that classify updates component's classification."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "bloat-001",
-            "component_type": "service",
-            "match_rules": {"name_pattern": ".*BloatService.*"},
-            "classification": "BLOAT",
-        }]
+        sig_data = [
+            {
+                "signature_id": "bloat-001",
+                "component_type": "service",
+                "match_rules": {"name_pattern": ".*BloatService.*"},
+                "classification": "BLOAT",
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         engine = ClassificationEngine()
@@ -225,12 +227,14 @@ class TestClassificationEngine:
     def test_classify_caching(self, tmp_path: Path) -> None:
         """Test that classification results are cached."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "cache-001",
-            "component_type": "program",
-            "match_rules": {"name_pattern": ".*CacheTest.*"},
-            "classification": "OPTIONAL",
-        }]
+        sig_data = [
+            {
+                "signature_id": "cache-001",
+                "component_type": "program",
+                "match_rules": {"name_pattern": ".*CacheTest.*"},
+                "classification": "OPTIONAL",
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         engine = ClassificationEngine()
@@ -254,12 +258,14 @@ class TestClassificationEngine:
     def test_classify_skip_cache(self, tmp_path: Path) -> None:
         """Test classification with cache disabled."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "nocache-001",
-            "component_type": "program",
-            "match_rules": {"name_pattern": ".*NoCacheTest.*"},
-            "classification": "BLOAT",
-        }]
+        sig_data = [
+            {
+                "signature_id": "nocache-001",
+                "component_type": "program",
+                "match_rules": {"name_pattern": ".*NoCacheTest.*"},
+                "classification": "BLOAT",
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         engine = ClassificationEngine()
@@ -331,12 +337,14 @@ class TestClassificationEngine:
     def test_reclassify_manual_override(self, tmp_path: Path) -> None:
         """Test manual reclassification."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "reclassify-001",
-            "component_type": "program",
-            "match_rules": {"name_pattern": ".*TestApp.*"},
-            "classification": "BLOAT",
-        }]
+        sig_data = [
+            {
+                "signature_id": "reclassify-001",
+                "component_type": "program",
+                "match_rules": {"name_pattern": ".*TestApp.*"},
+                "classification": "BLOAT",
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         engine = ClassificationEngine()
@@ -373,13 +381,15 @@ class TestClassificationEngine:
     def test_explain_classification(self, tmp_path: Path) -> None:
         """Test getting classification explanation."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "explain-001",
-            "component_name": "Explainable App",
-            "component_type": "program",
-            "match_rules": {"name_pattern": ".*Explainable.*"},
-            "classification": "BLOAT",
-        }]
+        sig_data = [
+            {
+                "signature_id": "explain-001",
+                "component_name": "Explainable App",
+                "component_type": "program",
+                "match_rules": {"name_pattern": ".*Explainable.*"},
+                "classification": "BLOAT",
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         engine = ClassificationEngine()
@@ -414,13 +424,15 @@ class TestClassificationEngine:
     def test_get_safe_actions(self, tmp_path: Path) -> None:
         """Test getting safe actions for classified component."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "safe-001",
-            "component_type": "program",
-            "match_rules": {"name_pattern": ".*SafeTest.*"},
-            "classification": "BLOAT",
-            "safe_actions": ["disable", "contain"],
-        }]
+        sig_data = [
+            {
+                "signature_id": "safe-001",
+                "component_type": "program",
+                "match_rules": {"name_pattern": ".*SafeTest.*"},
+                "classification": "BLOAT",
+                "safe_actions": ["disable", "contain"],
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         engine = ClassificationEngine()
@@ -471,13 +483,15 @@ class TestClassificationEngine:
     def test_get_unsafe_actions(self, tmp_path: Path) -> None:
         """Test getting unsafe actions for classified component."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "unsafe-001",
-            "component_type": "program",
-            "match_rules": {"name_pattern": ".*UnsafeTest.*"},
-            "classification": "OPTIONAL",
-            "unsafe_actions": ["remove"],
-        }]
+        sig_data = [
+            {
+                "signature_id": "unsafe-001",
+                "component_type": "program",
+                "match_rules": {"name_pattern": ".*UnsafeTest.*"},
+                "classification": "OPTIONAL",
+                "unsafe_actions": ["remove"],
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         engine = ClassificationEngine()
@@ -498,14 +512,16 @@ class TestClassificationEngine:
     def test_get_related_components(self, tmp_path: Path) -> None:
         """Test getting related components."""
         sig_file = tmp_path / "sigs.json"
-        sig_data = [{
-            "signature_id": "main-001",
-            "component_name": "Main App",
-            "component_type": "program",
-            "match_rules": {"name_pattern": ".*MainApp.*"},
-            "classification": "BLOAT",
-            "related_components": ["helper-001", "helper-002"],
-        }]
+        sig_data = [
+            {
+                "signature_id": "main-001",
+                "component_name": "Main App",
+                "component_type": "program",
+                "match_rules": {"name_pattern": ".*MainApp.*"},
+                "classification": "BLOAT",
+                "related_components": ["helper-001", "helper-002"],
+            }
+        ]
         sig_file.write_text(json.dumps(sig_data))
 
         engine = ClassificationEngine()
@@ -568,9 +584,24 @@ class TestClassificationEngine:
         engine.load_signatures(sig_file)
 
         components = [
-            Component(component_type=ComponentType.PROGRAM, name="BloatApp1", display_name="Bloat 1", publisher="T"),
-            Component(component_type=ComponentType.PROGRAM, name="BloatApp2", display_name="Bloat 2", publisher="T"),
-            Component(component_type=ComponentType.SERVICE, name="AggroSvc", display_name="Aggro", publisher="T"),
+            Component(
+                component_type=ComponentType.PROGRAM,
+                name="BloatApp1",
+                display_name="Bloat 1",
+                publisher="T",
+            ),
+            Component(
+                component_type=ComponentType.PROGRAM,
+                name="BloatApp2",
+                display_name="Bloat 2",
+                publisher="T",
+            ),
+            Component(
+                component_type=ComponentType.SERVICE,
+                name="AggroSvc",
+                display_name="Aggro",
+                publisher="T",
+            ),
         ]
 
         for c in components:

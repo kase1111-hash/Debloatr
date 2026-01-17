@@ -4,20 +4,19 @@ This module provides handlers for removing various component types
 including programs, services, UWP apps, and other components.
 """
 
+import logging
 import os
 import shutil
 import subprocess
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
-from uuid import uuid4
-import logging
+from typing import Any
 
 from src.core.models import (
+    ActionType,
     Component,
     ComponentType,
-    ActionType,
     Snapshot,
 )
 
@@ -45,10 +44,10 @@ class RemoveResult:
     component_type: ComponentType
     files_removed: list[str] = field(default_factory=list)
     registry_cleaned: bool = False
-    quarantine_path: Optional[Path] = None
-    error_message: Optional[str] = None
+    quarantine_path: Path | None = None
+    error_message: str | None = None
     requires_reboot: bool = False
-    snapshot: Optional[Snapshot] = None
+    snapshot: Snapshot | None = None
 
 
 class RemoveHandler:
@@ -68,7 +67,7 @@ class RemoveHandler:
         self,
         dry_run: bool = False,
         create_snapshots: bool = True,
-        quarantine_path: Optional[Path] = None,
+        quarantine_path: Path | None = None,
         create_restore_point: bool = True,
     ) -> None:
         """Initialize the remove handler.
@@ -81,16 +80,17 @@ class RemoveHandler:
         """
         self.dry_run = dry_run
         self.create_snapshots = create_snapshots
-        self.quarantine_path = quarantine_path or Path(os.environ.get(
-            "PROGRAMDATA", "C:/ProgramData"
-        )) / "Debloatr" / "Quarantine"
+        self.quarantine_path = (
+            quarantine_path
+            or Path(os.environ.get("PROGRAMDATA", "C:/ProgramData")) / "Debloatr" / "Quarantine"
+        )
         self.create_restore_point = create_restore_point
         self._is_windows = os.name == "nt"
 
     def remove_component(
         self,
         component: Component,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> RemoveResult:
         """Remove a component based on its type.
 
@@ -172,7 +172,7 @@ class RemoveHandler:
 
         errors: list[str] = []
         files_removed: list[str] = []
-        quarantine_used: Optional[Path] = None
+        quarantine_used: Path | None = None
 
         try:
             # Try native uninstaller first
@@ -503,7 +503,11 @@ class RemoveHandler:
                 shortcut_path = context.get("shortcut_path", "")
                 if shortcut_path and Path(shortcut_path).exists():
                     quarantine = self._quarantine_files(Path(shortcut_path), value_name)
-                    result = {"success": True} if quarantine else {"success": False, "error": "Quarantine failed"}
+                    result = (
+                        {"success": True}
+                        if quarantine
+                        else {"success": False, "error": "Quarantine failed"}
+                    )
                 else:
                     result = {"success": False, "error": "Shortcut not found"}
             else:
@@ -667,7 +671,9 @@ class RemoveHandler:
                 capture_output=True,
                 text=True,
                 timeout=300,  # 5 minute timeout for uninstallers
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             return {
@@ -681,7 +687,7 @@ class RemoveHandler:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    def _quarantine_files(self, path: Path, name: str) -> Optional[Path]:
+    def _quarantine_files(self, path: Path, name: str) -> Path | None:
         """Move files to quarantine instead of deleting."""
         try:
             # Create quarantine directory
@@ -789,7 +795,9 @@ class RemoveHandler:
                 capture_output=True,
                 text=True,
                 timeout=120,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             return {
@@ -815,7 +823,9 @@ class RemoveHandler:
                 capture_output=True,
                 text=True,
                 timeout=120,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             return {

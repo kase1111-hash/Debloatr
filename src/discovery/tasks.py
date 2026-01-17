@@ -7,19 +7,18 @@ This module scans for scheduled tasks and collects metadata including:
 - Hidden and self-healing task detection
 """
 
+import json
+import logging
 import os
 import re
 import subprocess
-import json
-import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional
-import logging
+from typing import Any
 
-from src.core.models import Component, ComponentType, Classification, RiskLevel
+from src.core.models import Component, ComponentType
 from src.discovery.base import BaseDiscoveryModule
 
 logger = logging.getLogger("debloatr.discovery.tasks")
@@ -78,12 +77,12 @@ class TaskTrigger:
 
     trigger_type: TriggerType
     enabled: bool = True
-    start_boundary: Optional[datetime] = None
-    end_boundary: Optional[datetime] = None
-    repetition_interval: Optional[str] = None  # e.g., "PT1H" for hourly
-    repetition_duration: Optional[str] = None
-    execution_time_limit: Optional[str] = None
-    delay: Optional[str] = None  # Random delay
+    start_boundary: datetime | None = None
+    end_boundary: datetime | None = None
+    repetition_interval: str | None = None  # e.g., "PT1H" for hourly
+    repetition_duration: str | None = None
+    execution_time_limit: str | None = None
+    delay: str | None = None  # Random delay
 
 
 @dataclass
@@ -91,9 +90,9 @@ class TaskAction:
     """Represents a task action."""
 
     action_type: str  # "Exec", "ComHandler", "SendEmail", "ShowMessage"
-    path: Optional[Path] = None
+    path: Path | None = None
     arguments: str = ""
-    working_directory: Optional[Path] = None
+    working_directory: Path | None = None
 
 
 @dataclass
@@ -133,13 +132,13 @@ class ScheduledTask(Component):
     run_level: str = "LeastPrivilege"
     author: str = ""
     description: str = ""
-    last_run_time: Optional[datetime] = None
-    next_run_time: Optional[datetime] = None
+    last_run_time: datetime | None = None
+    next_run_time: datetime | None = None
     last_result: int = 0
-    execution_time_limit: Optional[str] = None
+    execution_time_limit: str | None = None
     is_self_healing: bool = False
     self_healing_target: str = ""
-    registration_date: Optional[datetime] = None
+    registration_date: datetime | None = None
     principal_user_id: str = ""
 
     def __post_init__(self) -> None:
@@ -359,7 +358,9 @@ class TasksScanner(BaseDiscoveryModule):
                         LastTaskResult = if ($info) { $info.LastTaskResult } else { 0 }
                     }
                 } | ConvertTo-Json -Depth 5 -Compress
-                """.replace("\n", " ")
+                """.replace(
+                    "\n", " "
+                ),
             ]
 
             result = subprocess.run(
@@ -367,7 +368,9 @@ class TasksScanner(BaseDiscoveryModule):
                 capture_output=True,
                 text=True,
                 timeout=180,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             if result.returncode != 0:
@@ -396,7 +399,7 @@ class TasksScanner(BaseDiscoveryModule):
 
         return tasks
 
-    def _process_task(self, raw: dict[str, Any]) -> Optional[ScheduledTask]:
+    def _process_task(self, raw: dict[str, Any]) -> ScheduledTask | None:
         """Process a raw task dictionary into a ScheduledTask.
 
         Args:
@@ -410,7 +413,7 @@ class TasksScanner(BaseDiscoveryModule):
             return None
 
         task_path = raw.get("TaskPath", "\\")
-        full_path = f"{task_path}{task_name}"
+        _full_path = f"{task_path}{task_name}"  # Reserved for hierarchical task handling
 
         # Get settings
         settings = raw.get("Settings", {}) or {}
@@ -510,7 +513,7 @@ class TasksScanner(BaseDiscoveryModule):
 
         return actions
 
-    def _parse_datetime(self, value: Any) -> Optional[datetime]:
+    def _parse_datetime(self, value: Any) -> datetime | None:
         """Parse various datetime formats."""
         if not value:
             return None
@@ -597,8 +600,7 @@ class TasksScanner(BaseDiscoveryModule):
         # Check if it runs at boot/logon and executes an updater
         if not task.is_self_healing:
             boot_logon_triggers = any(
-                t.trigger_type in [TriggerType.BOOT, TriggerType.LOGON]
-                for t in task.triggers
+                t.trigger_type in [TriggerType.BOOT, TriggerType.LOGON] for t in task.triggers
             )
 
             if boot_logon_triggers:
@@ -655,10 +657,7 @@ def get_tasks_by_trigger(
     Returns:
         List of tasks with that trigger type.
     """
-    return [
-        task for task in tasks
-        if any(t.trigger_type == trigger_type for t in task.triggers)
-    ]
+    return [task for task in tasks if any(t.trigger_type == trigger_type for t in task.triggers)]
 
 
 def get_hidden_tasks(tasks: list[ScheduledTask]) -> list[ScheduledTask]:

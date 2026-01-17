@@ -6,17 +6,17 @@ This module scans for system drivers and helper components including:
 - Overlay injectors (DLL injection patterns)
 """
 
+import json
+import logging
 import os
 import re
 import subprocess
-import json
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional
-import logging
+from typing import Any
 
-from src.core.models import Component, ComponentType, Classification, RiskLevel
+from src.core.models import Component, ComponentType
 from src.discovery.base import BaseDiscoveryModule
 
 logger = logging.getLogger("debloatr.discovery.drivers")
@@ -58,7 +58,7 @@ class SignatureStatus(Enum):
     UNKNOWN = "Unknown"  # Could not verify
 
     @classmethod
-    def from_bool(cls, is_signed: Optional[bool]) -> "SignatureStatus":
+    def from_bool(cls, is_signed: bool | None) -> "SignatureStatus":
         """Convert boolean to SignatureStatus."""
         if is_signed is None:
             return cls.UNKNOWN
@@ -95,7 +95,7 @@ class SystemDriver(Component):
     associated_hardware: list[str] = field(default_factory=list)
     load_order: str = ""
     is_running: bool = False
-    driver_path: Optional[Path] = None
+    driver_path: Path | None = None
     driver_version: str = ""
     driver_date: str = ""
     inf_name: str = ""
@@ -266,7 +266,9 @@ class DriversScanner(BaseDiscoveryModule):
                     Date,
                     Version
                 | ConvertTo-Json -Compress
-                """.replace("\n", " ")
+                """.replace(
+                    "\n", " "
+                ),
             ]
 
             result = subprocess.run(
@@ -274,7 +276,9 @@ class DriversScanner(BaseDiscoveryModule):
                 capture_output=True,
                 text=True,
                 timeout=120,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             if result.returncode != 0:
@@ -315,7 +319,9 @@ class DriversScanner(BaseDiscoveryModule):
                 capture_output=True,
                 text=True,
                 timeout=60,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             if result.returncode != 0:
@@ -333,22 +339,24 @@ class DriversScanner(BaseDiscoveryModule):
 
             reader = csv.DictReader(StringIO(result.stdout))
             for row in reader:
-                drivers.append({
-                    "Driver": row.get("Module Name", ""),
-                    "OriginalFileName": row.get("Path", ""),
-                    "ClassName": row.get("Type", ""),
-                    "ProviderName": "",
-                    "Date": row.get("Link Date", ""),
-                    "State": row.get("State", ""),
-                    "Inbox": False,
-                })
+                drivers.append(
+                    {
+                        "Driver": row.get("Module Name", ""),
+                        "OriginalFileName": row.get("Path", ""),
+                        "ClassName": row.get("Type", ""),
+                        "ProviderName": "",
+                        "Date": row.get("Link Date", ""),
+                        "State": row.get("State", ""),
+                        "Inbox": False,
+                    }
+                )
 
         except Exception as e:
             logger.error(f"Error getting drivers via driverquery: {e}")
 
         return drivers
 
-    def _process_driver(self, raw: dict[str, Any]) -> Optional[SystemDriver]:
+    def _process_driver(self, raw: dict[str, Any]) -> SystemDriver | None:
         """Process a raw driver dictionary into a SystemDriver.
 
         Args:
@@ -426,11 +434,14 @@ class DriversScanner(BaseDiscoveryModule):
             return False
 
         provider_lower = provider.lower()
-        return any(ms in provider_lower for ms in [
-            "microsoft",
-            "windows",
-            "ms-windows",
-        ])
+        return any(
+            ms in provider_lower
+            for ms in [
+                "microsoft",
+                "windows",
+                "ms-windows",
+            ]
+        )
 
     def _check_overlay_injector(self, driver: SystemDriver) -> None:
         """Check if a driver appears to be an overlay injector.
@@ -467,7 +478,8 @@ class DriversScanner(BaseDiscoveryModule):
             List of unsigned drivers.
         """
         return [
-            d for d in drivers
+            d
+            for d in drivers
             if d.signature_status in [SignatureStatus.UNSIGNED, SignatureStatus.INVALID]
         ]
 

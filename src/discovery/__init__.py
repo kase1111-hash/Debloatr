@@ -1,41 +1,41 @@
 """Discovery modules for scanning system components."""
 
 from .base import BaseDiscoveryModule
-from .programs import ProgramsScanner, InstalledProgram
-from .services import (
-    ServicesScanner,
-    WindowsService,
-    ServiceStartType,
-    ServiceState,
-    ServiceAccountType,
-    RecoveryAction,
-)
-from .tasks import (
-    TasksScanner,
-    ScheduledTask,
-    TriggerType,
-    TaskState,
-    TaskTrigger,
-    TaskAction,
-)
-from .startup import (
-    StartupScanner,
-    StartupEntry,
-    StartupEntryType,
-    StartupScope,
-)
 from .drivers import (
     DriversScanner,
-    SystemDriver,
     DriverType,
     SignatureStatus,
+    SystemDriver,
+)
+from .programs import InstalledProgram, ProgramsScanner
+from .services import (
+    RecoveryAction,
+    ServiceAccountType,
+    ServicesScanner,
+    ServiceStartType,
+    ServiceState,
+    WindowsService,
+)
+from .startup import (
+    StartupEntry,
+    StartupEntryType,
+    StartupScanner,
+    StartupScope,
+)
+from .tasks import (
+    ScheduledTask,
+    TaskAction,
+    TasksScanner,
+    TaskState,
+    TaskTrigger,
+    TriggerType,
 )
 from .telemetry import (
-    TelemetryScanner,
-    TelemetryComponent,
     ConnectionType,
     EndpointCategory,
     NetworkEndpoint,
+    TelemetryComponent,
+    TelemetryScanner,
 )
 
 __all__ = [

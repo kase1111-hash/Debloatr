@@ -5,21 +5,20 @@ which actions are available for a component and generates
 detailed execution plans.
 """
 
+import logging
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Optional
-from uuid import uuid4
-import logging
+from typing import Any
 
+from src.analysis.risk import RiskAnalyzer
 from src.core.models import (
+    ActionPlan,
+    ActionType,
+    Classification,
     Component,
     ComponentType,
-    Classification,
     RiskLevel,
-    ActionType,
-    ActionPlan,
 )
-from src.analysis.risk import RiskAnalyzer, RiskAssessment
 
 logger = logging.getLogger("debloatr.actions.planner")
 
@@ -43,7 +42,7 @@ class SafetyRule:
     description: str
     blocked_actions: list[ActionType]
     condition: callable  # (Component, dict) -> bool
-    applies_to: Optional[list[ComponentType]] = None
+    applies_to: list[ComponentType] | None = None
     message: str = ""
 
 
@@ -53,7 +52,12 @@ SAFETY_RULES: list[SafetyRule] = [
         rule_id="CORE_LOCKED",
         name="Core components are read-only",
         description="Components classified as CORE cannot be modified",
-        blocked_actions=[ActionType.DISABLE, ActionType.CONTAIN, ActionType.REMOVE, ActionType.REPLACE],
+        blocked_actions=[
+            ActionType.DISABLE,
+            ActionType.CONTAIN,
+            ActionType.REMOVE,
+            ActionType.REPLACE,
+        ],
         condition=lambda c, ctx: c.classification == Classification.CORE,
         message="Core system component - modifications locked for safety",
     ),
@@ -69,7 +73,12 @@ SAFETY_RULES: list[SafetyRule] = [
         rule_id="CRITICAL_RISK",
         name="Critical risk blocks all actions",
         description="Components with CRITICAL risk level cannot be modified",
-        blocked_actions=[ActionType.DISABLE, ActionType.CONTAIN, ActionType.REMOVE, ActionType.REPLACE],
+        blocked_actions=[
+            ActionType.DISABLE,
+            ActionType.CONTAIN,
+            ActionType.REMOVE,
+            ActionType.REPLACE,
+        ],
         condition=lambda c, ctx: c.risk_level == RiskLevel.CRITICAL,
         message="Critical system component - modifications blocked",
     ),
@@ -87,8 +96,7 @@ SAFETY_RULES: list[SafetyRule] = [
         description="Drivers must be disabled before they can be removed",
         blocked_actions=[ActionType.REMOVE],
         condition=lambda c, ctx: (
-            c.component_type == ComponentType.DRIVER and
-            ctx.get("is_running", True)
+            c.component_type == ComponentType.DRIVER and ctx.get("is_running", True)
         ),
         applies_to=[ComponentType.DRIVER],
         message="Driver is running - disable before removal",
@@ -149,8 +157,8 @@ class ActionPlanner:
 
     def __init__(
         self,
-        safety_rules: Optional[list[SafetyRule]] = None,
-        risk_analyzer: Optional[RiskAnalyzer] = None,
+        safety_rules: list[SafetyRule] | None = None,
+        risk_analyzer: RiskAnalyzer | None = None,
         require_staging_for_oem: bool = True,
         staging_days: int = 7,
     ) -> None:
@@ -170,7 +178,7 @@ class ActionPlanner:
     def get_available_actions(
         self,
         component: Component,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> ActionAvailability:
         """Determine which actions are available for a component.
 
@@ -264,7 +272,7 @@ class ActionPlanner:
         self,
         component: Component,
         action: ActionType,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> ActionPlan:
         """Create a detailed action plan for a component.
 

@@ -4,14 +4,14 @@ This module implements heuristic rules for classifying components
 that don't match any signature in the database.
 """
 
-from dataclasses import dataclass, field
-from enum import Enum
-from pathlib import Path
-from typing import Any, Callable, Optional
 import logging
 import re
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Any
 
-from src.core.models import Component, ComponentType, Classification
+from src.core.models import Classification, Component, ComponentType
 
 logger = logging.getLogger("debloatr.classification.heuristics")
 
@@ -309,11 +309,19 @@ def _check_oem_preinstall(component: Component, context: dict[str, Any]) -> bool
     # Check for common OEM publisher patterns
     publisher = (component.publisher or "").lower()
     oem_publishers = [
-        "hewlett-packard", "hp inc", "hp ",
-        "dell", "alienware",
-        "lenovo", "thinkpad",
-        "asus", "acer", "msi",
-        "samsung", "toshiba", "sony",
+        "hewlett-packard",
+        "hp inc",
+        "hp ",
+        "dell",
+        "alienware",
+        "lenovo",
+        "thinkpad",
+        "asus",
+        "acer",
+        "msi",
+        "samsung",
+        "toshiba",
+        "sony",
     ]
 
     for oem in oem_publishers:
@@ -451,7 +459,7 @@ class HeuristicsEngine:
 
     def __init__(
         self,
-        rules: Optional[dict[str, HeuristicRule]] = None,
+        rules: dict[str, HeuristicRule] | None = None,
         threshold_bloat: float = 0.4,
         threshold_aggressive: float = 0.7,
     ) -> None:
@@ -469,7 +477,7 @@ class HeuristicsEngine:
     def analyze(
         self,
         component: Component,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> HeuristicResult:
         """Analyze a component using heuristic rules.
 
@@ -574,11 +582,7 @@ class HeuristicsEngine:
         if not triggered_rules:
             return "No bloatware indicators detected"
 
-        rule_names = [
-            self.rules[r].name
-            for r in triggered_rules
-            if r in self.rules
-        ]
+        rule_names = [self.rules[r].name for r in triggered_rules if r in self.rules]
 
         explanation = (
             f"Bloat score: {score:.1%}. "
@@ -643,7 +647,7 @@ class HeuristicsEngine:
 
 def create_checker_for_engine(
     heuristics_engine: HeuristicsEngine,
-    context_provider: Optional[Callable[[Component], dict[str, Any]]] = None,
+    context_provider: Callable[[Component], dict[str, Any]] | None = None,
 ) -> Callable[[Component], tuple[str, float]]:
     """Create a checker function compatible with ClassificationEngine.
 
@@ -654,6 +658,7 @@ def create_checker_for_engine(
     Returns:
         Checker function for registering with ClassificationEngine
     """
+
     def checker(component: Component) -> tuple[str, float]:
         context = context_provider(component) if context_provider else {}
         result = heuristics_engine.analyze(component, context)

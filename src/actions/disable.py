@@ -4,20 +4,17 @@ This module provides handlers for disabling various component types
 including services, scheduled tasks, startup entries, and drivers.
 """
 
+import logging
 import os
 import subprocess
 from dataclasses import dataclass, field
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
-from uuid import uuid4
-import logging
+from typing import Any
 
 from src.core.models import (
+    ActionType,
     Component,
     ComponentType,
-    ActionType,
-    ActionResult,
     Snapshot,
 )
 
@@ -44,9 +41,9 @@ class DisableResult:
     component_type: ComponentType
     previous_state: dict[str, Any] = field(default_factory=dict)
     current_state: dict[str, Any] = field(default_factory=dict)
-    error_message: Optional[str] = None
+    error_message: str | None = None
     requires_reboot: bool = False
-    snapshot: Optional[Snapshot] = None
+    snapshot: Snapshot | None = None
 
 
 class DisableHandler:
@@ -80,7 +77,7 @@ class DisableHandler:
     def disable_component(
         self,
         component: Component,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> DisableResult:
         """Disable a component based on its type.
 
@@ -450,9 +447,7 @@ class DisableHandler:
 
         try:
             # Use sc.exe to disable the driver
-            disable_result = self._run_command(
-                f'sc config "{driver_name}" start= disabled'
-            )
+            disable_result = self._run_command(f'sc config "{driver_name}" start= disabled')
 
             if not disable_result["success"]:
                 return DisableResult(
@@ -559,6 +554,7 @@ class DisableHandler:
         if result["success"] and result["output"]:
             try:
                 import json
+
                 data = json.loads(result["output"])
                 return {
                     "status": str(data.get("Status", "Unknown")),
@@ -583,6 +579,7 @@ class DisableHandler:
         if result["success"] and result["output"]:
             try:
                 import json
+
                 data = json.loads(result["output"])
                 return {"state": str(data.get("State", "Unknown"))}
             except Exception:
@@ -645,7 +642,9 @@ class DisableHandler:
 
         return result
 
-    def _disable_folder_startup(self, component: Component, context: dict[str, Any]) -> dict[str, Any]:
+    def _disable_folder_startup(
+        self, component: Component, context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Disable a folder-based startup entry by moving it."""
         shortcut_path = context.get("shortcut_path", "")
         if not shortcut_path:
@@ -675,7 +674,9 @@ class DisableHandler:
                 capture_output=True,
                 text=True,
                 timeout=60,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             return {
@@ -701,7 +702,9 @@ class DisableHandler:
                 text=True,
                 shell=True,
                 timeout=60,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
             )
 
             return {

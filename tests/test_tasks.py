@@ -1,24 +1,22 @@
 """Tests for the scheduled tasks scanner."""
 
-import pytest
 import sys
-from pathlib import Path
 from datetime import datetime
-from unittest.mock import Mock, patch, MagicMock
+from pathlib import Path
+
+import pytest
 
 from src.core.models import ComponentType
 from src.discovery.tasks import (
     ScheduledTask,
+    TaskAction,
     TasksScanner,
-    TriggerType,
     TaskState,
     TaskTrigger,
-    TaskAction,
-    get_tasks_by_trigger,
+    TriggerType,
     get_hidden_tasks,
     get_self_healing_tasks,
-    SELF_HEALING_PATTERNS,
-    TELEMETRY_TASK_PATTERNS,
+    get_tasks_by_trigger,
 )
 
 
@@ -150,9 +148,7 @@ class TestScheduledTask:
             publisher="Test",
             task_path="\\",
             task_name="PeriodicTask",
-            triggers=[
-                TaskTrigger(TriggerType.TIME, repetition_interval="PT1H")
-            ],
+            triggers=[TaskTrigger(TriggerType.TIME, repetition_interval="PT1H")],
         )
 
         assert task.execution_frequency == "Hourly"
@@ -477,20 +473,29 @@ class TestTaskHelperFunctions:
         tasks = [
             ScheduledTask(
                 component_type=ComponentType.TASK,
-                name="boot", display_name="Boot", publisher="Test",
-                task_path="\\", task_name="Boot",
+                name="boot",
+                display_name="Boot",
+                publisher="Test",
+                task_path="\\",
+                task_name="Boot",
                 triggers=[TaskTrigger(TriggerType.BOOT)],
             ),
             ScheduledTask(
                 component_type=ComponentType.TASK,
-                name="logon", display_name="Logon", publisher="Test",
-                task_path="\\", task_name="Logon",
+                name="logon",
+                display_name="Logon",
+                publisher="Test",
+                task_path="\\",
+                task_name="Logon",
                 triggers=[TaskTrigger(TriggerType.LOGON)],
             ),
             ScheduledTask(
                 component_type=ComponentType.TASK,
-                name="boot2", display_name="Boot2", publisher="Test",
-                task_path="\\", task_name="Boot2",
+                name="boot2",
+                display_name="Boot2",
+                publisher="Test",
+                task_path="\\",
+                task_name="Boot2",
                 triggers=[TaskTrigger(TriggerType.BOOT)],
             ),
         ]
@@ -506,14 +511,20 @@ class TestTaskHelperFunctions:
         tasks = [
             ScheduledTask(
                 component_type=ComponentType.TASK,
-                name="visible", display_name="Visible", publisher="Test",
-                task_path="\\", task_name="Visible",
+                name="visible",
+                display_name="Visible",
+                publisher="Test",
+                task_path="\\",
+                task_name="Visible",
                 is_hidden=False,
             ),
             ScheduledTask(
                 component_type=ComponentType.TASK,
-                name="hidden", display_name="Hidden", publisher="Test",
-                task_path="\\", task_name="Hidden",
+                name="hidden",
+                display_name="Hidden",
+                publisher="Test",
+                task_path="\\",
+                task_name="Hidden",
                 is_hidden=True,
             ),
         ]
@@ -527,14 +538,20 @@ class TestTaskHelperFunctions:
         tasks = [
             ScheduledTask(
                 component_type=ComponentType.TASK,
-                name="normal", display_name="Normal", publisher="Test",
-                task_path="\\", task_name="Normal",
+                name="normal",
+                display_name="Normal",
+                publisher="Test",
+                task_path="\\",
+                task_name="Normal",
                 is_self_healing=False,
             ),
             ScheduledTask(
                 component_type=ComponentType.TASK,
-                name="healing", display_name="Healing", publisher="Test",
-                task_path="\\", task_name="Healing",
+                name="healing",
+                display_name="Healing",
+                publisher="Test",
+                task_path="\\",
+                task_name="Healing",
                 is_self_healing=True,
             ),
         ]

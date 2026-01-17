@@ -1,16 +1,13 @@
 """Unit tests for risk analyzer module."""
 
-import pytest
-from pathlib import Path
-
-from src.core.models import Component, ComponentType, RiskLevel
 from src.analysis.risk import (
+    DimensionScore,
     RiskAnalyzer,
     RiskAssessment,
     RiskDimension,
-    DimensionScore,
     create_default_analyzer,
 )
+from src.core.models import Component, ComponentType, RiskLevel
 
 
 class TestRiskDimension:

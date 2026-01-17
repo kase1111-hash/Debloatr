@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 from uuid import uuid4
 
 
@@ -145,7 +145,7 @@ class Component:
     name: str
     display_name: str
     publisher: str
-    install_path: Optional[Path] = None
+    install_path: Path | None = None
     classification: Classification = Classification.UNKNOWN
     risk_level: RiskLevel = RiskLevel.NONE
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -177,8 +177,8 @@ class ClassificationResult:
     classification: Classification
     source: str  # "signature", "heuristic", "llm", "none"
     confidence: float = 0.0
-    signature_id: Optional[str] = None
-    explanation: Optional[str] = None
+    signature_id: str | None = None
+    explanation: str | None = None
     heuristic_flags: list[str] = field(default_factory=list)
 
 
@@ -228,8 +228,8 @@ class ActionResult:
     success: bool
     action: ActionType
     component_id: str
-    snapshot_id: Optional[str] = None
-    error_message: Optional[str] = None
+    snapshot_id: str | None = None
+    error_message: str | None = None
     executed_at: datetime = field(default_factory=datetime.now)
     rollback_available: bool = True
 
@@ -267,11 +267,11 @@ class Session:
     """
 
     actions: list[ActionResult] = field(default_factory=list)
-    restore_point_id: Optional[str] = None
+    restore_point_id: str | None = None
     description: str = ""
     session_id: str = field(default_factory=lambda: str(uuid4()))
     started_at: datetime = field(default_factory=datetime.now)
-    ended_at: Optional[datetime] = None
+    ended_at: datetime | None = None
 
     @property
     def is_active(self) -> bool:
@@ -294,9 +294,9 @@ class SignatureMatchRule:
         hash_sha256: List of SHA256 hashes to match
     """
 
-    name_pattern: Optional[str] = None
-    publisher_pattern: Optional[str] = None
-    path_pattern: Optional[str] = None
+    name_pattern: str | None = None
+    publisher_pattern: str | None = None
+    path_pattern: str | None = None
     hash_sha256: list[str] = field(default_factory=list)
 
 

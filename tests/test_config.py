@@ -1,19 +1,16 @@
 """Tests for configuration management."""
 
-import json
-import pytest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from src.core.config import (
-    Config,
-    ScanConfig,
     ActionConfig,
     ClassificationConfig,
-    UIConfig,
+    Config,
+    ScanConfig,
+    get_default_config,
     load_config,
     save_config,
-    get_default_config,
 )
 
 

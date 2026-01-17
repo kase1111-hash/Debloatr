@@ -8,9 +8,10 @@ The orchestrator is responsible for:
 """
 
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Callable, Optional
+from typing import Any
 
 from .config import Config
 from .logging_config import get_logger, log_scan_result
@@ -37,7 +38,7 @@ class ScanResult:
     scan_time_ms: float = 0.0
     module_results: dict[str, "ModuleScanResult"] = field(default_factory=dict)
     started_at: datetime = field(default_factory=datetime.now)
-    completed_at: Optional[datetime] = None
+    completed_at: datetime | None = None
     errors: list[str] = field(default_factory=list)
 
     @property
@@ -72,7 +73,7 @@ class ModuleScanResult:
     module_name: str
     components: list[Component] = field(default_factory=list)
     scan_time_ms: float = 0.0
-    error: Optional[str] = None
+    error: str | None = None
 
     @property
     def success(self) -> bool:
@@ -110,7 +111,7 @@ class ScanOrchestrator:
         self.modules: list = []  # List of BaseDiscoveryModule
         self.logger = get_logger("main")
 
-    def register_module(self, module: "BaseDiscoveryModule") -> None:  # type: ignore[name-defined]
+    def register_module(self, module: Any) -> None:
         """Register a discovery module.
 
         Args:
@@ -120,9 +121,7 @@ class ScanOrchestrator:
             self.modules.append(module)
             self.logger.debug(f"Registered discovery module: {module.get_module_name()}")
         else:
-            self.logger.warning(
-                f"Discovery module not available: {module.get_module_name()}"
-            )
+            self.logger.warning(f"Discovery module not available: {module.get_module_name()}")
 
     def get_registered_modules(self) -> list[str]:
         """Get names of all registered modules.
@@ -134,8 +133,8 @@ class ScanOrchestrator:
 
     def run_scan(
         self,
-        modules: Optional[list[str]] = None,
-        progress_callback: Optional[ProgressCallback] = None,
+        modules: list[str] | None = None,
+        progress_callback: ProgressCallback | None = None,
     ) -> ScanResult:
         """Run a complete system scan.
 
@@ -185,7 +184,7 @@ class ScanOrchestrator:
 
         return result
 
-    def _run_module(self, module: "BaseDiscoveryModule") -> ModuleScanResult:  # type: ignore[name-defined]
+    def _run_module(self, module: Any) -> ModuleScanResult:
         """Run a single discovery module.
 
         Args:

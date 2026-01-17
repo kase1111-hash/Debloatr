@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Debloatr - Bloatware Scanner & Debloater.
 
-Entry point for the command-line interface.
+Entry point for the command-line interface and GUI.
 """
 
 import argparse
@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 from src.core.config import Config, load_config, save_config
-from src.core.logging_config import setup_logging, get_logger
+from src.core.logging_config import get_logger, setup_logging
 from src.core.orchestrator import ScanOrchestrator
 
 
@@ -26,7 +26,7 @@ def create_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--version",
         action="version",
-        version="%(prog)s 0.1.0",
+        version="%(prog)s 1.0.0",
     )
 
     parser.add_argument(
@@ -36,16 +36,30 @@ def create_argument_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
-        "--verbose", "-v",
+        "--verbose",
+        "-v",
         action="count",
         default=0,
         help="Increase verbosity (use -vv for debug)",
     )
 
     parser.add_argument(
-        "--quiet", "-q",
+        "--quiet",
+        "-q",
         action="store_true",
         help="Suppress console output",
+    )
+
+    parser.add_argument(
+        "--gui",
+        action="store_true",
+        help="Launch graphical user interface",
+    )
+
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Output results as JSON (global flag for all commands)",
     )
 
     # Subcommands
@@ -59,12 +73,14 @@ def create_argument_parser() -> argparse.ArgumentParser:
         help="Output results as JSON",
     )
     scan_parser.add_argument(
-        "--output", "-o",
+        "--output",
+        "-o",
         type=Path,
         help="Write results to file",
     )
     scan_parser.add_argument(
-        "--type", "-t",
+        "--type",
+        "-t",
         choices=["programs", "services", "tasks", "startup", "drivers", "telemetry", "uwp"],
         action="append",
         help="Scan specific component types (can be repeated)",
@@ -73,12 +89,19 @@ def create_argument_parser() -> argparse.ArgumentParser:
     # List command
     list_parser = subparsers.add_parser("list", help="List discovered components")
     list_parser.add_argument(
-        "--filter", "-f",
+        "--json",
+        action="store_true",
+        help="Output as JSON",
+    )
+    list_parser.add_argument(
+        "--filter",
+        "-f",
         choices=["core", "essential", "optional", "bloat", "aggressive", "unknown"],
         help="Filter by classification",
     )
     list_parser.add_argument(
-        "--risk", "-r",
+        "--risk",
+        "-r",
         choices=["none", "low", "medium", "high", "critical"],
         help="Filter by risk level",
     )
@@ -86,16 +109,38 @@ def create_argument_parser() -> argparse.ArgumentParser:
     # Plan command
     plan_parser = subparsers.add_parser("plan", help="Show action plan for component")
     plan_parser.add_argument("component_id", help="Component ID to plan for")
+    plan_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Output as JSON",
+    )
 
     # Action commands
     disable_parser = subparsers.add_parser("disable", help="Disable a component")
     disable_parser.add_argument("component_id", help="Component ID to disable")
+    disable_parser.add_argument(
+        "--yes",
+        "-y",
+        action="store_true",
+        help="Skip confirmation prompt",
+    )
 
     remove_parser = subparsers.add_parser("remove", help="Remove a component")
     remove_parser.add_argument("component_id", help="Component ID to remove")
+    remove_parser.add_argument(
+        "--yes",
+        "-y",
+        action="store_true",
+        help="Skip confirmation prompt (still requires typing REMOVE)",
+    )
 
     # Session commands
-    subparsers.add_parser("sessions", help="List all debloat sessions")
+    sessions_parser = subparsers.add_parser("sessions", help="List all debloat sessions")
+    sessions_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Output as JSON",
+    )
 
     undo_parser = subparsers.add_parser("undo", help="Undo a session or action")
     undo_parser.add_argument(
@@ -107,6 +152,12 @@ def create_argument_parser() -> argparse.ArgumentParser:
         "--last",
         action="store_true",
         help="Undo the last session",
+    )
+    undo_parser.add_argument(
+        "--yes",
+        "-y",
+        action="store_true",
+        help="Skip confirmation prompt",
     )
 
     # Recovery command
@@ -144,15 +195,12 @@ def get_log_level(verbose: int) -> int:
 
 def run_scan(args: argparse.Namespace, config: Config) -> int:
     """Execute the scan command."""
+    from src.ui.cli.formatters import format_scan_result
+
     logger = get_logger("main")
     logger.info("Starting system scan...")
 
     orchestrator = ScanOrchestrator(config)
-
-    # TODO: Register discovery modules when implemented
-    # orchestrator.register_module(ProgramsScanner())
-    # orchestrator.register_module(ServicesScanner())
-    # etc.
 
     # Run scan with optional module filter
     result = orchestrator.run_scan(modules=args.type)
@@ -187,16 +235,11 @@ def run_scan(args: argparse.Namespace, config: Config) -> int:
             print(json_output)
     else:
         # Text output
-        print(f"\nScan completed in {result.scan_time_ms:.1f}ms")
-        print(f"Total components found: {result.total_count}")
-        print("\nSummary by classification:")
-        for classification, count in result.get_summary().items():
-            print(f"  {classification}: {count}")
+        print(format_scan_result(result))
 
-        if result.errors:
-            print("\nErrors:")
-            for error in result.errors:
-                print(f"  - {error}")
+        if args.output:
+            args.output.write_text(format_scan_result(result))
+            print(f"\nResults also written to {args.output}")
 
     return 0
 
@@ -214,6 +257,18 @@ def run_config(args: argparse.Namespace, config: Config) -> int:
 
     print("Use --init to create config or --show to display current config")
     return 1
+
+
+def run_gui(config: Config) -> int:
+    """Launch the graphical user interface."""
+    try:
+        from src.ui.gui.main import run_gui_app
+
+        return run_gui_app(config)
+    except ImportError as e:
+        print(f"Error: GUI dependencies not installed: {e}")
+        print("Install with: pip install PySide6")
+        return 1
 
 
 def main() -> int:
@@ -235,16 +290,45 @@ def main() -> int:
     # Ensure directories exist
     config.ensure_directories()
 
+    # Launch GUI if requested
+    if args.gui:
+        return run_gui(config)
+
+    # Import CLI commands
+    from src.ui.cli.commands import (
+        run_disable_command,
+        run_list_command,
+        run_plan_command,
+        run_recovery_command,
+        run_remove_command,
+        run_sessions_command,
+        run_undo_command,
+    )
+
     # Execute command
     if args.command == "scan":
         return run_scan(args, config)
+    elif args.command == "list":
+        return run_list_command(args, config)
+    elif args.command == "plan":
+        return run_plan_command(args, config)
+    elif args.command == "disable":
+        return run_disable_command(args, config)
+    elif args.command == "remove":
+        return run_remove_command(args, config)
+    elif args.command == "sessions":
+        return run_sessions_command(args, config)
+    elif args.command == "undo":
+        return run_undo_command(args, config)
+    elif args.command == "recovery":
+        return run_recovery_command(args, config)
     elif args.command == "config":
         return run_config(args, config)
     elif args.command is None:
         parser.print_help()
         return 0
     else:
-        print(f"Command '{args.command}' not yet implemented")
+        print(f"Error: Unknown command '{args.command}'")
         return 1
 
 

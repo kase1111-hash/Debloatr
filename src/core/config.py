@@ -8,7 +8,7 @@ import json
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 # Default paths
 DEFAULT_CONFIG_DIR = Path(os.environ.get("APPDATA", "~")) / "Debloatr"
@@ -244,7 +244,7 @@ class Config:
         return config
 
 
-def load_config(config_path: Optional[Path] = None) -> Config:
+def load_config(config_path: Path | None = None) -> Config:
     """Load configuration from file.
 
     Args:
@@ -270,7 +270,7 @@ def load_config(config_path: Optional[Path] = None) -> Config:
     return Config.from_dict(data)
 
 
-def save_config(config: Config, config_path: Optional[Path] = None) -> None:
+def save_config(config: Config, config_path: Path | None = None) -> None:
     """Save configuration to file.
 
     Args:
