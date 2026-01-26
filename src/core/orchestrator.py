@@ -5,12 +5,14 @@ The orchestrator is responsible for:
 - Coordinating scan execution
 - Aggregating results from all modules
 - Providing progress feedback
+- Integrating classification after discovery
 """
 
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 from .config import Config
@@ -101,15 +103,20 @@ class ScanOrchestrator:
         print(f"Found {result.total_count} components")
     """
 
-    def __init__(self, config: Config) -> None:
+    def __init__(self, config: Config, auto_register: bool = True) -> None:
         """Initialize the orchestrator.
 
         Args:
             config: Application configuration.
+            auto_register: Whether to automatically register all discovery modules.
         """
         self.config = config
         self.modules: list = []  # List of BaseDiscoveryModule
         self.logger = get_logger("main")
+        self._classification_engine: Any = None
+
+        if auto_register:
+            self._register_default_modules()
 
     def register_module(self, module: Any) -> None:
         """Register a discovery module.
@@ -173,6 +180,11 @@ class ScanOrchestrator:
                 result.components.extend(module_result.components)
             else:
                 result.errors.append(f"{module_name}: {module_result.error}")
+
+        # Classify discovered components
+        if result.components:
+            self.logger.info("Classifying discovered components...")
+            self.classify_components(result.components)
 
         # Finalize result
         result.scan_time_ms = (time.perf_counter() - start_time) * 1000
@@ -247,3 +259,105 @@ class ScanOrchestrator:
                 return self._run_module(module)
 
         raise ValueError(f"Module not found: {module_name}")
+
+    def _register_default_modules(self) -> None:
+        """Register all available discovery modules."""
+        try:
+            from src.discovery import (
+                DriversScanner,
+                ProgramsScanner,
+                ServicesScanner,
+                StartupScanner,
+                TasksScanner,
+                TelemetryScanner,
+            )
+
+            # Register each module, checking availability
+            module_classes = [
+                ProgramsScanner,
+                ServicesScanner,
+                TasksScanner,
+                StartupScanner,
+                DriversScanner,
+                TelemetryScanner,
+            ]
+
+            for module_class in module_classes:
+                try:
+                    module = module_class()
+                    self.register_module(module)
+                except Exception as e:
+                    self.logger.warning(f"Failed to register {module_class.__name__}: {e}")
+
+            self.logger.info(f"Registered {len(self.modules)} discovery modules")
+
+        except ImportError as e:
+            self.logger.error(f"Failed to import discovery modules: {e}")
+
+    def _get_classification_engine(self) -> Any:
+        """Get or create the classification engine.
+
+        Returns:
+            ClassificationEngine instance with loaded signatures.
+        """
+        if self._classification_engine is None:
+            try:
+                from src.classification.engine import ClassificationEngine
+                from src.classification.heuristics import (
+                    HeuristicsEngine,
+                    create_checker_for_engine,
+                )
+
+                self._classification_engine = ClassificationEngine(
+                    enable_heuristics=True,
+                    heuristic_threshold=0.6,
+                )
+
+                # Load signatures from config directory
+                signatures_path = Path(self.config.config_dir) / "signatures"
+                if not signatures_path.exists():
+                    # Try data/signatures relative to project root
+                    signatures_path = Path(__file__).parent.parent.parent / "data" / "signatures"
+
+                if signatures_path.exists():
+                    count = self._classification_engine.load_signatures(signatures_path)
+                    self.logger.info(f"Loaded {count} signatures from {signatures_path}")
+
+                # Register heuristics checker
+                heuristics_engine = HeuristicsEngine()
+                checker = create_checker_for_engine(heuristics_engine)
+                self._classification_engine.register_heuristic(checker)
+                self.logger.debug("Registered heuristics checker")
+
+            except ImportError as e:
+                self.logger.warning(f"Classification engine not available: {e}")
+                self._classification_engine = None
+
+        return self._classification_engine
+
+    def classify_components(self, components: list[Component]) -> list[Component]:
+        """Classify a list of components.
+
+        Args:
+            components: List of components to classify.
+
+        Returns:
+            The same list with classifications applied.
+        """
+        engine = self._get_classification_engine()
+        if engine is None:
+            self.logger.warning("Classification engine not available, skipping classification")
+            return components
+
+        classified_count = 0
+        for component in components:
+            try:
+                decision = engine.classify(component)
+                component.classification = decision.classification
+                if decision.classification != Classification.UNKNOWN:
+                    classified_count += 1
+            except Exception as e:
+                self.logger.debug(f"Classification error for {component.name}: {e}")
+
+        self.logger.info(f"Classified {classified_count}/{len(components)} components")
+        return components
