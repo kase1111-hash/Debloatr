@@ -277,11 +277,56 @@ class TestDisableHandler:
         handler = DisableHandler()
         assert handler.dry_run is False
         assert handler.create_snapshots is True
+        assert handler.command_timeout == 60
 
     def test_init_dry_run(self) -> None:
         """Test creating handler in dry-run mode."""
         handler = DisableHandler(dry_run=True)
         assert handler.dry_run is True
+
+    def test_init_custom_timeout(self) -> None:
+        """Test creating handler with custom timeout."""
+        handler = DisableHandler(command_timeout=120)
+        assert handler.command_timeout == 120
+
+    def test_disable_program_no_associated_components(self) -> None:
+        """Test disabling program with no associated services/tasks/startup entries."""
+        handler = DisableHandler(dry_run=True)
+
+        component = Component(
+            component_type=ComponentType.PROGRAM,
+            name="standalone-app",
+            display_name="Standalone App",
+            publisher="Test",
+        )
+
+        # No associated services, tasks, or startup entries
+        context = {}
+        result = handler.disable_program(component, context)
+
+        # Should succeed but indicate no operations were performed
+        assert result.success is True
+        assert result.current_state["disabled_count"] == 0
+        assert "No associated" in result.error_message
+
+    def test_disable_program_with_associated_services(self) -> None:
+        """Test disabling program with associated services."""
+        handler = DisableHandler(dry_run=True)
+
+        component = Component(
+            component_type=ComponentType.PROGRAM,
+            name="multi-component-app",
+            display_name="Multi Component App",
+            publisher="Test",
+        )
+
+        context = {
+            "associated_services": ["TestService1", "TestService2"],
+        }
+        result = handler.disable_program(component, context)
+
+        assert result.success is True
+        assert result.current_state["disabled_count"] == 2
 
     def test_disable_service_dry_run(self) -> None:
         """Test disabling service in dry-run mode."""
