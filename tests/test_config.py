@@ -44,6 +44,12 @@ class TestActionConfig:
         assert config.create_restore_point is True
         assert config.staging_days_oem == 7
         assert config.enable_quarantine is True
+        assert config.command_timeout_seconds == 60
+
+    def test_custom_timeout(self):
+        """Test custom command timeout configuration."""
+        config = ActionConfig(command_timeout_seconds=120)
+        assert config.command_timeout_seconds == 120
 
 
 class TestClassificationConfig:
@@ -100,6 +106,7 @@ class TestConfig:
         assert "ui" in data
         assert data["scan"]["scan_programs"] is True
         assert data["actions"]["default_mode"] == "DRY_RUN"
+        assert data["actions"]["command_timeout_seconds"] == 60
 
     def test_from_dict(self):
         """Test configuration deserialization from dictionary."""
@@ -110,6 +117,7 @@ class TestConfig:
             },
             "actions": {
                 "default_mode": "INTERACTIVE",
+                "command_timeout_seconds": 90,
             },
             "protected_components": ["important-app"],
         }
@@ -119,6 +127,7 @@ class TestConfig:
         assert config.scan.scan_programs is False
         assert config.scan.scan_services is True
         assert config.actions.default_mode == "INTERACTIVE"
+        assert config.actions.command_timeout_seconds == 90
         assert "important-app" in config.protected_components
 
     def test_roundtrip(self):

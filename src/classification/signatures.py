@@ -57,6 +57,8 @@ class SignatureDatabase:
         self._by_publisher: dict[str, list[Signature]] = {}
         self._loaded_files: list[Path] = []
         self._file_hashes: dict[str, str] = {}
+        self._versions: dict[str, str] = {}  # file path -> version
+        self._last_updated: dict[str, str] = {}  # file path -> last_updated date
 
     def load_from_file(
         self,
@@ -103,10 +105,19 @@ class SignatureDatabase:
         # Handle both array and object with signatures key
         if isinstance(data, list):
             signatures_data = data
+            version = "unknown"
+            last_updated = "unknown"
         elif isinstance(data, dict):
             signatures_data = data.get("signatures", [])
+            version = data.get("version", "unknown")
+            last_updated = data.get("last_updated", "unknown")
         else:
             raise ValueError("Invalid signature file format")
+
+        # Track version metadata
+        file_key = str(file_path)
+        self._versions[file_key] = version
+        self._last_updated[file_key] = last_updated
 
         # Load each signature
         count = 0
@@ -119,7 +130,7 @@ class SignatureDatabase:
                 logger.warning(f"Failed to parse signature: {e}")
 
         self._loaded_files.append(file_path)
-        logger.info(f"Loaded {count} signatures from {file_path}")
+        logger.info(f"Loaded {count} signatures from {file_path} (version: {version})")
 
         return count
 
@@ -479,6 +490,49 @@ class SignatureDatabase:
         """Get total number of signatures."""
         return len(self.signatures)
 
+    @property
+    def versions(self) -> dict[str, str]:
+        """Get version information for all loaded signature files.
+
+        Returns:
+            Dictionary mapping file path to version string.
+        """
+        return self._versions.copy()
+
+    @property
+    def primary_version(self) -> str:
+        """Get the version of the primary (first loaded) signature file.
+
+        Returns:
+            Version string, or 'unknown' if no files loaded.
+        """
+        if self._loaded_files:
+            return self._versions.get(str(self._loaded_files[0]), "unknown")
+        return "unknown"
+
+    def get_version_info(self) -> dict[str, Any]:
+        """Get comprehensive version information for all loaded signatures.
+
+        Returns:
+            Dictionary with version metadata for all loaded files.
+        """
+        info: dict[str, Any] = {
+            "total_signatures": self.count,
+            "files_loaded": len(self._loaded_files),
+            "files": [],
+        }
+
+        for file_path in self._loaded_files:
+            file_key = str(file_path)
+            info["files"].append({
+                "path": file_key,
+                "version": self._versions.get(file_key, "unknown"),
+                "last_updated": self._last_updated.get(file_key, "unknown"),
+                "hash": self._file_hashes.get(file_key),
+            })
+
+        return info
+
     def clear(self) -> None:
         """Clear all loaded signatures."""
         self.signatures.clear()
@@ -486,3 +540,5 @@ class SignatureDatabase:
         self._by_publisher.clear()
         self._loaded_files.clear()
         self._file_hashes.clear()
+        self._versions.clear()
+        self._last_updated.clear()

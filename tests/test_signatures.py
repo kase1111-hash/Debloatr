@@ -418,6 +418,87 @@ class TestSignatureDatabase:
         db.clear()
         assert db.count == 0
         assert len(db.signatures) == 0
+        assert len(db.versions) == 0
+
+    def test_version_tracking(self, tmp_path: Path) -> None:
+        """Test that version information is tracked when loading signatures."""
+        sig_file = tmp_path / "sigs.json"
+        sig_data = {
+            "version": "2.1.0",
+            "last_updated": "2026-01-15",
+            "signatures": [
+                {"signature_id": "ver-001", "component_name": "Versioned App"}
+            ],
+        }
+        sig_file.write_text(json.dumps(sig_data))
+
+        db = SignatureDatabase()
+        db.load_from_file(sig_file)
+
+        assert db.primary_version == "2.1.0"
+        assert str(sig_file) in db.versions
+        assert db.versions[str(sig_file)] == "2.1.0"
+
+    def test_version_tracking_array_format(self, tmp_path: Path) -> None:
+        """Test version tracking with array format (no version metadata)."""
+        sig_file = tmp_path / "sigs.json"
+        sig_data = [{"signature_id": "arr-001", "component_name": "Array App"}]
+        sig_file.write_text(json.dumps(sig_data))
+
+        db = SignatureDatabase()
+        db.load_from_file(sig_file)
+
+        assert db.primary_version == "unknown"
+
+    def test_get_version_info(self, tmp_path: Path) -> None:
+        """Test getting comprehensive version information."""
+        sig_file = tmp_path / "sigs.json"
+        sig_data = {
+            "version": "1.5.0",
+            "last_updated": "2026-01-20",
+            "signatures": [
+                {"signature_id": "info-001"},
+                {"signature_id": "info-002"},
+            ],
+        }
+        sig_file.write_text(json.dumps(sig_data))
+
+        db = SignatureDatabase()
+        db.load_from_file(sig_file)
+
+        info = db.get_version_info()
+
+        assert info["total_signatures"] == 2
+        assert info["files_loaded"] == 1
+        assert len(info["files"]) == 1
+        assert info["files"][0]["version"] == "1.5.0"
+        assert info["files"][0]["last_updated"] == "2026-01-20"
+
+    def test_multiple_files_version_tracking(self, tmp_path: Path) -> None:
+        """Test version tracking with multiple signature files."""
+        sig1 = tmp_path / "sigs1.json"
+        sig1.write_text(json.dumps({
+            "version": "1.0.0",
+            "signatures": [{"signature_id": "multi-001"}]
+        }))
+
+        sig2 = tmp_path / "sigs2.json"
+        sig2.write_text(json.dumps({
+            "version": "2.0.0",
+            "signatures": [{"signature_id": "multi-002"}]
+        }))
+
+        db = SignatureDatabase()
+        db.load_from_file(sig1)
+        db.load_from_file(sig2)
+
+        # Primary version should be from first loaded file
+        assert db.primary_version == "1.0.0"
+
+        # Both versions should be tracked
+        assert len(db.versions) == 2
+        assert db.versions[str(sig1)] == "1.0.0"
+        assert db.versions[str(sig2)] == "2.0.0"
 
     def test_parse_safe_unsafe_actions(self, tmp_path: Path) -> None:
         """Test parsing safe and unsafe action types."""

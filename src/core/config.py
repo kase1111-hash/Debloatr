@@ -44,6 +44,7 @@ class ActionConfig:
     create_restore_point: bool = True
     staging_days_oem: int = 7  # Days to wait before allowing OEM removal
     enable_quarantine: bool = True
+    command_timeout_seconds: int = 60  # Timeout for PowerShell/subprocess commands
 
 
 @dataclass
@@ -156,6 +157,7 @@ class Config:
                 "create_restore_point": self.actions.create_restore_point,
                 "staging_days_oem": self.actions.staging_days_oem,
                 "enable_quarantine": self.actions.enable_quarantine,
+                "command_timeout_seconds": self.actions.command_timeout_seconds,
             },
             "classification": {
                 "use_signatures": self.classification.use_signatures,
@@ -208,6 +210,7 @@ class Config:
                 create_restore_point=actions_data.get("create_restore_point", True),
                 staging_days_oem=actions_data.get("staging_days_oem", 7),
                 enable_quarantine=actions_data.get("enable_quarantine", True),
+                command_timeout_seconds=actions_data.get("command_timeout_seconds", 60),
             )
 
         # Load classification config

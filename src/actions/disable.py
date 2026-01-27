@@ -63,15 +63,18 @@ class DisableHandler:
         self,
         dry_run: bool = False,
         create_snapshots: bool = True,
+        command_timeout: int = 60,
     ) -> None:
         """Initialize the disable handler.
 
         Args:
             dry_run: If True, simulate actions without making changes
             create_snapshots: Whether to create snapshots for rollback
+            command_timeout: Timeout in seconds for PowerShell/subprocess commands
         """
         self.dry_run = dry_run
         self.create_snapshots = create_snapshots
+        self.command_timeout = command_timeout
         self._is_windows = os.name == "nt"
 
     def disable_component(
@@ -528,7 +531,22 @@ class DisableHandler:
             if not result.success:
                 errors.append(f"Startup: {result.error_message}")
 
-        success = len(errors) == 0 or len(results) == 0
+        # Determine success:
+        # - If operations were attempted: success only if no errors
+        # - If no operations were attempted: success (no-op), but note it
+        if len(results) == 0:
+            # No associated services, tasks, or startups to disable
+            return DisableResult(
+                success=True,
+                component_id=component.id,
+                component_type=ComponentType.PROGRAM,
+                previous_state={"sub_results": 0},
+                current_state={"disabled_count": 0},
+                error_message="No associated services, tasks, or startup entries to disable",
+                requires_reboot=False,
+            )
+
+        success = len(errors) == 0
         requires_reboot = any(r.requires_reboot for r in results)
 
         return DisableResult(
@@ -673,7 +691,7 @@ class DisableHandler:
                 ["powershell.exe", "-NoProfile", "-Command", command],
                 capture_output=True,
                 text=True,
-                timeout=60,
+                timeout=self.command_timeout,
                 creationflags=(
                     subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
                 ),
@@ -686,7 +704,7 @@ class DisableHandler:
             }
 
         except subprocess.TimeoutExpired:
-            return {"success": False, "output": "", "error": "Command timed out"}
+            return {"success": False, "output": "", "error": f"Command timed out after {self.command_timeout}s"}
         except Exception as e:
             return {"success": False, "output": "", "error": str(e)}
 
@@ -701,7 +719,7 @@ class DisableHandler:
                 capture_output=True,
                 text=True,
                 shell=True,
-                timeout=60,
+                timeout=self.command_timeout,
                 creationflags=(
                     subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
                 ),
@@ -714,18 +732,22 @@ class DisableHandler:
             }
 
         except subprocess.TimeoutExpired:
-            return {"success": False, "output": "", "error": "Command timed out"}
+            return {"success": False, "output": "", "error": f"Command timed out after {self.command_timeout}s"}
         except Exception as e:
             return {"success": False, "output": "", "error": str(e)}
 
 
-def create_disable_handler(dry_run: bool = False) -> DisableHandler:
+def create_disable_handler(
+    dry_run: bool = False,
+    command_timeout: int = 60,
+) -> DisableHandler:
     """Create a disable handler.
 
     Args:
         dry_run: If True, simulate actions
+        command_timeout: Timeout in seconds for commands
 
     Returns:
         DisableHandler instance
     """
-    return DisableHandler(dry_run=dry_run)
+    return DisableHandler(dry_run=dry_run, command_timeout=command_timeout)
