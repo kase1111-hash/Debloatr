@@ -353,9 +353,7 @@ class TelemetryScanner(BaseDiscoveryModule):
                         ProcessPath = if ($proc) { $proc.Path } else { "" }
                     }
                 } | ConvertTo-Json -Compress
-                """.replace(
-                    "\n", " "
-                ),
+                """.replace("\n", " "),
             ]
 
             result = subprocess.run(

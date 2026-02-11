@@ -153,12 +153,25 @@ Use clear, descriptive commit messages:
 
 ## Contributing to Signatures
 
-The signature database is critical for accurate bloatware detection. When adding signatures:
+The signature database is critical for accurate bloatware detection. We provide a template and validation tools to make contributing easy.
+
+### Quick Start
+
+1. Copy the template: `data/signatures/TEMPLATE.json`
+2. Fill in all required fields (see template comments for valid values)
+3. Validate your signature file:
+   ```bash
+   python scripts/validate_signature.py your_signature_file.json
+   ```
+4. Submit a PR adding your signatures to `data/signatures/expanded.json`
+
+### Requirements for New Signatures
 
 1. **Research thoroughly** - Document evidence for the classification
-2. **Test on real systems** - Verify the signature matches correctly
+2. **Test on real systems** - Verify the regex `name_pattern` matches real component names
 3. **Include evidence URLs** - Link to sources supporting the classification
-4. **Consider safe actions** - Mark which actions are safe for the component
+4. **Document breakage** - Explain what happens when the component is disabled/removed
+5. **Specify reinstall behavior** - Does the component come back after Windows Update?
 
 ### Signature Format
 
@@ -176,8 +189,26 @@ The signature database is critical for accurate bloatware detection. When adding
   "classification": "BLOAT|AGGRESSIVE|OPTIONAL|ESSENTIAL|CORE",
   "safe_actions": ["disable", "remove", "contain"],
   "evidence_url": "https://example.com/evidence",
-  "breakage_notes": "Any known issues from disabling/removing"
+  "breakage_notes": "Any known issues from disabling/removing",
+  "reinstall_behavior": "none|windows_update|self_healing|manual"
 }
+```
+
+### Validation Script
+
+The `scripts/validate_signature.py` script checks:
+- All required fields are present and non-empty
+- Regex patterns compile without errors
+- `classification`, `component_type`, and `safe_actions` use valid enum values
+- No duplicate `signature_id` values
+- `breakage_notes` has meaningful content (>10 characters)
+
+```bash
+# Validate a single file
+python scripts/validate_signature.py data/signatures/expanded.json
+
+# Validate multiple files
+python scripts/validate_signature.py data/signatures/default.json data/signatures/expanded.json
 ```
 
 ## Design Principles

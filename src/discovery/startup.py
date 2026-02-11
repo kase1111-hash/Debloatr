@@ -559,9 +559,7 @@ class StartupScanner(BaseDiscoveryModule):
                     WorkingDirectory = $shortcut.WorkingDirectory
                     Description = $shortcut.Description
                 }} | ConvertTo-Json -Compress
-                """.replace(
-                    "\n", " "
-                ),
+                """.replace("\n", " "),
             ]
 
             result = subprocess.run(

@@ -474,7 +474,7 @@ class SignatureDatabase:
             signatures_data.append(sig_data)
 
         output = {
-            "version": "1.0",
+            "version": "0.1.0",
             "generated": datetime.now().isoformat(),
             "signature_count": len(signatures_data),
             "signatures": signatures_data,
@@ -524,12 +524,14 @@ class SignatureDatabase:
 
         for file_path in self._loaded_files:
             file_key = str(file_path)
-            info["files"].append({
-                "path": file_key,
-                "version": self._versions.get(file_key, "unknown"),
-                "last_updated": self._last_updated.get(file_key, "unknown"),
-                "hash": self._file_hashes.get(file_key),
-            })
+            info["files"].append(
+                {
+                    "path": file_key,
+                    "version": self._versions.get(file_key, "unknown"),
+                    "last_updated": self._last_updated.get(file_key, "unknown"),
+                    "hash": self._file_hashes.get(file_key),
+                }
+            )
 
         return info
 

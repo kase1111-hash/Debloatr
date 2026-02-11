@@ -358,9 +358,7 @@ class TasksScanner(BaseDiscoveryModule):
                         LastTaskResult = if ($info) { $info.LastTaskResult } else { 0 }
                     }
                 } | ConvertTo-Json -Depth 5 -Compress
-                """.replace(
-                    "\n", " "
-                ),
+                """.replace("\n", " "),
             ]
 
             result = subprocess.run(

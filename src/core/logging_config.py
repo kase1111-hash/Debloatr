@@ -240,6 +240,3 @@ def log_scan_result(
     """
     logger = get_logger("scan")
     logger.info(f"{module_name} | Found {component_count} components in {duration_ms:.1f}ms")
-
-
-

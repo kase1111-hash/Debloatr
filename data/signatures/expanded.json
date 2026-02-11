@@ -1,0 +1,2105 @@
+{
+  "version": "1.1.0",
+  "last_updated": "2026-02-11",
+  "description": "Expanded signature database — additional OEM, Microsoft, telemetry, and third-party signatures.",
+  "signatures": [
+    {
+      "signature_id": "microsoft-bing-weather-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "MSN Weather",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.BingWeather.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Weather app. Can use web browser instead.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-bing-news-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "MSN News",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.BingNews.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "News aggregator app. Not essential.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-bing-finance-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "MSN Money",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.BingFinance.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Finance tracking app. Not essential.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-bing-sports-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "MSN Sports",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.BingSports.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Sports tracking app. Not essential.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-people-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Microsoft People",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.People.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Contact aggregation app. Mail app may lose contact integration.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-maps-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Windows Maps",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.WindowsMaps.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Maps app. Use web maps instead.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-zunemusic-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Groove Music",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.ZuneMusic.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Music player. Streaming service discontinued. Use alternative player.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-zunevideo-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Movies & TV",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.ZuneVideo.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Video player. Removing means no built-in media player for purchased content.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-office-hub-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "My Office",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.MicrosoftOfficeHub.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Office trial launcher. Does not affect actual Office installations.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-onenote-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "OneNote for Windows 10",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.Office\\.OneNote.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "UWP version. Desktop OneNote (from Office suite) is unaffected.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-paint3d-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Paint 3D",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.MSPaint.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "3D painting app. Classic Paint (mspaint.exe) is unaffected.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-sticky-notes-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Sticky Notes",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.MicrosoftStickyNotes.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Desktop sticky notes. Notes are synced to Microsoft account and recoverable.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-voicerecorder-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Windows Voice Recorder",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.WindowsSoundRecorder.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Simple voice recorder. Rarely used by most users.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-alarms-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Windows Alarms & Clock",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.WindowsAlarms.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Clock, timer, and alarm app. Taskbar clock is unaffected.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-comms-phone-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Phone Link",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.YourPhone.*|^Microsoft\\.Windows\\.Phone.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Phone-to-PC integration. Only useful with Phone Link companion app.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-todos-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Microsoft To Do",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.Todos.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Task management app. Data synced to Microsoft account.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-powerautomate-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Power Automate",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.PowerAutomateDesktop.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Workflow automation tool. Not needed for most users.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-clipchamp-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Clipchamp",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Clipchamp\\.Clipchamp.*",
+        "publisher_pattern": "Microsoft|Clipchamp",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Video editor. Pre-installed on Windows 11. Not essential.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-xbox-app-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Xbox App",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.GamingApp.*|^Microsoft\\.XboxApp.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": ["microsoft-xbox-gamebar-001", "microsoft-xbox-identity-001"],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Required for Game Pass. Safe to remove if not a PC gamer.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-xbox-speechtotext-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Xbox Game Speech Window",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.XboxSpeechToTextOverlay.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["microsoft-xbox-gamebar-001"],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Game accessibility overlay. Only needed for speech-to-text in games.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-xbox-tcui-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Xbox TCUI",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.Xbox\\.TCUI.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": ["microsoft-xbox-gamebar-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Xbox Title Callable UI. Needed for some Xbox features and games.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-outlook-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Outlook for Windows",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.OutlookForWindows.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "New Outlook UWP app. Does not affect classic Outlook from Office.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-copilot-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Microsoft Copilot",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Microsoft\\.Copilot.*|^Microsoft\\.Windows\\.Ai.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "AI assistant. Frequently reinstalled by Windows updates. Disable recommended over removal.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-widgets-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Windows Widgets",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^MicrosoftWindows\\.Client\\.WebExperience.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Taskbar widgets panel (Win11). Removing may leave empty taskbar space.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-teams-new-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Microsoft Teams (new)",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^MSTeams.*|^MicrosoftTeams.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["microsoft-teams-personal-001"],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "New Teams UWP app on Windows 11. Reinstalled by updates. Keep if using Teams.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "hp-wolf-security-001",
+      "publisher": "HP Inc.",
+      "component_name": "HP Wolf Security",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^HP Wolf Security.*|^HP Sure.*",
+        "publisher_pattern": "HP",
+        "path_pattern": ".*\\\\HP\\\\HP Wolf.*|.*\\\\HP\\\\Sure.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "HP's security suite. Windows Defender is sufficient. Has multiple sub-components.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "hp-audio-switch-001",
+      "publisher": "HP Inc.",
+      "component_name": "HP Audio Switch",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^HP Audio Switch.*",
+        "publisher_pattern": "HP",
+        "path_pattern": ".*\\\\HP\\\\.*Audio.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Audio device switching utility. Windows audio settings are sufficient.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "hp-documentation-001",
+      "publisher": "HP Inc.",
+      "component_name": "HP Documentation",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^HP Documentation.*",
+        "publisher_pattern": "HP",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Offline user manual. Available online if needed.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "hp-smart-001",
+      "publisher": "HP Inc.",
+      "component_name": "HP Smart",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^AD2F1837\\.HPPrinterControl.*",
+        "publisher_pattern": "HP",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Printer management. Only needed if using HP printer. Standard drivers still work.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "hp-pc-hardware-diagnostics-001",
+      "publisher": "HP Inc.",
+      "component_name": "HP PC Hardware Diagnostics",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^HP PC Hardware Diagnostics.*",
+        "publisher_pattern": "HP",
+        "path_pattern": ".*\\\\HP\\\\Diagnostics.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Hardware testing tool. Useful for troubleshooting but runs background services.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "dell-command-update-001",
+      "publisher": "Dell Inc.",
+      "component_name": "Dell Command | Update",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Dell Command.*Update.*",
+        "publisher_pattern": "Dell",
+        "path_pattern": ".*\\\\Dell\\\\Command.*Update.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": ["dell-update-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Enterprise driver update tool. Useful but has background services.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "dell-power-manager-001",
+      "publisher": "Dell Inc.",
+      "component_name": "Dell Power Manager",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Dell Power Manager.*",
+        "publisher_pattern": "Dell",
+        "path_pattern": ".*\\\\Dell\\\\Power.*Manager.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Battery management on Dell laptops. Windows battery settings are usually sufficient.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "dell-optimizer-001",
+      "publisher": "Dell Inc.",
+      "component_name": "Dell Optimizer",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Dell Optimizer.*",
+        "publisher_pattern": "Dell",
+        "path_pattern": ".*\\\\Dell\\\\Dell.*Optimizer.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "AI-based performance optimization. Runs telemetry services. Not essential.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "dell-cinema-color-001",
+      "publisher": "Dell Inc.",
+      "component_name": "Dell CinemaColor",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Dell CinemaColor.*|^Dell Cinema.*",
+        "publisher_pattern": "Dell",
+        "path_pattern": ".*\\\\Dell\\\\Cinema.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Display color profile manager. Windows color management is sufficient.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "dell-pair-001",
+      "publisher": "Dell Inc.",
+      "component_name": "Dell Pair",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^DellInc\\.DellPair.*",
+        "publisher_pattern": "Dell",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Dell peripheral pairing app. Standard Bluetooth settings are sufficient.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "lenovo-hotkeys-001",
+      "publisher": "Lenovo",
+      "component_name": "Lenovo Hotkeys",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Lenovo Hotkeys.*|^Lenovo Utility.*",
+        "publisher_pattern": "Lenovo",
+        "path_pattern": ".*\\\\Lenovo\\\\Hotkey.*|.*\\\\Lenovo\\\\Utility.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Fn key functionality. Removing may break special keys (brightness, volume, etc.).",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "lenovo-now-001",
+      "publisher": "Lenovo",
+      "component_name": "Lenovo Now",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Lenovo Now.*|^Lenovo Welcome.*",
+        "publisher_pattern": "Lenovo",
+        "path_pattern": ".*\\\\Lenovo\\\\.*Now.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "First-run promotional app. Not needed after setup.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "lenovo-pen-settings-001",
+      "publisher": "Lenovo",
+      "component_name": "Lenovo Pen Settings",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Lenovo Pen Settings.*",
+        "publisher_pattern": "Lenovo",
+        "path_pattern": ".*\\\\Lenovo\\\\.*Pen.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Stylus configuration. Only needed if using active pen.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "asus-armoury-crate-001",
+      "publisher": "ASUSTeK COMPUTER INC.",
+      "component_name": "ASUS Armoury Crate",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^ASUS.*Armoury.*Crate.*|^Armoury Crate.*",
+        "publisher_pattern": "ASUS|ASUSTeK",
+        "path_pattern": ".*\\\\ASUS\\\\ArmouryCrate.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Controls RGB lighting, fan profiles, and performance modes on ASUS hardware. Difficult to fully remove.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "asus-giftbox-001",
+      "publisher": "ASUSTeK COMPUTER INC.",
+      "component_name": "ASUS GiftBox",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^ASUSTeKCOMPUTERINC\\.GiftBox.*",
+        "publisher_pattern": "ASUS|ASUSTeK",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Promotional app pushing third-party software offers.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "asus-myasus-001",
+      "publisher": "ASUSTeK COMPUTER INC.",
+      "component_name": "MyASUS",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^B9ECED6F\\.ABORAX.*|^ASUSTeK.*MyASUS.*",
+        "publisher_pattern": "ASUS|ASUSTeK",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "System management app. Provides driver updates and warranty info.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "acer-care-center-001",
+      "publisher": "Acer Incorporated",
+      "component_name": "Acer Care Center",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Acer Care Center.*",
+        "publisher_pattern": "Acer",
+        "path_pattern": ".*\\\\Acer\\\\Care Center.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "System management tool. Driver updates available via Acer website.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "acer-quick-access-001",
+      "publisher": "Acer Incorporated",
+      "component_name": "Acer Quick Access",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Acer Quick Access.*",
+        "publisher_pattern": "Acer",
+        "path_pattern": ".*\\\\Acer\\\\Quick Access.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Quick settings for wireless, display, USB charging. May affect hotkeys.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "acer-product-registration-001",
+      "publisher": "Acer Incorporated",
+      "component_name": "Acer Product Registration",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Acer.*Registration.*",
+        "publisher_pattern": "Acer",
+        "path_pattern": ".*\\\\Acer\\\\Registration.*",
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Nags to register product. No functional purpose.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "kaspersky-security-001",
+      "publisher": "Kaspersky Lab",
+      "component_name": "Kaspersky Security",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Kaspersky.*",
+        "publisher_pattern": "Kaspersky",
+        "path_pattern": ".*\\\\Kaspersky Lab\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Pre-installed trial. Use Kaspersky removal tool for clean uninstall.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "trend-micro-001",
+      "publisher": "Trend Micro Inc.",
+      "component_name": "Trend Micro Maximum Security",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Trend Micro.*",
+        "publisher_pattern": "Trend Micro",
+        "path_pattern": ".*\\\\Trend Micro\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Pre-installed antivirus trial. Windows Defender is sufficient.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "webroot-001",
+      "publisher": "Webroot Inc.",
+      "component_name": "Webroot SecureAnywhere",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Webroot.*",
+        "publisher_pattern": "Webroot",
+        "path_pattern": ".*\\\\Webroot\\\\.*|.*\\\\WRData\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Pre-installed antivirus trial. Windows Defender is sufficient.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "bitdefender-001",
+      "publisher": "Bitdefender",
+      "component_name": "Bitdefender",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Bitdefender.*",
+        "publisher_pattern": "Bitdefender",
+        "path_pattern": ".*\\\\Bitdefender.*",
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Pre-installed antivirus trial. Use Bitdefender removal tool for clean uninstall.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-diagsvc-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Diagnostic Policy Service",
+      "component_type": "service",
+      "match_rules": {
+        "name_pattern": "^DPS$",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": ["microsoft-diagtrack-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Disabling prevents automatic troubleshooting but reduces telemetry.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-retaildemo-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Retail Demo Service",
+      "component_type": "service",
+      "match_rules": {
+        "name_pattern": "^RetailDemo$",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Only used for retail store demo mode. No purpose on consumer PCs.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-mapbroker-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Downloaded Maps Manager",
+      "component_type": "service",
+      "match_rules": {
+        "name_pattern": "^MapsBroker$",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["microsoft-maps-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Manages offline maps. Safe to disable if not using Windows Maps offline.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-xblauthmanager-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Xbox Live Auth Manager",
+      "component_type": "service",
+      "match_rules": {
+        "name_pattern": "^XblAuthManager$",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": ["microsoft-xbox-gamebar-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Xbox Live authentication. Needed for Game Pass and Xbox Game Bar.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-xblgamesave-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Xbox Live Game Save",
+      "component_type": "service",
+      "match_rules": {
+        "name_pattern": "^XblGameSave$",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": ["microsoft-xbox-gamebar-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Cloud game save sync. Disable if not using Xbox games.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "candy-crush-friends-001",
+      "publisher": "King.com Ltd",
+      "component_name": "Candy Crush Friends Saga",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^king\\.com\\.CandyCrushFriends.*",
+        "publisher_pattern": "King",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": ["candy-crush-001"],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Advertising bloatware. May be reinstalled by Windows updates.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "march-of-empires-001",
+      "publisher": "Gameloft SE",
+      "component_name": "March of Empires",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Gameloft.*MarchOfEmpires.*",
+        "publisher_pattern": "Gameloft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Advertising bloatware game.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "farmville-001",
+      "publisher": "Zynga Inc.",
+      "component_name": "FarmVille",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Zynga.*FarmVille.*",
+        "publisher_pattern": "Zynga",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Advertising bloatware game.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "hidden-city-001",
+      "publisher": "G5 Entertainment AB",
+      "component_name": "Hidden City",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^G5.*HiddenCity.*",
+        "publisher_pattern": "G5 Entertainment",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Advertising bloatware game.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "asphalt-001",
+      "publisher": "Gameloft SE",
+      "component_name": "Asphalt Street Storm Racing",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^Gameloft.*Asphalt.*",
+        "publisher_pattern": "Gameloft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Advertising bloatware game.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "nvidia-broadcast-001",
+      "publisher": "NVIDIA Corporation",
+      "component_name": "NVIDIA Broadcast",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^NVIDIA Broadcast.*",
+        "publisher_pattern": "NVIDIA",
+        "path_pattern": ".*\\\\NVIDIA Corporation\\\\NVIDIA Broadcast.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "AI audio/video enhancement. Not needed if not using streaming features.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "nvidia-ngx-updater-001",
+      "publisher": "NVIDIA Corporation",
+      "component_name": "NVIDIA NGX Updater",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": "^NvNode.*|^NVIDIA NGX.*",
+        "publisher_pattern": "NVIDIA",
+        "path_pattern": ".*\\\\NVIDIA Corporation\\\\.*NvNode.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["nvidia-geforce-experience-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Background update service for NVIDIA components. Reinstalled by driver updates.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "amd-adrenalin-001",
+      "publisher": "Advanced Micro Devices, Inc.",
+      "component_name": "AMD Adrenalin Software",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^AMD Radeon.*Software.*|^AMD Software.*Adrenalin.*",
+        "publisher_pattern": "AMD|Advanced Micro Devices",
+        "path_pattern": ".*\\\\AMD\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "GPU management suite. Drivers work without it but lose performance tuning.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "razer-synapse-001",
+      "publisher": "Razer Inc.",
+      "component_name": "Razer Synapse",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Razer Synapse.*",
+        "publisher_pattern": "Razer",
+        "path_pattern": ".*\\\\Razer\\\\Synapse.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Peripheral configuration. Devices use defaults without it. Multiple background services.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "logitech-ghub-001",
+      "publisher": "Logitech",
+      "component_name": "Logitech G HUB",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Logitech G HUB.*|^lghub.*",
+        "publisher_pattern": "Logitech",
+        "path_pattern": ".*\\\\LGHUB\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Peripheral configuration. Devices use defaults without it. High resource usage.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-edge-webview-updater-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Microsoft Edge WebView2 Runtime Updater",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": "^MicrosoftEdgeUpdate.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": ".*\\\\Microsoft\\\\EdgeUpdate\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Updates Edge and WebView2. Many apps depend on WebView2. Disable only if sure.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "mozilla-maintenance-001",
+      "publisher": "Mozilla Corporation",
+      "component_name": "Mozilla Maintenance Service",
+      "component_type": "service",
+      "match_rules": {
+        "name_pattern": "^MozillaMaintenance$",
+        "publisher_pattern": "Mozilla",
+        "path_pattern": ".*\\\\Mozilla Maintenance Service\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Enables background Firefox updates. Firefox can update manually without it.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "brave-update-001",
+      "publisher": "Brave Software Inc.",
+      "component_name": "Brave Update Service",
+      "component_type": "service",
+      "match_rules": {
+        "name_pattern": "^brave.*|^BraveUpdate.*",
+        "publisher_pattern": "Brave",
+        "path_pattern": ".*\\\\BraveSoftware\\\\Update\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Background browser update service. Brave can update manually.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "zoom-001",
+      "publisher": "Zoom Video Communications, Inc.",
+      "component_name": "Zoom",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Zoom$|^Zoom Workplace.*",
+        "publisher_pattern": "Zoom",
+        "path_pattern": ".*\\\\Zoom\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Video conferencing. Remove if not actively using. Web client available.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "slack-001",
+      "publisher": "Slack Technologies, LLC",
+      "component_name": "Slack",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Slack$",
+        "publisher_pattern": "Slack",
+        "path_pattern": ".*\\\\Slack\\\\.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Messaging app. Remove if not actively using. Web client available.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "linkedin-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "LinkedIn",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "^LinkedIn\\.LinkedIn.*|^7EE7776C\\.LinkedInforWindows.*",
+        "publisher_pattern": "LinkedIn|Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Pre-installed social networking app. Use web version instead.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "samsung-smartswitch-001",
+      "publisher": "Samsung Electronics",
+      "component_name": "Samsung Smart Switch",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "^Samsung Smart Switch.*",
+        "publisher_pattern": "Samsung",
+        "path_pattern": ".*\\\\Samsung\\\\Smart Switch.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Phone data migration tool. Not needed after initial setup.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-onedrive-startup-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "OneDrive Startup",
+      "component_type": "startup",
+      "match_rules": {
+        "name_pattern": "^OneDrive$",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": ".*\\\\OneDrive\\\\OneDrive\\.exe.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["microsoft-onedrive-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Auto-starts OneDrive on login. Disable if not using OneDrive sync.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-edge-startup-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Microsoft Edge Startup Boost",
+      "component_type": "startup",
+      "match_rules": {
+        "name_pattern": "^MicrosoftEdgeAutoLaunch.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": ".*\\\\Microsoft\\\\Edge\\\\.*msedge\\.exe.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Pre-launches Edge for faster startup. Uses memory. Disable safe.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-teams-startup-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Microsoft Teams Auto-Start",
+      "component_type": "startup",
+      "match_rules": {
+        "name_pattern": "^com\\.squirrel\\.Teams.*|^Teams.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": ".*\\\\Teams\\\\Update\\.exe.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["microsoft-teams-personal-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Auto-starts Teams on login. Can be launched manually when needed.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "spotify-startup-001",
+      "publisher": "Spotify AB",
+      "component_name": "Spotify Auto-Start",
+      "component_type": "startup",
+      "match_rules": {
+        "name_pattern": "^Spotify$",
+        "publisher_pattern": "Spotify",
+        "path_pattern": ".*\\\\Spotify\\\\Spotify\\.exe.*",
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["spotify-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Auto-starts Spotify on login. Can be disabled in Spotify settings too.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "discord-startup-001",
+      "publisher": "Discord Inc.",
+      "component_name": "Discord Auto-Start",
+      "component_type": "startup",
+      "match_rules": {
+        "name_pattern": "^Discord$",
+        "publisher_pattern": "Discord",
+        "path_pattern": ".*\\\\Discord\\\\Update\\.exe.*",
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Auto-starts Discord on login. Can be disabled in Discord settings too.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "samsung-magician-001",
+      "publisher": "Samsung Electronics",
+      "component_name": "Samsung Magician",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)samsung\\s*magician",
+        "publisher_pattern": "(?i)samsung",
+        "path_pattern": "(?i)samsung\\\\magician"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "SSD management utility. Removing disables firmware update checks but SSD continues to function normally.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "msi-dragon-center-001",
+      "publisher": "Micro-Star International",
+      "component_name": "MSI Dragon Center",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)(msi\\s*)?dragon\\s*center",
+        "publisher_pattern": "(?i)micro-star|msi",
+        "path_pattern": "(?i)msi\\\\dragon"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["msi-center-001"],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "System monitoring/fan control utility. Removing disables custom fan curves and RGB control; hardware defaults remain functional.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "msi-center-001",
+      "publisher": "Micro-Star International",
+      "component_name": "MSI Center",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)msi\\s*center",
+        "publisher_pattern": "(?i)micro-star|msi",
+        "path_pattern": "(?i)msi\\\\center"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["msi-dragon-center-001"],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Successor to Dragon Center. Same impact — removing disables OEM fan/RGB control, hardware defaults remain.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "toshiba-service-station-001",
+      "publisher": "Toshiba Corporation",
+      "component_name": "Toshiba Service Station",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)toshiba\\s*service\\s*station",
+        "publisher_pattern": "(?i)toshiba",
+        "path_pattern": "(?i)toshiba.*service.*station"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "OEM update checker. Removing stops Toshiba-specific update notifications; Windows Update handles driver updates.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "sony-vaio-care-001",
+      "publisher": "Sony Corporation",
+      "component_name": "VAIO Care",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)vaio\\s*care",
+        "publisher_pattern": "(?i)sony",
+        "path_pattern": "(?i)sony\\\\vaio"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "OEM diagnostics and support. Removing stops background health checks; system continues normally.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "cyberlink-powerdvd-001",
+      "publisher": "CyberLink Corp.",
+      "component_name": "CyberLink PowerDVD",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)cyberlink\\s*power\\s*dvd",
+        "publisher_pattern": "(?i)cyberlink",
+        "path_pattern": "(?i)cyberlink\\\\powerdvd"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "OEM-bundled media player. Removing has no system impact; Windows Media Player or VLC are alternatives.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "cyberlink-youcam-001",
+      "publisher": "CyberLink Corp.",
+      "component_name": "CyberLink YouCam",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)cyberlink\\s*you\\s*cam",
+        "publisher_pattern": "(?i)cyberlink",
+        "path_pattern": "(?i)cyberlink\\\\youcam"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Webcam enhancement software. Removing has no impact on webcam functionality; Windows Camera app works independently.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "wildtangent-games-001",
+      "publisher": "WildTangent",
+      "component_name": "WildTangent Games",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)wildtangent",
+        "publisher_pattern": "(?i)wildtangent",
+        "path_pattern": "(?i)wildtangent"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "OEM-bundled game portal with aggressive ads. Safe to remove entirely.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-skype-uwp-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Skype",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "(?i)microsoft\\.skypeapp",
+        "publisher_pattern": "(?i)microsoft",
+        "path_pattern": ""
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Pre-installed Skype UWP app. Removing does not affect Skype desktop client if separately installed.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-feedback-hub-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Feedback Hub",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "(?i)microsoft\\.windowsfeedbackhub",
+        "publisher_pattern": "(?i)microsoft",
+        "path_pattern": ""
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Used to send feedback to Microsoft. Removing has no system impact unless user actively submits feedback.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-mixed-reality-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Mixed Reality Portal",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "(?i)microsoft\\.mixedreality\\.portal",
+        "publisher_pattern": "(?i)microsoft",
+        "path_pattern": ""
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "VR/AR headset portal. Only needed if using Windows Mixed Reality headsets. Safe to remove for all other users.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-3d-viewer-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "3D Viewer",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "(?i)microsoft\\.microsoft3dviewer",
+        "publisher_pattern": "(?i)microsoft",
+        "path_pattern": ""
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "3D model viewer. Removed from default Windows 11 installations. Safe to remove on Windows 10.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-3d-builder-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "3D Builder",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "(?i)microsoft\\.3dbuilder",
+        "publisher_pattern": "(?i)microsoft",
+        "path_pattern": ""
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "3D printing preparation tool. Rarely used; safe to remove entirely.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "windows-connect-service-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Connected User Experiences and Telemetry",
+      "component_type": "service",
+      "match_rules": {
+        "name_pattern": "(?i)^diagtrack$",
+        "publisher_pattern": "",
+        "path_pattern": "(?i)diagtrack\\.dll"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": ["windows-telemetry-task-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Core telemetry service. Disabling reduces data collection but may affect Windows Update diagnostics. Do not remove.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "windows-telemetry-task-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Microsoft Compatibility Appraiser",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": "(?i)microsoft\\s*compatibility\\s*appraiser",
+        "publisher_pattern": "",
+        "path_pattern": "(?i)compattelrunner"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": ["windows-connect-service-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Telemetry collection task. Can cause high disk usage. Disabling reduces telemetry; may affect feature update compatibility checks.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "windows-customer-experience-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Customer Experience Improvement Program",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": "(?i)(microsoft\\\\windows\\\\)?customer\\s*experience",
+        "publisher_pattern": "",
+        "path_pattern": ""
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "CEIP data collection tasks. Disabling stops usage telemetry. No functional impact.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "hp-touchpoint-analytics-001",
+      "publisher": "HP Inc.",
+      "component_name": "HP Touchpoint Analytics",
+      "component_type": "service",
+      "match_rules": {
+        "name_pattern": "(?i)hp\\s*touchpoint|touchpoint\\s*analytics",
+        "publisher_pattern": "(?i)hp|hewlett",
+        "path_pattern": "(?i)touchpoint\\\\analytics"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "HP telemetry service collecting usage data. Safe to disable or remove entirely.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "hp-sure-sense-001",
+      "publisher": "HP Inc.",
+      "component_name": "HP Sure Sense",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)hp\\s*sure\\s*sense",
+        "publisher_pattern": "(?i)hp|hewlett",
+        "path_pattern": "(?i)hp.*sure.*sense"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "HP-branded malware protection layer. Redundant with Windows Defender. Safe to remove.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "dell-digital-delivery-001",
+      "publisher": "Dell Technologies",
+      "component_name": "Dell Digital Delivery",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)dell\\s*digital\\s*delivery",
+        "publisher_pattern": "(?i)dell",
+        "path_pattern": "(?i)dell.*digital.*delivery"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Delivers pre-purchased software after setup. Once software is installed, this service has no purpose.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "dell-support-assist-remediation-001",
+      "publisher": "Dell Technologies",
+      "component_name": "Dell SupportAssist Remediation",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)dell\\s*supportassist.*remediation",
+        "publisher_pattern": "(?i)dell",
+        "path_pattern": "(?i)dell.*supportassist.*remediation"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Companion to Dell SupportAssist for applying fixes. Removing stops Dell auto-remediation; manual Windows Update is sufficient.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "lenovo-system-update-001",
+      "publisher": "Lenovo",
+      "component_name": "Lenovo System Update",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)lenovo\\s*system\\s*update",
+        "publisher_pattern": "(?i)lenovo",
+        "path_pattern": "(?i)lenovo.*systemupdate"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Lenovo driver/firmware updater. Removing stops Lenovo-specific updates; Windows Update handles most drivers.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "lenovo-vantage-service-001",
+      "publisher": "Lenovo",
+      "component_name": "Lenovo Vantage Service",
+      "component_type": "service",
+      "match_rules": {
+        "name_pattern": "(?i)(lenovo.*vantage|imcontroller)",
+        "publisher_pattern": "(?i)lenovo",
+        "path_pattern": "(?i)lenovo.*imcontroller"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Background service for Lenovo Vantage. Tends to reinstall. Disabling stops background telemetry.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "dropbox-updater-001",
+      "publisher": "Dropbox, Inc.",
+      "component_name": "Dropbox Update",
+      "component_type": "startup",
+      "match_rules": {
+        "name_pattern": "(?i)dropbox\\s*update",
+        "publisher_pattern": "(?i)dropbox",
+        "path_pattern": "(?i)dropbox\\\\update"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Dropbox auto-updater startup entry. Disabling stops automatic updates but Dropbox sync continues to work.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "adobe-updater-001",
+      "publisher": "Adobe Inc.",
+      "component_name": "Adobe Updater Startup Utility",
+      "component_type": "startup",
+      "match_rules": {
+        "name_pattern": "(?i)adobe.*update|adobearm",
+        "publisher_pattern": "(?i)adobe",
+        "path_pattern": "(?i)adobe.*arm"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Adobe auto-updater at login. Disabling stops automatic updates; manual update via Adobe apps still works.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "java-updater-001",
+      "publisher": "Oracle Corporation",
+      "component_name": "Java Update Scheduler",
+      "component_type": "startup",
+      "match_rules": {
+        "name_pattern": "(?i)java\\s*update|jusched",
+        "publisher_pattern": "(?i)oracle|sun\\s*microsystems",
+        "path_pattern": "(?i)java.*jusched"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Java update checker at login. Disabling stops update nag popups; Java runtime continues to function.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "realtek-audio-console-001",
+      "publisher": "Realtek Semiconductor",
+      "component_name": "Realtek Audio Console",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "(?i)realtekaudiocontrol|realtek.*audio.*console",
+        "publisher_pattern": "(?i)realtek",
+        "path_pattern": ""
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Audio management UWP companion app. Removing may lose advanced audio settings UI but audio driver continues to work.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    }
+  ]
+}
