@@ -24,7 +24,6 @@ class TestClassificationSource:
         """Test classification source values."""
         assert ClassificationSource.SIGNATURE.value == "signature"
         assert ClassificationSource.HEURISTIC.value == "heuristic"
-        assert ClassificationSource.LLM.value == "llm"
         assert ClassificationSource.MANUAL.value == "manual"
         assert ClassificationSource.NONE.value == "none"
 

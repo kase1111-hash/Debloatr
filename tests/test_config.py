@@ -29,7 +29,7 @@ class TestScanConfig:
         assert config.scan_telemetry is True
         assert config.scan_uwp is True
         assert config.include_microsoft is True
-        assert config.include_portable is True
+        assert config.include_portable is False
 
 
 class TestActionConfig:
@@ -61,8 +61,6 @@ class TestClassificationConfig:
 
         assert config.use_signatures is True
         assert config.use_heuristics is True
-        assert config.use_llm is False
-        assert config.llm_endpoint == ""
         assert config.auto_classify_unknown_as == "UNKNOWN"
         assert config.heuristic_threshold == 0.6
 

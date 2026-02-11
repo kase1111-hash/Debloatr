@@ -13,11 +13,15 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING
 
 from .config import Config
 from .logging_config import get_logger, log_scan_result
 from .models import Classification, Component
+
+if TYPE_CHECKING:
+    from src.classification.engine import ClassificationEngine
+    from src.discovery.base import BaseDiscoveryModule
 
 # Type alias for progress callback
 ProgressCallback = Callable[[str, int, int], None]
@@ -111,14 +115,14 @@ class ScanOrchestrator:
             auto_register: Whether to automatically register all discovery modules.
         """
         self.config = config
-        self.modules: list = []  # List of BaseDiscoveryModule
+        self.modules: list[BaseDiscoveryModule] = []
         self.logger = get_logger("main")
-        self._classification_engine: Any = None
+        self._classification_engine: ClassificationEngine | None = None
 
         if auto_register:
             self._register_default_modules()
 
-    def register_module(self, module: Any) -> None:
+    def register_module(self, module: "BaseDiscoveryModule") -> None:
         """Register a discovery module.
 
         Args:
@@ -196,7 +200,7 @@ class ScanOrchestrator:
 
         return result
 
-    def _run_module(self, module: Any) -> ModuleScanResult:
+    def _run_module(self, module: "BaseDiscoveryModule") -> ModuleScanResult:
         """Run a single discovery module.
 
         Args:
@@ -294,7 +298,7 @@ class ScanOrchestrator:
         except ImportError as e:
             self.logger.error(f"Failed to import discovery modules: {e}")
 
-    def _get_classification_engine(self) -> Any:
+    def _get_classification_engine(self) -> "ClassificationEngine | None":
         """Get or create the classification engine.
 
         Returns:

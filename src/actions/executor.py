@@ -352,11 +352,8 @@ class ExecutionEngine:
                 snapshot = handler_result.snapshot
 
             elif action == ActionType.REPLACE:
-                # Replace is a combination of remove + install replacement
-                # For now, just mark as not implemented
-                return ExecutionResult(
-                    success=False,
-                    error_message="REPLACE action not yet implemented",
+                raise NotImplementedError(
+                    "REPLACE action is not supported in this version"
                 )
 
             elif action == ActionType.IGNORE:

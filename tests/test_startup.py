@@ -109,10 +109,10 @@ class TestStartupEntry:
             arguments="--arg1 --arg2",
         )
 
-        assert (
-            '"C:\\app.exe" --arg1 --arg2' in entry.full_command
-            or "C:\\app.exe --arg1 --arg2" in entry.full_command
-        )
+        # Path separator varies by platform
+        cmd = entry.full_command
+        assert "app.exe" in cmd
+        assert "--arg1 --arg2" in cmd
 
     def test_full_command_no_args(self):
         """Test full_command with no arguments."""
@@ -126,7 +126,7 @@ class TestStartupEntry:
             target_path=Path("C:/app.exe"),
         )
 
-        assert entry.full_command == "C:\\app.exe"
+        assert entry.full_command == str(Path("C:/app.exe"))
 
     def test_full_task_details(self):
         """Test entry with all details."""

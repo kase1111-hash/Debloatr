@@ -167,7 +167,7 @@ class ClassificationResult:
 
     Attributes:
         classification: The determined classification
-        source: How classification was determined (signature/heuristic/llm/none)
+        source: How classification was determined (signature/heuristic/none)
         signature_id: ID of matching signature (if signature-based)
         confidence: Confidence score (0.0-1.0)
         explanation: Human-readable explanation
@@ -175,7 +175,7 @@ class ClassificationResult:
     """
 
     classification: Classification
-    source: str  # "signature", "heuristic", "llm", "none"
+    source: str  # "signature", "heuristic", "none"
     confidence: float = 0.0
     signature_id: str | None = None
     explanation: str | None = None
