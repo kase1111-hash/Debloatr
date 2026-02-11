@@ -32,7 +32,7 @@ class ScanConfig:
     scan_telemetry: bool = True
     scan_uwp: bool = True
     include_microsoft: bool = True
-    include_portable: bool = True
+    include_portable: bool = False
 
 
 @dataclass
@@ -53,9 +53,6 @@ class ClassificationConfig:
 
     use_signatures: bool = True
     use_heuristics: bool = True
-    use_llm: bool = False
-    llm_endpoint: str = ""
-    llm_api_key: str = ""
     auto_classify_unknown_as: str = "UNKNOWN"  # Classification for unknowns
     heuristic_threshold: float = 0.6  # Score threshold for BLOAT classification
 
@@ -162,8 +159,6 @@ class Config:
             "classification": {
                 "use_signatures": self.classification.use_signatures,
                 "use_heuristics": self.classification.use_heuristics,
-                "use_llm": self.classification.use_llm,
-                "llm_endpoint": self.classification.llm_endpoint,
                 "auto_classify_unknown_as": self.classification.auto_classify_unknown_as,
                 "heuristic_threshold": self.classification.heuristic_threshold,
             },
@@ -219,9 +214,6 @@ class Config:
             config.classification = ClassificationConfig(
                 use_signatures=class_data.get("use_signatures", True),
                 use_heuristics=class_data.get("use_heuristics", True),
-                use_llm=class_data.get("use_llm", False),
-                llm_endpoint=class_data.get("llm_endpoint", ""),
-                llm_api_key=class_data.get("llm_api_key", ""),
                 auto_classify_unknown_as=class_data.get("auto_classify_unknown_as", "UNKNOWN"),
                 heuristic_threshold=class_data.get("heuristic_threshold", 0.6),
             )

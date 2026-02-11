@@ -113,7 +113,7 @@ class ProgramsScanner(BaseDiscoveryModule):
     def __init__(
         self,
         scan_uwp: bool = True,
-        scan_portable: bool = True,
+        scan_portable: bool = False,
         calculate_sizes: bool = True,
     ) -> None:
         """Initialize the programs scanner.
@@ -616,7 +616,7 @@ class ProgramsScanner(BaseDiscoveryModule):
             Formatted display name.
         """
         # Remove version numbers
-        name = re.sub(r"[-_]?\d+(\.\d+)*$", "", directory_name)
+        name = re.sub(r"[-_]?\d+(\.\d+)+$", "", directory_name)
 
         # Add spaces
         name = re.sub(r"([a-z])([A-Z])", r"\1 \2", name)

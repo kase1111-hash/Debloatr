@@ -419,15 +419,30 @@ def run_gui_app(config: "Config") -> int:
 
         def _action_disable(self, comp: Component):
             """Disable a component."""
-            pass
+            QMessageBox.warning(
+                self,
+                "Not Available",
+                f"Disable action is not yet implemented in the GUI.\n\n"
+                f"Use the CLI instead:\n  debloatd disable {comp.id}",
+            )
 
         def _action_contain(self, comp: Component):
             """Contain a component."""
-            pass
+            QMessageBox.warning(
+                self,
+                "Not Available",
+                f"Contain action is not yet implemented in the GUI.\n\n"
+                f"Use the CLI instead for component:\n  {comp.display_name}",
+            )
 
         def _action_remove(self, comp: Component):
             """Remove a component."""
-            pass
+            QMessageBox.warning(
+                self,
+                "Not Available",
+                f"Remove action is not yet implemented in the GUI.\n\n"
+                f"Use the CLI instead:\n  debloatd remove {comp.id}",
+            )
 
     class SessionHistoryWidget(QWidget):
         """Session history view."""

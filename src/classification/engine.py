@@ -1,8 +1,7 @@
 """Classification Engine - Core classification logic.
 
 This module provides the classification engine that combines
-signature matching, heuristics, and optional LLM analysis
-to classify discovered components.
+signature matching and heuristics to classify discovered components.
 """
 
 import logging
@@ -28,7 +27,6 @@ class ClassificationSource(Enum):
 
     SIGNATURE = "signature"  # Matched a known signature
     HEURISTIC = "heuristic"  # Based on heuristic rules
-    LLM = "llm"  # LLM advisory classification
     MANUAL = "manual"  # User-specified classification
     NONE = "none"  # No classification
 
@@ -70,7 +68,6 @@ class ClassificationEngine:
     Combines multiple classification methods:
     1. Signature matching (deterministic, highest priority)
     2. Heuristic rules (confidence-based)
-    3. LLM analysis (optional, advisory only)
 
     Example:
         engine = ClassificationEngine()

@@ -451,12 +451,18 @@ class TestSystemRestoreManager:
 
     def test_create_restore_point_dry_run(self):
         """Test creating a restore point in dry-run mode."""
+        import os
+
         manager = SystemRestoreManager(dry_run=True)
 
         result = manager.create_restore_point("Test restore point")
 
-        # In dry run, returns 0
-        assert result == 0
+        if os.name == "nt":
+            # On Windows, dry run returns 0
+            assert result == 0
+        else:
+            # On non-Windows, returns None (not available)
+            assert result is None
 
     @patch("src.core.restore.SystemRestoreManager._run_powershell")
     def test_list_restore_points(self, mock_ps):

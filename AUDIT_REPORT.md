@@ -2,7 +2,7 @@
 
 **Audit Date:** 2026-01-27
 **Auditor:** Claude Code
-**Software Version:** 1.0.0
+**Software Version:** 0.1.0-alpha
 **Overall Assessment:** **FIT FOR PURPOSE** with minor recommendations
 
 ---

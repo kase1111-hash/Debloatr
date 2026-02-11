@@ -1,7 +1,7 @@
 """Logging configuration for Debloatr.
 
 This module sets up structured logging with file rotation,
-separate logs for different concerns (main, actions, LLM).
+separate logs for different concerns (main, actions, scan).
 """
 
 import logging
@@ -27,7 +27,6 @@ class DebloatrLogger:
     Manages multiple log files for different concerns:
         - main.log: General application logging
         - actions.log: All action executions and rollbacks
-        - llm_analysis.log: LLM queries and responses
         - scan.log: Discovery scan results
     """
 
@@ -93,7 +92,6 @@ class DebloatrLogger:
 
         # Setup specialized loggers
         self._setup_action_logger(logs_dir)
-        self._setup_llm_logger(logs_dir)
         self._setup_scan_logger(logs_dir)
 
     def _create_file_handler(
@@ -137,19 +135,6 @@ class DebloatrLogger:
         logger.addHandler(handler)
         self.loggers["actions"] = logger
 
-    def _setup_llm_logger(self, logs_dir: Path) -> None:
-        """Setup the LLM analysis logger."""
-        logger = logging.getLogger("debloatr.llm")
-        logger.setLevel(self.log_level)
-        logger.propagate = False
-
-        handler = self._create_file_handler(
-            logs_dir / "llm_analysis.log",
-            "%(asctime)s | %(levelname)-8s | LLM | %(message)s",
-        )
-        logger.addHandler(handler)
-        self.loggers["llm"] = logger
-
     def _setup_scan_logger(self, logs_dir: Path) -> None:
         """Setup the scan results logger."""
         logger = logging.getLogger("debloatr.scan")
@@ -167,7 +152,7 @@ class DebloatrLogger:
         """Get a logger by name.
 
         Args:
-            name: Logger name ("main", "actions", "llm", "scan").
+            name: Logger name ("main", "actions", "scan").
 
         Returns:
             The requested logger, or main logger if not found.
@@ -207,7 +192,6 @@ def get_logger(name: str = "main") -> logging.Logger:
         name: Logger name. Options:
             - "main": General application logging
             - "actions": Action execution logging
-            - "llm": LLM analysis logging
             - "scan": Scan results logging
 
     Returns:
@@ -258,21 +242,4 @@ def log_scan_result(
     logger.info(f"{module_name} | Found {component_count} components in {duration_ms:.1f}ms")
 
 
-def log_llm_query(
-    component_name: str,
-    query_type: str,
-    response_summary: str,
-    confidence: float,
-) -> None:
-    """Log an LLM analysis query.
 
-    Args:
-        component_name: Name of the analyzed component.
-        query_type: Type of query (classify, explain, etc.).
-        response_summary: Summary of the LLM response.
-        confidence: Confidence score from LLM.
-    """
-    logger = get_logger("llm")
-    logger.info(
-        f"{component_name} | {query_type} | confidence={confidence:.2f} | {response_summary}"
-    )
