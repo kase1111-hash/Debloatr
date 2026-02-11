@@ -127,12 +127,27 @@ class DisableHandler:
             DisableResult
         """
         service_name = context.get("service_name", component.name)
+        escaped_name = service_name.replace("'", "''")
 
         # Capture previous state
         previous_state = self._get_service_state(service_name)
 
+        # Check for dependent services before proceeding
+        dependents = self._get_dependent_services(service_name)
+        if dependents:
+            previous_state["dependent_services"] = dependents
+            logger.warning(
+                f"Service '{service_name}' has {len(dependents)} dependent(s): "
+                f"{', '.join(dependents)}"
+            )
+
         if self.dry_run:
             logger.info(f"[DRY RUN] Would disable service: {service_name}")
+            if dependents:
+                logger.info(
+                    f"[DRY RUN] Warning: {len(dependents)} dependent service(s) "
+                    f"would also be stopped: {', '.join(dependents)}"
+                )
             return DisableResult(
                 success=True,
                 component_id=component.id,
@@ -162,14 +177,14 @@ class DisableHandler:
             # Stop the service if running
             if previous_state.get("status") == "Running":
                 stop_result = self._run_powershell(
-                    f"Stop-Service -Name '{service_name}' -Force -ErrorAction Stop"
+                    f"Stop-Service -Name '{escaped_name}' -Force -ErrorAction Stop"
                 )
                 if not stop_result["success"]:
                     logger.warning(f"Failed to stop service: {stop_result['error']}")
 
             # Set startup type to Disabled
             disable_result = self._run_powershell(
-                f"Set-Service -Name '{service_name}' -StartupType Disabled -ErrorAction Stop"
+                f"Set-Service -Name '{escaped_name}' -StartupType Disabled -ErrorAction Stop"
             )
 
             if not disable_result["success"]:
@@ -253,16 +268,24 @@ class DisableHandler:
             )
 
         try:
+            # Escape single quotes in task path components
+            task_name = Path(task_path).name.replace("'", "''")
+            task_parent = str(Path(task_path).parent).replace("/", "\\")
+            if not task_parent.endswith("\\"):
+                task_parent += "\\"
+            task_parent = task_parent.replace("'", "''")
+
             # Disable the task
             disable_result = self._run_powershell(
-                f"Disable-ScheduledTask -TaskPath '{Path(task_path).parent}' "
-                f"-TaskName '{Path(task_path).name}' -ErrorAction Stop"
+                f"Disable-ScheduledTask -TaskPath '{task_parent}' "
+                f"-TaskName '{task_name}' -ErrorAction Stop"
             )
 
             if not disable_result["success"]:
                 # Try alternative method with full path
+                escaped_path = task_path.replace("'", "''")
                 disable_result = self._run_powershell(
-                    f"schtasks /Change /TN '{task_path}' /Disable"
+                    f"schtasks /Change /TN '{escaped_path}' /Disable"
                 )
 
             if not disable_result["success"]:
@@ -559,13 +582,29 @@ class DisableHandler:
             requires_reboot=requires_reboot,
         )
 
+    def _get_dependent_services(self, service_name: str) -> list[str]:
+        """Get list of services that depend on this service."""
+        if not self._is_windows:
+            return []
+
+        escaped_name = service_name.replace("'", "''")
+        result = self._run_powershell(
+            f"(Get-Service -Name '{escaped_name}' -ErrorAction SilentlyContinue)"
+            f".DependentServices | Select-Object -ExpandProperty Name"
+        )
+
+        if result["success"] and result["output"]:
+            return [s.strip() for s in result["output"].strip().split("\n") if s.strip()]
+        return []
+
     def _get_service_state(self, service_name: str) -> dict[str, Any]:
         """Get current state of a service."""
         if not self._is_windows:
             return {"status": "Unknown", "start_type": "Unknown"}
 
+        escaped_name = service_name.replace("'", "''")
         result = self._run_powershell(
-            f"Get-Service -Name '{service_name}' | "
+            f"Get-Service -Name '{escaped_name}' | "
             f"Select-Object Status, StartType | ConvertTo-Json"
         )
 
@@ -588,9 +627,15 @@ class DisableHandler:
         if not self._is_windows:
             return {"state": "Unknown"}
 
+        task_name = Path(task_path).name.replace("'", "''")
+        task_parent = str(Path(task_path).parent).replace("/", "\\")
+        if not task_parent.endswith("\\"):
+            task_parent += "\\"
+        task_parent = task_parent.replace("'", "''")
+
         result = self._run_powershell(
-            f"Get-ScheduledTask -TaskPath '{Path(task_path).parent}\\' "
-            f"-TaskName '{Path(task_path).name}' -ErrorAction SilentlyContinue | "
+            f"Get-ScheduledTask -TaskPath '{task_parent}' "
+            f"-TaskName '{task_name}' -ErrorAction SilentlyContinue | "
             f"Select-Object State | ConvertTo-Json"
         )
 
@@ -635,9 +680,12 @@ class DisableHandler:
         if not self._is_windows:
             return {}
 
+        escaped_key = key.replace("'", "''")
+        escaped_name = value_name.replace("'", "''")
         result = self._run_powershell(
-            f"Get-ItemProperty -Path '{key}' -Name '{value_name}' -ErrorAction SilentlyContinue | "
-            f"Select-Object -ExpandProperty '{value_name}'"
+            f"Get-ItemProperty -Path '{escaped_key}' -Name '{escaped_name}' "
+            f"-ErrorAction SilentlyContinue | "
+            f"Select-Object -ExpandProperty '{escaped_name}'"
         )
 
         return {
@@ -648,13 +696,15 @@ class DisableHandler:
 
     def _disable_registry_startup(self, registry_key: str, value_name: str) -> dict[str, Any]:
         """Disable a registry-based startup entry by renaming it."""
+        escaped_key = registry_key.replace("'", "''")
+        escaped_name = value_name.replace("'", "''")
         # Rename the value to disable it (prefix with ~)
         result = self._run_powershell(
-            f"$val = (Get-ItemProperty -Path '{registry_key}' -Name '{value_name}' "
-            f"-ErrorAction SilentlyContinue).'{value_name}'; "
+            f"$val = (Get-ItemProperty -Path '{escaped_key}' -Name '{escaped_name}' "
+            f"-ErrorAction SilentlyContinue).'{escaped_name}'; "
             f"if ($val) {{ "
-            f"Remove-ItemProperty -Path '{registry_key}' -Name '{value_name}' -Force; "
-            f"Set-ItemProperty -Path '{registry_key}' -Name '~{value_name}' -Value $val "
+            f"Remove-ItemProperty -Path '{escaped_key}' -Name '{escaped_name}' -Force; "
+            f"Set-ItemProperty -Path '{escaped_key}' -Name '~{escaped_name}' -Value $val "
             f"}}"
         )
 

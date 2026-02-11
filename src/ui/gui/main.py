@@ -70,8 +70,18 @@ def run_gui_app(config: "Config") -> int:
         )
 
     # Import core modules
+    from src.actions.executor import ExecutionEngine, ExecutionResult
+    from src.actions.planner import ActionPlanner
     from src.core.config import Config
-    from src.core.models import Classification, Component, ComponentType, RiskLevel
+    from src.core.models import (
+        ActionPlan,
+        ActionType,
+        Classification,
+        Component,
+        ComponentType,
+        ExecutionMode,
+        RiskLevel,
+    )
     from src.core.orchestrator import ScanOrchestrator
     from src.core.rollback import create_rollback_manager
     from src.core.session import create_session_manager
@@ -116,6 +126,67 @@ def run_gui_app(config: "Config") -> int:
 
                 self.progress.emit("Processing results...", 90)
                 self.finished.emit(result)
+            except Exception as e:
+                self.error.emit(str(e))
+
+    class ActionWorker(QThread):
+        """Worker thread for executing actions off the GUI thread."""
+
+        progress = Signal(str, int)  # message, percent
+        finished = Signal(object)  # ExecutionResult
+        error = Signal(str)  # error message
+
+        def __init__(
+            self,
+            engine: ExecutionEngine,
+            plan: ActionPlan,
+        ):
+            super().__init__()
+            self.engine = engine
+            self.plan = plan
+
+        def run(self):
+            try:
+                self.progress.emit(
+                    f"Executing {self.plan.action.value} on "
+                    f"{self.plan.component.display_name}...",
+                    50,
+                )
+                result = self.engine.execute(self.plan)
+                self.finished.emit(result)
+            except Exception as e:
+                self.error.emit(str(e))
+
+    class BatchActionWorker(QThread):
+        """Worker thread for executing batch actions."""
+
+        progress = Signal(str, int)  # message, percent
+        finished = Signal(object)  # list[ExecutionResult]
+        error = Signal(str)
+
+        def __init__(
+            self,
+            engine: ExecutionEngine,
+            plans: list[ActionPlan],
+        ):
+            super().__init__()
+            self.engine = engine
+            self.plans = plans
+
+        def run(self):
+            try:
+                results = []
+                total = len(self.plans)
+                for i, plan in enumerate(self.plans):
+                    percent = int((i / total) * 100)
+                    self.progress.emit(
+                        f"[{i + 1}/{total}] {plan.action.value} "
+                        f"{plan.component.display_name}...",
+                        percent,
+                    )
+                    result = self.engine.execute(plan)
+                    results.append(result)
+                self.finished.emit(results)
             except Exception as e:
                 self.error.emit(str(e))
 
@@ -417,32 +488,19 @@ def run_gui_app(config: "Config") -> int:
 
             menu.exec(self.tree.mapToGlobal(pos))
 
+        action_requested = Signal(object, object)  # Component, ActionType
+
         def _action_disable(self, comp: Component):
-            """Disable a component."""
-            QMessageBox.warning(
-                self,
-                "Not Available",
-                f"Disable action is not yet implemented in the GUI.\n\n"
-                f"Use the CLI instead:\n  debloatd disable {comp.id}",
-            )
+            """Request disable action for a component."""
+            self.action_requested.emit(comp, ActionType.DISABLE)
 
         def _action_contain(self, comp: Component):
-            """Contain a component."""
-            QMessageBox.warning(
-                self,
-                "Not Available",
-                f"Contain action is not yet implemented in the GUI.\n\n"
-                f"Use the CLI instead for component:\n  {comp.display_name}",
-            )
+            """Request contain action for a component."""
+            self.action_requested.emit(comp, ActionType.CONTAIN)
 
         def _action_remove(self, comp: Component):
-            """Remove a component."""
-            QMessageBox.warning(
-                self,
-                "Not Available",
-                f"Remove action is not yet implemented in the GUI.\n\n"
-                f"Use the CLI instead:\n  debloatd remove {comp.id}",
-            )
+            """Request remove action for a component."""
+            self.action_requested.emit(comp, ActionType.REMOVE)
 
     class SessionHistoryWidget(QWidget):
         """Session history view."""
@@ -601,6 +659,8 @@ def run_gui_app(config: "Config") -> int:
     class ComponentDetailWidget(QWidget):
         """Detail panel for selected component."""
 
+        action_requested = Signal(object, object)  # Component, ActionType
+
         def __init__(self, parent=None):
             super().__init__(parent)
             self.current_component: Component | None = None
@@ -624,13 +684,22 @@ def run_gui_app(config: "Config") -> int:
 
             self.disable_btn = QPushButton("Disable")
             self.disable_btn.setEnabled(False)
+            self.disable_btn.clicked.connect(
+                lambda: self._request_action(ActionType.DISABLE)
+            )
 
             self.contain_btn = QPushButton("Contain")
             self.contain_btn.setEnabled(False)
+            self.contain_btn.clicked.connect(
+                lambda: self._request_action(ActionType.CONTAIN)
+            )
 
             self.remove_btn = QPushButton("Remove")
             self.remove_btn.setEnabled(False)
             self.remove_btn.setStyleSheet("background-color: #e74c3c; color: white;")
+            self.remove_btn.clicked.connect(
+                lambda: self._request_action(ActionType.REMOVE)
+            )
 
             btn_layout.addWidget(self.disable_btn)
             btn_layout.addWidget(self.contain_btn)
@@ -691,6 +760,11 @@ def run_gui_app(config: "Config") -> int:
             }
             return explanations.get(component.classification, "No explanation available.")
 
+        def _request_action(self, action: ActionType):
+            """Emit action request for the current component."""
+            if self.current_component:
+                self.action_requested.emit(self.current_component, action)
+
     class MainWindow(QMainWindow):
         """Main application window."""
 
@@ -699,6 +773,9 @@ def run_gui_app(config: "Config") -> int:
             self.config = cfg
             self.components: list[Component] = []
             self.scan_worker = None
+            self.action_worker = None
+            self.batch_worker = None
+            self._planner = ActionPlanner()
             self.setup_ui()
             self.setup_connections()
 
@@ -790,6 +867,10 @@ def run_gui_app(config: "Config") -> int:
             # Component selection
             self.component_tree.component_selected.connect(self.component_detail.show_component)
 
+            # Action requests from tree context menu and detail panel buttons
+            self.component_tree.action_requested.connect(self.execute_action)
+            self.component_detail.action_requested.connect(self.execute_action)
+
         def start_scan(self):
             """Start a system scan."""
             self.progress_bar.setVisible(True)
@@ -826,6 +907,89 @@ def run_gui_app(config: "Config") -> int:
             self.status_bar.showMessage(f"Scan failed: {error}")
             QMessageBox.critical(self, "Scan Error", f"Failed to scan: {error}")
 
+        def execute_action(self, component: Component, action: ActionType):
+            """Execute an action on a component with confirmation."""
+            # Check availability via planner
+            availability = self._planner.get_available_actions(component)
+            if action not in availability.available_actions:
+                reason = availability.blocked_actions.get(action, "Unknown reason")
+                QMessageBox.warning(
+                    self,
+                    "Action Blocked",
+                    f"Cannot {action.value} '{component.display_name}':\n\n{reason}",
+                )
+                return
+
+            # Build confirmation message
+            warnings = availability.warnings
+            warn_text = ""
+            if warnings:
+                warn_text = "\n\nWarnings:\n" + "\n".join(f"  - {w}" for w in warnings)
+
+            reply = QMessageBox.question(
+                self,
+                f"Confirm {action.value}",
+                f"Are you sure you want to {action.value} "
+                f"'{component.display_name}'?{warn_text}",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            )
+
+            if reply != QMessageBox.StandardButton.Yes:
+                return
+
+            # Create plan and execute
+            try:
+                plan = self._planner.create_action_plan(component, action)
+            except ValueError as e:
+                QMessageBox.warning(self, "Plan Error", str(e))
+                return
+
+            engine = ExecutionEngine(mode=ExecutionMode.INTERACTIVE)
+            engine.start_session(f"GUI: {action.value} {component.display_name}")
+
+            self.progress_bar.setVisible(True)
+            self.progress_bar.setValue(0)
+
+            self.action_worker = ActionWorker(engine, plan)
+            self.action_worker.progress.connect(self._on_action_progress)
+            self.action_worker.finished.connect(
+                lambda result: self._on_action_finished(result, engine)
+            )
+            self.action_worker.error.connect(self._on_action_error)
+            self.action_worker.start()
+
+        def _on_action_progress(self, message: str, percent: int):
+            """Handle action progress update."""
+            self.progress_bar.setValue(percent)
+            self.status_bar.showMessage(message)
+
+        def _on_action_finished(self, result: ExecutionResult, engine: ExecutionEngine):
+            """Handle action completion."""
+            self.progress_bar.setVisible(False)
+            session = engine.end_session()
+
+            if result.success:
+                msg = "Action completed successfully."
+                if result.requires_reboot:
+                    msg += "\n\nA system restart is required for changes to take effect."
+                QMessageBox.information(self, "Success", msg)
+                self.status_bar.showMessage("Action completed successfully")
+            else:
+                QMessageBox.warning(
+                    self,
+                    "Action Failed",
+                    f"Action failed: {result.error_message}",
+                )
+                self.status_bar.showMessage(f"Action failed: {result.error_message}")
+
+            self.session_history.refresh()
+
+        def _on_action_error(self, error: str):
+            """Handle action error."""
+            self.progress_bar.setVisible(False)
+            self.status_bar.showMessage(f"Action error: {error}")
+            QMessageBox.critical(self, "Action Error", f"Failed to execute action: {error}")
+
         def safe_debloat(self):
             """Perform safe debloat on BLOAT and AGGRESSIVE components."""
             bloat = [
@@ -847,9 +1011,67 @@ def run_gui_app(config: "Config") -> int:
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             )
 
-            if reply == QMessageBox.StandardButton.Yes:
-                self.status_bar.showMessage("Performing safe debloat...")
-                QMessageBox.information(self, "Info", "Safe debloat would be performed here.")
+            if reply != QMessageBox.StandardButton.Yes:
+                return
+
+            # Create plans for all bloat components
+            plans = []
+            for comp in bloat:
+                try:
+                    plan = self._planner.create_action_plan(comp, ActionType.DISABLE)
+                    plans.append(plan)
+                except ValueError:
+                    pass  # Skip components that can't be disabled
+
+            if not plans:
+                QMessageBox.information(
+                    self, "Info", "No components are eligible for safe debloat."
+                )
+                return
+
+            engine = ExecutionEngine(mode=ExecutionMode.BATCH_CONFIRM)
+            engine.start_session(f"Safe Debloat: {len(plans)} components")
+
+            self.progress_bar.setVisible(True)
+            self.progress_bar.setValue(0)
+            self.status_bar.showMessage("Performing safe debloat...")
+
+            self.batch_worker = BatchActionWorker(engine, plans)
+            self.batch_worker.progress.connect(self._on_action_progress)
+            self.batch_worker.finished.connect(
+                lambda results: self._on_batch_finished(results, engine)
+            )
+            self.batch_worker.error.connect(self._on_action_error)
+            self.batch_worker.start()
+
+        def _on_batch_finished(
+            self, results: list[ExecutionResult], engine: ExecutionEngine
+        ):
+            """Handle batch action completion."""
+            self.progress_bar.setVisible(False)
+            session = engine.end_session()
+            summary = engine.get_session_summary()
+
+            succeeded = summary["successful"]
+            failed = summary["failed"]
+            total = summary["total_actions"]
+
+            msg = f"Safe debloat complete.\n\n"
+            msg += f"Successful: {succeeded}/{total}\n"
+            if failed:
+                msg += f"Failed: {failed}\n"
+            if summary.get("requires_reboot"):
+                msg += "\nA system restart is required for some changes to take effect."
+
+            if failed:
+                QMessageBox.warning(self, "Partial Success", msg)
+            else:
+                QMessageBox.information(self, "Success", msg)
+
+            self.status_bar.showMessage(
+                f"Safe debloat: {succeeded}/{total} succeeded"
+            )
+            self.session_history.refresh()
 
         def undo_last_session(self):
             """Undo the last session."""

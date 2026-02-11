@@ -230,9 +230,12 @@ class RemoveHandler:
             RemoveResult
         """
         package_name = context.get("package_name", component.name)
+        all_users = context.get("all_users", False)
+        escaped_name = package_name.replace("'", "''")
 
         if self.dry_run:
-            logger.info(f"[DRY RUN] Would remove UWP app: {package_name}")
+            scope = "all users" if all_users else "current user"
+            logger.info(f"[DRY RUN] Would remove UWP app: {package_name} ({scope})")
             return RemoveResult(
                 success=True,
                 component_id=component.id,
@@ -253,21 +256,32 @@ class RemoveHandler:
             snapshot = Snapshot(
                 component_id=component.id,
                 action=ActionType.REMOVE,
-                captured_state={"package_name": package_name},
+                captured_state={
+                    "package_name": package_name,
+                    "all_users": all_users,
+                },
             )
 
         try:
-            # Remove for current user
-            result = self._run_powershell(
-                f"Get-AppxPackage -Name '*{package_name}*' | Remove-AppxPackage -ErrorAction Stop"
-            )
+            # Remove for current user or all users
+            if all_users:
+                result = self._run_powershell(
+                    f"Get-AppxPackage -AllUsers -Name '*{escaped_name}*' | "
+                    f"Remove-AppxPackage -AllUsers -ErrorAction Stop"
+                )
+            else:
+                result = self._run_powershell(
+                    f"Get-AppxPackage -Name '*{escaped_name}*' | "
+                    f"Remove-AppxPackage -ErrorAction Stop"
+                )
 
-            # Also remove provisioned package (for all users)
-            self._run_powershell(
-                f"Get-AppxProvisionedPackage -Online | "
-                f"Where-Object {{ $_.PackageName -like '*{package_name}*' }} | "
-                f"Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue"
-            )
+            # Also remove provisioned package to prevent reinstall on new user profiles
+            if all_users:
+                self._run_powershell(
+                    f"Get-AppxProvisionedPackage -Online | "
+                    f"Where-Object {{ $_.PackageName -like '*{escaped_name}*' }} | "
+                    f"Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue"
+                )
 
             if result["success"]:
                 logger.info(f"Successfully removed UWP app: {package_name}")
@@ -311,6 +325,7 @@ class RemoveHandler:
             RemoveResult
         """
         service_name = context.get("service_name", component.name)
+        escaped_service = service_name.replace('"', '\\"')
 
         if self.dry_run:
             logger.info(f"[DRY RUN] Would remove service: {service_name}")
@@ -340,10 +355,10 @@ class RemoveHandler:
 
         try:
             # Stop the service first
-            self._run_command(f'net stop "{service_name}" /y')
+            self._run_command(f'net stop "{escaped_service}" /y')
 
             # Mark for deletion
-            result = self._run_command(f'sc delete "{service_name}"')
+            result = self._run_command(f'sc delete "{escaped_service}"')
 
             if result["success"]:
                 logger.info(f"Successfully marked service for deletion: {service_name}")

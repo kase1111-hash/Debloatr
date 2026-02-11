@@ -25,6 +25,30 @@ from src.core.models import (
 
 logger = logging.getLogger("debloatr.actions.executor")
 
+# Components known to reinstall themselves via Windows Update or self-healing mechanisms
+SELF_HEALING_PACKAGES = {
+    "Microsoft.BingWeather",
+    "Microsoft.BingNews",
+    "Microsoft.BingFinance",
+    "Microsoft.BingSports",
+    "Microsoft.GetHelp",
+    "Microsoft.Getstarted",
+    "Microsoft.MicrosoftOfficeHub",
+    "Microsoft.MicrosoftSolitaireCollection",
+    "Microsoft.MicrosoftStickyNotes",
+    "Microsoft.People",
+    "Microsoft.WindowsMaps",
+    "Microsoft.ZuneVideo",
+    "Microsoft.ZuneMusic",
+    "Microsoft.Todos",
+    "Microsoft.PowerAutomateDesktop",
+    "Microsoft.Clipchamp",
+    "Microsoft.OutlookForWindows",
+    "MicrosoftTeams",
+    "Microsoft.549981C3F5F10",  # Cortana
+    "Microsoft.Windows.Ai.Copilot.Provider",
+}
+
 
 @dataclass
 class ExecutionContext:
@@ -119,6 +143,8 @@ class ExecutionEngine:
         # Session management
         self._current_session: Session | None = None
         self._action_log: list[ActionResult] = []
+        self._reboot_required: bool = False
+        self._reboot_reasons: list[str] = []
 
     def start_session(self, description: str = "") -> Session:
         """Start a new execution session.
@@ -131,6 +157,8 @@ class ExecutionEngine:
         """
         self._current_session = Session(description=description)
         self._action_log = []
+        self._reboot_required = False
+        self._reboot_reasons = []
         logger.info(f"Started session: {self._current_session.session_id}")
         return self._current_session
 
@@ -322,6 +350,18 @@ class ExecutionEngine:
         action = context.action
         plan = context.plan
 
+        # Warn about self-healing components
+        if action == ActionType.REMOVE:
+            comp_name = component.name or ""
+            for pkg in SELF_HEALING_PACKAGES:
+                if pkg.lower() in comp_name.lower():
+                    logger.warning(
+                        f"Component '{component.display_name}' may reinstall itself "
+                        f"via Windows Update. Consider also removing the provisioned "
+                        f"package or disabling the delivery optimization service."
+                    )
+                    break
+
         try:
             # Dispatch to appropriate handler
             if action == ActionType.DISABLE:
@@ -382,6 +422,13 @@ class ExecutionEngine:
             # Add to session log
             self._action_log.append(action_result)
 
+            # Track reboot requirements across session
+            if requires_reboot:
+                self._reboot_required = True
+                self._reboot_reasons.append(
+                    f"{action.value} {component.display_name}"
+                )
+
             return ExecutionResult(
                 success=success,
                 action_result=action_result,
@@ -420,9 +467,8 @@ class ExecutionEngine:
             "successful": sum(1 for a in actions if a.success),
             "failed": sum(1 for a in actions if not a.success),
             "by_action_type": self._count_by_action_type(actions),
-            "requires_reboot": any(
-                r.requires_reboot for r in self._action_log if hasattr(r, "requires_reboot")
-            ),
+            "requires_reboot": self._reboot_required,
+            "reboot_reasons": list(self._reboot_reasons),
         }
 
     def _count_by_action_type(self, actions: list[ActionResult]) -> dict[str, int]:

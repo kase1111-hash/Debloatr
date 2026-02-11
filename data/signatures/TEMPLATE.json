@@ -1,0 +1,37 @@
+{
+  "_comment": "Use this template when contributing a new bloatware signature.",
+  "_instructions": "1. Copy this file. 2. Fill in every field. 3. Run: python scripts/validate_signature.py your_file.json 4. Submit a PR.",
+
+  "signature_id": "publisher-component-001",
+  "publisher": "Publisher Name, Inc.",
+  "component_name": "Human-Readable Component Name",
+  "component_type": "program",
+  "_component_type_options": "program | service | task | startup | driver | uwp | telemetry",
+
+  "match_rules": {
+    "name_pattern": "^ExactRegex.*",
+    "publisher_pattern": "Publisher",
+    "path_pattern": ".*\\\\Publisher\\\\Component\\\\.*",
+    "hash_sha256": []
+  },
+  "_match_rules_notes": "At least name_pattern is required. Use ^ and $ anchors. Patterns are case-insensitive.",
+
+  "classification": "BLOAT",
+  "_classification_options": "CORE | ESSENTIAL | OPTIONAL | BLOAT | AGGRESSIVE | UNKNOWN",
+
+  "related_components": [],
+  "_related_notes": "List signature_ids of related components (e.g. a service and its parent program).",
+
+  "safe_actions": ["DISABLE"],
+  "unsafe_actions": ["REMOVE"],
+  "_action_options": "DISABLE | REMOVE | CONTAIN | IGNORE",
+
+  "reinstall_behavior": "none",
+  "_reinstall_options": "none | self_healing | update_restored",
+
+  "breakage_notes": "Describe what breaks when this component is disabled/removed.",
+  "evidence_url": "https://example.com/community-discussion-about-this-bloatware",
+  "_evidence_notes": "Link to community documentation, forum post, or article confirming bloatware status.",
+
+  "last_updated": "2026-02-11"
+}
