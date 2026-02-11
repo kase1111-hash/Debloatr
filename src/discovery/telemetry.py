@@ -498,17 +498,17 @@ class TelemetryScanner(BaseDiscoveryModule):
 
         # Check Microsoft endpoints
         for endpoint in MICROSOFT_TELEMETRY_ENDPOINTS:
-            if endpoint.lower() in address_lower or address_lower in endpoint.lower():
+            if endpoint.lower() in address_lower:
                 return True, EndpointCategory.MICROSOFT
 
         # Check third-party endpoints
         for endpoint in THIRD_PARTY_TELEMETRY_ENDPOINTS:
-            if endpoint.lower() in address_lower or address_lower in endpoint.lower():
+            if endpoint.lower() in address_lower:
                 return True, EndpointCategory.THIRD_PARTY
 
         # Check advertising endpoints
         for endpoint in ADVERTISING_ENDPOINTS:
-            if endpoint.lower() in address_lower or address_lower in endpoint.lower():
+            if endpoint.lower() in address_lower:
                 return True, EndpointCategory.ADVERTISING
 
         # Check for common telemetry patterns

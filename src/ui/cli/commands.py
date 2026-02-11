@@ -145,7 +145,11 @@ def run_list_command(args: argparse.Namespace, config: Config) -> int:
 
     # Apply filters
     if args.filter:
-        filter_class = Classification(args.filter.upper())
+        filter_value = args.filter.upper()
+        if filter_value not in Classification.__members__:
+            print(f"Error: Unknown classification '{args.filter}'")
+            return 1
+        filter_class = Classification[filter_value]
         components = [c for c in components if c.classification == filter_class]
 
     if args.risk:

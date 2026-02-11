@@ -441,8 +441,12 @@ class RollbackManager:
 
             if not result["success"]:
                 # Try PowerShell method
+                task_name = Path(task_path).name.replace("'", "''")
+                task_parent = str(Path(task_path).parent).replace("/", "\\")
+                if not task_parent.endswith("\\"):
+                    task_parent += "\\"
                 result = self._run_powershell(
-                    f"Enable-ScheduledTask -TaskPath '\\' -TaskName '{Path(task_path).name}' -ErrorAction Stop"
+                    f"Enable-ScheduledTask -TaskPath '{task_parent}' -TaskName '{task_name}' -ErrorAction Stop"
                 )
 
             if not result["success"]:
@@ -673,8 +677,9 @@ class RollbackManager:
 
         # Remove Debloatr firewall rules
         rule_prefix = f"Debloatr_Block_{component_name}"
+        escaped_prefix = rule_prefix.replace("'", "''")
         fw_result = self._run_powershell(
-            f"Get-NetFirewallRule | Where-Object {{ $_.DisplayName -like '{rule_prefix}*' }} | "
+            f"Get-NetFirewallRule | Where-Object {{ $_.DisplayName -like '{escaped_prefix}*' }} | "
             f"Remove-NetFirewallRule -ErrorAction SilentlyContinue"
         )
         if not fw_result["success"]:

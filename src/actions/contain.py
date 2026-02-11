@@ -404,9 +404,10 @@ class ContainHandler:
     def _remove_firewall_rules(self, rule_name: str) -> dict[str, Any]:
         """Remove firewall rules by name prefix."""
         try:
+            escaped_name = rule_name.replace("'", "''")
             result = self._run_powershell(
                 f"Get-NetFirewallRule | "
-                f"Where-Object {{ $_.DisplayName -like '{rule_name}*' }} | "
+                f"Where-Object {{ $_.DisplayName -like '{escaped_name}*' }} | "
                 f"Remove-NetFirewallRule -ErrorAction Stop"
             )
 

@@ -297,7 +297,7 @@ class SystemRestoreManager:
             return True
 
         # Use vssadmin to delete the shadow copy
-        result = self._run_command("vssadmin delete shadows /shadow={sequence_number} /quiet")
+        result = self._run_command(f"vssadmin delete shadows /shadow={sequence_number} /quiet")
 
         # Alternative: use WMI
         if not result["success"]:
