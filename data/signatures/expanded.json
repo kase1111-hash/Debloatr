@@ -1502,6 +1502,604 @@
       "breakage_notes": "Auto-starts Discord on login. Can be disabled in Discord settings too.",
       "evidence_url": "",
       "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "samsung-magician-001",
+      "publisher": "Samsung Electronics",
+      "component_name": "Samsung Magician",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)samsung\\s*magician",
+        "publisher_pattern": "(?i)samsung",
+        "path_pattern": "(?i)samsung\\\\magician"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "SSD management utility. Removing disables firmware update checks but SSD continues to function normally.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "msi-dragon-center-001",
+      "publisher": "Micro-Star International",
+      "component_name": "MSI Dragon Center",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)(msi\\s*)?dragon\\s*center",
+        "publisher_pattern": "(?i)micro-star|msi",
+        "path_pattern": "(?i)msi\\\\dragon"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["msi-center-001"],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "System monitoring/fan control utility. Removing disables custom fan curves and RGB control; hardware defaults remain functional.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "msi-center-001",
+      "publisher": "Micro-Star International",
+      "component_name": "MSI Center",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)msi\\s*center",
+        "publisher_pattern": "(?i)micro-star|msi",
+        "path_pattern": "(?i)msi\\\\center"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["msi-dragon-center-001"],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Successor to Dragon Center. Same impact — removing disables OEM fan/RGB control, hardware defaults remain.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "toshiba-service-station-001",
+      "publisher": "Toshiba Corporation",
+      "component_name": "Toshiba Service Station",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)toshiba\\s*service\\s*station",
+        "publisher_pattern": "(?i)toshiba",
+        "path_pattern": "(?i)toshiba.*service.*station"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "OEM update checker. Removing stops Toshiba-specific update notifications; Windows Update handles driver updates.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "sony-vaio-care-001",
+      "publisher": "Sony Corporation",
+      "component_name": "VAIO Care",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)vaio\\s*care",
+        "publisher_pattern": "(?i)sony",
+        "path_pattern": "(?i)sony\\\\vaio"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "OEM diagnostics and support. Removing stops background health checks; system continues normally.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "cyberlink-powerdvd-001",
+      "publisher": "CyberLink Corp.",
+      "component_name": "CyberLink PowerDVD",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)cyberlink\\s*power\\s*dvd",
+        "publisher_pattern": "(?i)cyberlink",
+        "path_pattern": "(?i)cyberlink\\\\powerdvd"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "OEM-bundled media player. Removing has no system impact; Windows Media Player or VLC are alternatives.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "cyberlink-youcam-001",
+      "publisher": "CyberLink Corp.",
+      "component_name": "CyberLink YouCam",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)cyberlink\\s*you\\s*cam",
+        "publisher_pattern": "(?i)cyberlink",
+        "path_pattern": "(?i)cyberlink\\\\youcam"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Webcam enhancement software. Removing has no impact on webcam functionality; Windows Camera app works independently.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "wildtangent-games-001",
+      "publisher": "WildTangent",
+      "component_name": "WildTangent Games",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)wildtangent",
+        "publisher_pattern": "(?i)wildtangent",
+        "path_pattern": "(?i)wildtangent"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "OEM-bundled game portal with aggressive ads. Safe to remove entirely.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-skype-uwp-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Skype",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "(?i)microsoft\\.skypeapp",
+        "publisher_pattern": "(?i)microsoft",
+        "path_pattern": ""
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Pre-installed Skype UWP app. Removing does not affect Skype desktop client if separately installed.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-feedback-hub-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Feedback Hub",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "(?i)microsoft\\.windowsfeedbackhub",
+        "publisher_pattern": "(?i)microsoft",
+        "path_pattern": ""
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Used to send feedback to Microsoft. Removing has no system impact unless user actively submits feedback.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-mixed-reality-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Mixed Reality Portal",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "(?i)microsoft\\.mixedreality\\.portal",
+        "publisher_pattern": "(?i)microsoft",
+        "path_pattern": ""
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "VR/AR headset portal. Only needed if using Windows Mixed Reality headsets. Safe to remove for all other users.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-3d-viewer-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "3D Viewer",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "(?i)microsoft\\.microsoft3dviewer",
+        "publisher_pattern": "(?i)microsoft",
+        "path_pattern": ""
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "3D model viewer. Removed from default Windows 11 installations. Safe to remove on Windows 10.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "microsoft-3d-builder-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "3D Builder",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "(?i)microsoft\\.3dbuilder",
+        "publisher_pattern": "(?i)microsoft",
+        "path_pattern": ""
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "3D printing preparation tool. Rarely used; safe to remove entirely.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "windows-connect-service-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Connected User Experiences and Telemetry",
+      "component_type": "service",
+      "match_rules": {
+        "name_pattern": "(?i)^diagtrack$",
+        "publisher_pattern": "",
+        "path_pattern": "(?i)diagtrack\\.dll"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": ["windows-telemetry-task-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Core telemetry service. Disabling reduces data collection but may affect Windows Update diagnostics. Do not remove.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "windows-telemetry-task-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Microsoft Compatibility Appraiser",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": "(?i)microsoft\\s*compatibility\\s*appraiser",
+        "publisher_pattern": "",
+        "path_pattern": "(?i)compattelrunner"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": ["windows-connect-service-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Telemetry collection task. Can cause high disk usage. Disabling reduces telemetry; may affect feature update compatibility checks.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "windows-customer-experience-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Customer Experience Improvement Program",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": "(?i)(microsoft\\\\windows\\\\)?customer\\s*experience",
+        "publisher_pattern": "",
+        "path_pattern": ""
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "CEIP data collection tasks. Disabling stops usage telemetry. No functional impact.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "hp-touchpoint-analytics-001",
+      "publisher": "HP Inc.",
+      "component_name": "HP Touchpoint Analytics",
+      "component_type": "service",
+      "match_rules": {
+        "name_pattern": "(?i)hp\\s*touchpoint|touchpoint\\s*analytics",
+        "publisher_pattern": "(?i)hp|hewlett",
+        "path_pattern": "(?i)touchpoint\\\\analytics"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "HP telemetry service collecting usage data. Safe to disable or remove entirely.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "hp-sure-sense-001",
+      "publisher": "HP Inc.",
+      "component_name": "HP Sure Sense",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)hp\\s*sure\\s*sense",
+        "publisher_pattern": "(?i)hp|hewlett",
+        "path_pattern": "(?i)hp.*sure.*sense"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "HP-branded malware protection layer. Redundant with Windows Defender. Safe to remove.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "dell-digital-delivery-001",
+      "publisher": "Dell Technologies",
+      "component_name": "Dell Digital Delivery",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)dell\\s*digital\\s*delivery",
+        "publisher_pattern": "(?i)dell",
+        "path_pattern": "(?i)dell.*digital.*delivery"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Delivers pre-purchased software after setup. Once software is installed, this service has no purpose.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "dell-support-assist-remediation-001",
+      "publisher": "Dell Technologies",
+      "component_name": "Dell SupportAssist Remediation",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)dell\\s*supportassist.*remediation",
+        "publisher_pattern": "(?i)dell",
+        "path_pattern": "(?i)dell.*supportassist.*remediation"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Companion to Dell SupportAssist for applying fixes. Removing stops Dell auto-remediation; manual Windows Update is sufficient.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "lenovo-system-update-001",
+      "publisher": "Lenovo",
+      "component_name": "Lenovo System Update",
+      "component_type": "program",
+      "match_rules": {
+        "name_pattern": "(?i)lenovo\\s*system\\s*update",
+        "publisher_pattern": "(?i)lenovo",
+        "path_pattern": "(?i)lenovo.*systemupdate"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "none",
+      "breakage_notes": "Lenovo driver/firmware updater. Removing stops Lenovo-specific updates; Windows Update handles most drivers.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "lenovo-vantage-service-001",
+      "publisher": "Lenovo",
+      "component_name": "Lenovo Vantage Service",
+      "component_type": "service",
+      "match_rules": {
+        "name_pattern": "(?i)(lenovo.*vantage|imcontroller)",
+        "publisher_pattern": "(?i)lenovo",
+        "path_pattern": "(?i)lenovo.*imcontroller"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Background service for Lenovo Vantage. Tends to reinstall. Disabling stops background telemetry.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "dropbox-updater-001",
+      "publisher": "Dropbox, Inc.",
+      "component_name": "Dropbox Update",
+      "component_type": "startup",
+      "match_rules": {
+        "name_pattern": "(?i)dropbox\\s*update",
+        "publisher_pattern": "(?i)dropbox",
+        "path_pattern": "(?i)dropbox\\\\update"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Dropbox auto-updater startup entry. Disabling stops automatic updates but Dropbox sync continues to work.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "adobe-updater-001",
+      "publisher": "Adobe Inc.",
+      "component_name": "Adobe Updater Startup Utility",
+      "component_type": "startup",
+      "match_rules": {
+        "name_pattern": "(?i)adobe.*update|adobearm",
+        "publisher_pattern": "(?i)adobe",
+        "path_pattern": "(?i)adobe.*arm"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Adobe auto-updater at login. Disabling stops automatic updates; manual update via Adobe apps still works.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "java-updater-001",
+      "publisher": "Oracle Corporation",
+      "component_name": "Java Update Scheduler",
+      "component_type": "startup",
+      "match_rules": {
+        "name_pattern": "(?i)java\\s*update|jusched",
+        "publisher_pattern": "(?i)oracle|sun\\s*microsystems",
+        "path_pattern": "(?i)java.*jusched"
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "self_healing",
+      "breakage_notes": "Java update checker at login. Disabling stops update nag popups; Java runtime continues to function.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
+    },
+    {
+      "signature_id": "realtek-audio-console-001",
+      "publisher": "Realtek Semiconductor",
+      "component_name": "Realtek Audio Console",
+      "component_type": "uwp",
+      "match_rules": {
+        "name_pattern": "(?i)realtekaudiocontrol|realtek.*audio.*console",
+        "publisher_pattern": "(?i)realtek",
+        "path_pattern": ""
+      },
+      "match_type": "any",
+      "verification": {
+        "hash_sha256": []
+      },
+      "classification": "OPTIONAL",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Audio management UWP companion app. Removing may lose advanced audio settings UI but audio driver continues to work.",
+      "evidence_url": "",
+      "last_updated": "2026-02-11"
     }
   ]
 }

@@ -1,6 +1,6 @@
 # Bloatware Scanner & Debloater
 
-**Specification v1.0** | Target: Shop Grade
+**Specification v0.1.0-alpha** | Status: Active Development
 
 ---
 
@@ -55,7 +55,6 @@ Software or system components meeting **one or more** criteria:
 │  ┌─────────────────────────────┐    │
 │  │ Signature DB (deterministic)│    │
 │  │ Rule Engine (heuristic)     │    │
-│  │ LLM Layer (optional)        │    │
 │  └─────────────────────────────┘    │
 └──────────────┬──────────────────────┘
                │
@@ -277,39 +276,6 @@ if bloat_score >= 0.8: suggest AGGRESSIVE
 else: suggest UNKNOWN (manual review)
 ```
 
-### 5.4 LLM Analysis Layer (Optional)
-
-**Role:** Explanation, correlation, unknown resolution  
-**Authority Level:** Advisory only (non-executing)
-
-**Input Context:**
-```json
-{
-  "component_metadata": { },
-  "behavior_profile": { },
-  "heuristic_flags": [ ],
-  "similar_signatures": [ ]
-}
-```
-
-**Output Schema:**
-```json
-{
-  "explanation": "string (natural language)",
-  "suggested_classification": "enum",
-  "confidence": "float (0.0-1.0)",
-  "risk_rationale": "string",
-  "recommended_action": "enum",
-  "sources_referenced": ["string"]
-}
-```
-
-**LLM Constraints:**
-- Outputs are logged to `llm_analysis.log`
-- Outputs never auto-execute actions
-- User can override any LLM suggestion
-- LLM unavailability does not block scanner operation
-
 ---
 
 ## 6. Risk & Impact Analyzer
@@ -359,7 +325,6 @@ risk_level = max(
 | Disable | `DISABLE` | Stop service/task/startup; prevent auto-start | Full (re-enable) |
 | Contain | `CONTAIN` | Firewall block, ACL deny, execution prevention | Full (remove rules) |
 | Remove | `REMOVE` | Uninstall via native method or delete files | Partial (reinstall) |
-| Replace | `REPLACE` | Swap component with lightweight alternative | Full (restore original) |
 | Ignore | `IGNORE` | Mark reviewed, take no action | N/A |
 
 ### 7.2 Action Implementation Details
@@ -515,7 +480,7 @@ Required elements:
 - Component name and publisher
 - Classification badge with color
 - Risk level indicator
-- "Why this classification?" expandable (LLM or signature source)
+- "Why this classification?" expandable (signature or heuristic source)
 - Available actions (filtered by safety rules)
 - Related components list
 - Execution history for this component
@@ -571,7 +536,7 @@ Required elements:
 | `IDiscoveryModule` | Add custom discovery sources | DLL plugin |
 | `IClassificationProvider` | Additional signature sources | JSON feed URL |
 | `IActionHandler` | Custom action implementations | DLL plugin |
-| `ILLMConnector` | Alternative LLM backends | REST adapter |
+| `ISignatureProvider` | Additional signature sources | JSON feed URL |
 
 ### 12.2 Configuration Profiles
 
@@ -603,7 +568,7 @@ External feeds must provide:
 |-------|-------|----------|-------|
 | 1 | Sketch | Scanner + JSON output | Discovery modules only |
 | 2 | Garage | + Disable + Rollback | Core actions |
-| 3 | Shop | + OEM profiles + LLM explain | Full classification |
+| 3 | Shop | + OEM profiles + expanded signatures | Full classification |
 | 4 | Industrial | + Fleet policies + CI image integration | Enterprise |
 
 ### Phase 1 Deliverables (Sketch Grade)
@@ -623,11 +588,11 @@ External feeds must provide:
 
 ### Phase 3 Deliverables (Shop Grade)
 - [ ] Full heuristic rule engine
-- [ ] LLM integration layer
 - [ ] Risk analyzer
 - [ ] OEM profile support
 - [ ] Complete GUI with all views
 - [ ] Session management
+- [ ] Expanded signature database (150+)
 
 ---
 
@@ -663,8 +628,7 @@ debloatd/
 │   ├── classification/
 │   │   ├── engine.py
 │   │   ├── signatures.py
-│   │   ├── heuristics.py
-│   │   └── llm_layer.py
+│   │   └── heuristics.py
 │   ├── analysis/
 │   │   └── risk.py
 │   ├── actions/
@@ -719,6 +683,6 @@ debloatd/
 
 ---
 
-*Specification version: 1.0*  
-*Last updated: 2025-01-16*  
+*Specification version: 0.1.0-alpha*
+*Last updated: 2026-02-11*
 *Target implementation: Shop Grade*

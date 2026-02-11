@@ -363,9 +363,7 @@ class ServicesScanner(BaseDiscoveryModule):
                     @{N='Dependencies';E={($_.ServiceDependencies -join ',')}},
                     @{N='DependentServices';E={(Get-Service $_.Name -ErrorAction SilentlyContinue).DependentServices.Name -join ','}}
                 | ConvertTo-Json -Compress
-                """.replace(
-                    "\n", " "
-                ),
+                """.replace("\n", " "),
             ]
 
             result = subprocess.run(

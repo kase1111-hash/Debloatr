@@ -9,6 +9,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Project documentation (CONTRIBUTING.md, SECURITY.md, issue templates)
+- Expanded signature database with 75 new signatures (`data/signatures/expanded.json`)
+- Signature contribution template (`data/signatures/TEMPLATE.json`)
+- Signature validation script (`scripts/validate_signature.py`)
+- Integration test infrastructure for Windows (`tests/integration/`)
+- GitHub Actions CI workflow (`.github/workflows/ci.yml`)
+- Service dependency detection before disable actions
+- Self-healing component detection in executor
+- Session-level reboot requirement tracking
+- GUI action workers (`ActionWorker`, `BatchActionWorker`) for off-thread execution
+- GUI actions wired to real `ExecutionEngine` with confirmation dialogs
+
+### Changed
+- Classification engine is now two-tier (signatures + heuristics); LLM layer removed
+- `REPLACE` action now raises `NotImplementedError` instead of silent failure
+- Version corrected from 1.0.0 to 0.1.0-alpha across all files
+- Portable app scanning disabled by default
+- GUI action stubs replaced with real execution engine integration
+- Orchestrator module list typed as `list[BaseDiscoveryModule]`
+- UWP removal supports scoped removal (current user vs all users)
+- README updated to remove LLM references and fix version numbers
+
+### Fixed
+- Critical: missing f-string in `restore.py` vssadmin command (would pass literal `{sequence_number}`)
+- PowerShell single-quote injection in rollback, containment, and disable handlers
+- Bidirectional substring match in telemetry scanner causing false positives
+- Scheduled task path handling (hardcoded `\` parent) in rollback
+- CLI `--filter` enum validation (invalid values no longer crash)
+- Regex stripping bare digits from portable app display names
+- Platform-specific path assertions in tests (PosixPath vs Windows backslash)
+- Restore point test returning `None` on Linux instead of expected `0`
+
+### Removed
+- LLM classification source enum, config fields, logging methods
+- `llm_layer.py` reference from README file structure
 
 ## [0.1.0] - 2025-01-16
 

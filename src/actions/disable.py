@@ -754,7 +754,11 @@ class DisableHandler:
             }
 
         except subprocess.TimeoutExpired:
-            return {"success": False, "output": "", "error": f"Command timed out after {self.command_timeout}s"}
+            return {
+                "success": False,
+                "output": "",
+                "error": f"Command timed out after {self.command_timeout}s",
+            }
         except Exception as e:
             return {"success": False, "output": "", "error": str(e)}
 
@@ -782,7 +786,11 @@ class DisableHandler:
             }
 
         except subprocess.TimeoutExpired:
-            return {"success": False, "output": "", "error": f"Command timed out after {self.command_timeout}s"}
+            return {
+                "success": False,
+                "output": "",
+                "error": f"Command timed out after {self.command_timeout}s",
+            }
         except Exception as e:
             return {"success": False, "output": "", "error": str(e)}
 

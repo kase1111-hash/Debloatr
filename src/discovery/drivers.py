@@ -266,9 +266,7 @@ class DriversScanner(BaseDiscoveryModule):
                     Date,
                     Version
                 | ConvertTo-Json -Compress
-                """.replace(
-                    "\n", " "
-                ),
+                """.replace("\n", " "),
             ]
 
             result = subprocess.run(

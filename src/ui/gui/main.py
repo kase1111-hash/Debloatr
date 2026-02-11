@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from src.core.config import Config
 
 
-def run_gui_app(config: "Config") -> int:
+def run_gui_app(config: Config) -> int:
     """Run the GUI application.
 
     This function lazily imports PySide6 and creates all GUI classes
@@ -64,15 +64,12 @@ def run_gui_app(config: "Config") -> int:
             QVBoxLayout,
             QWidget,
         )
-    except ImportError:
-        raise ImportError(
-            "PySide6 is not installed. Install with: pip install PySide6"
-        )
+    except ImportError as exc:
+        raise ImportError("PySide6 is not installed. Install with: pip install PySide6") from exc
 
     # Import core modules
     from src.actions.executor import ExecutionEngine, ExecutionResult
     from src.actions.planner import ActionPlanner
-    from src.core.config import Config
     from src.core.models import (
         ActionPlan,
         ActionType,
@@ -227,7 +224,9 @@ def run_gui_app(config: "Config") -> int:
 
             self.classification_table = QTableWidget(6, 3)
             self.classification_table.setHorizontalHeaderLabels(["Classification", "Count", ""])
-            self.classification_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+            self.classification_table.horizontalHeader().setSectionResizeMode(
+                0, QHeaderView.ResizeMode.Stretch
+            )
             self.classification_table.horizontalHeader().setSectionResizeMode(
                 1, QHeaderView.ResizeMode.ResizeToContents
             )
@@ -259,8 +258,7 @@ def run_gui_app(config: "Config") -> int:
             """Create a stat display box."""
             frame = QFrame()
             frame.setFrameStyle(QFrame.Shape.Box | QFrame.Shadow.Raised)
-            frame.setStyleSheet(
-                f"""
+            frame.setStyleSheet(f"""
                 QFrame {{
                     background-color: {color};
                     border-radius: 8px;
@@ -269,8 +267,7 @@ def run_gui_app(config: "Config") -> int:
                 QLabel {{
                     color: white;
                 }}
-            """
-            )
+            """)
 
             layout = QVBoxLayout(frame)
 
@@ -525,11 +522,19 @@ def run_gui_app(config: "Config") -> int:
             self.table.setHorizontalHeaderLabels(
                 ["Session ID", "Description", "Started", "Actions", "Status"]
             )
-            self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+            self.table.horizontalHeader().setSectionResizeMode(
+                0, QHeaderView.ResizeMode.ResizeToContents
+            )
             self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
-            self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
-            self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
-            self.table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeMode.ResizeToContents)
+            self.table.horizontalHeader().setSectionResizeMode(
+                2, QHeaderView.ResizeMode.ResizeToContents
+            )
+            self.table.horizontalHeader().setSectionResizeMode(
+                3, QHeaderView.ResizeMode.ResizeToContents
+            )
+            self.table.horizontalHeader().setSectionResizeMode(
+                4, QHeaderView.ResizeMode.ResizeToContents
+            )
             self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
             self.table.setAlternatingRowColors(True)
 
@@ -643,9 +648,7 @@ def run_gui_app(config: "Config") -> int:
                 content += f"\n{status} {action.action}: {action.component_name}\n"
                 if action.error_message:
                     content += f"   Error: {action.error_message}\n"
-                content += (
-                    f"   Rollback: {'Available' if action.rollback_available else 'Not available'}\n"
-                )
+                content += f"   Rollback: {'Available' if action.rollback_available else 'Not available'}\n"
 
             text.setPlainText(content)
             layout.addWidget(text)
@@ -684,22 +687,16 @@ def run_gui_app(config: "Config") -> int:
 
             self.disable_btn = QPushButton("Disable")
             self.disable_btn.setEnabled(False)
-            self.disable_btn.clicked.connect(
-                lambda: self._request_action(ActionType.DISABLE)
-            )
+            self.disable_btn.clicked.connect(lambda: self._request_action(ActionType.DISABLE))
 
             self.contain_btn = QPushButton("Contain")
             self.contain_btn.setEnabled(False)
-            self.contain_btn.clicked.connect(
-                lambda: self._request_action(ActionType.CONTAIN)
-            )
+            self.contain_btn.clicked.connect(lambda: self._request_action(ActionType.CONTAIN))
 
             self.remove_btn = QPushButton("Remove")
             self.remove_btn.setEnabled(False)
             self.remove_btn.setStyleSheet("background-color: #e74c3c; color: white;")
-            self.remove_btn.clicked.connect(
-                lambda: self._request_action(ActionType.REMOVE)
-            )
+            self.remove_btn.clicked.connect(lambda: self._request_action(ActionType.REMOVE))
 
             btn_layout.addWidget(self.disable_btn)
             btn_layout.addWidget(self.contain_btn)
@@ -772,9 +769,9 @@ def run_gui_app(config: "Config") -> int:
             super().__init__()
             self.config = cfg
             self.components: list[Component] = []
-            self.scan_worker = None
-            self.action_worker = None
-            self.batch_worker = None
+            self.scan_worker: ScanWorker | None = None
+            self.action_worker: ActionWorker | None = None
+            self.batch_worker: BatchActionWorker | None = None
             self._planner = ActionPlanner()
             self.setup_ui()
             self.setup_connections()
@@ -966,7 +963,7 @@ def run_gui_app(config: "Config") -> int:
         def _on_action_finished(self, result: ExecutionResult, engine: ExecutionEngine):
             """Handle action completion."""
             self.progress_bar.setVisible(False)
-            session = engine.end_session()
+            engine.end_session()
 
             if result.success:
                 msg = "Action completed successfully."
@@ -1044,19 +1041,17 @@ def run_gui_app(config: "Config") -> int:
             self.batch_worker.error.connect(self._on_action_error)
             self.batch_worker.start()
 
-        def _on_batch_finished(
-            self, results: list[ExecutionResult], engine: ExecutionEngine
-        ):
+        def _on_batch_finished(self, results: list[ExecutionResult], engine: ExecutionEngine):
             """Handle batch action completion."""
             self.progress_bar.setVisible(False)
-            session = engine.end_session()
+            engine.end_session()
             summary = engine.get_session_summary()
 
             succeeded = summary["successful"]
             failed = summary["failed"]
             total = summary["total_actions"]
 
-            msg = f"Safe debloat complete.\n\n"
+            msg = "Safe debloat complete.\n\n"
             msg += f"Successful: {succeeded}/{total}\n"
             if failed:
                 msg += f"Failed: {failed}\n"
@@ -1068,9 +1063,7 @@ def run_gui_app(config: "Config") -> int:
             else:
                 QMessageBox.information(self, "Success", msg)
 
-            self.status_bar.showMessage(
-                f"Safe debloat: {succeeded}/{total} succeeded"
-            )
+            self.status_bar.showMessage(f"Safe debloat: {succeeded}/{total} succeeded")
             self.session_history.refresh()
 
         def undo_last_session(self):
@@ -1125,8 +1118,7 @@ def run_gui_app(config: "Config") -> int:
 
             info = QTextEdit()
             info.setReadOnly(True)
-            info.setHtml(
-                f"""
+            info.setHtml(f"""
 <h2>Recovery Status</h2>
 <table>
 <tr><td><b>Sessions available:</b></td><td>{status.has_sessions}</td></tr>
@@ -1138,8 +1130,7 @@ def run_gui_app(config: "Config") -> int:
 
 <h3>Recovery Options</h3>
 <p>Use the buttons below to recover your system.</p>
-"""
-            )
+""")
             layout.addWidget(info)
 
             btn_layout = QHBoxLayout()

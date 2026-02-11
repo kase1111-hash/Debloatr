@@ -392,9 +392,7 @@ class ExecutionEngine:
                 snapshot = handler_result.snapshot
 
             elif action == ActionType.REPLACE:
-                raise NotImplementedError(
-                    "REPLACE action is not supported in this version"
-                )
+                raise NotImplementedError("REPLACE action is not supported in this version")
 
             elif action == ActionType.IGNORE:
                 success = True
@@ -425,9 +423,7 @@ class ExecutionEngine:
             # Track reboot requirements across session
             if requires_reboot:
                 self._reboot_required = True
-                self._reboot_reasons.append(
-                    f"{action.value} {component.display_name}"
-                )
+                self._reboot_reasons.append(f"{action.value} {component.display_name}")
 
             return ExecutionResult(
                 success=success,
