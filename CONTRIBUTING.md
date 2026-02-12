@@ -14,8 +14,8 @@ Thank you for your interest in contributing to Debloatr! This document provides 
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/debloatr/debloatr.git
-   cd debloatr
+   git clone https://github.com/kase1111-hash/Debloatr.git
+   cd Debloatr
    ```
 
 2. **Create a virtual environment**
@@ -89,7 +89,8 @@ debloatr/
 │   ├── signatures/         # Bloatware signatures
 │   └── profiles/           # Configuration profiles
 ├── tests/                  # Test suite
-└── docs/                   # Documentation
+├── scripts/                # Utility scripts (signature validation)
+└── .github/                # CI workflows and issue templates
 ```
 
 ## How to Contribute
@@ -190,7 +191,7 @@ The signature database is critical for accurate bloatware detection. We provide 
   "safe_actions": ["disable", "remove", "contain"],
   "evidence_url": "https://example.com/evidence",
   "breakage_notes": "Any known issues from disabling/removing",
-  "reinstall_behavior": "none|windows_update|self_healing|manual"
+  "reinstall_behavior": "none|self_healing|update_restored"
 }
 ```
 

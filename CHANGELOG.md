@@ -67,7 +67,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Signature database with 55+ predefined bloatware signatures
 - Signature matching engine for deterministic classification
 - Heuristic rules engine with confidence scoring
-- Optional LLM integration layer for advisory analysis
 - Risk analyzer evaluating boot stability, hardware function, and security impact
 
 #### Action System (Phase 8)
@@ -111,5 +110,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dependencies: pywin32, psutil, pydantic
 - Optional: PySide6 for GUI
 
-[Unreleased]: https://github.com/debloatr/debloatr/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/debloatr/debloatr/releases/tag/v0.1.0
+[Unreleased]: https://github.com/kase1111-hash/Debloatr/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/kase1111-hash/Debloatr/releases/tag/v0.1.0

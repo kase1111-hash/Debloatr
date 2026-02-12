@@ -212,7 +212,7 @@ Software or system components meeting **one or more** criteria:
   "signature_id": "string (UUID)",
   "publisher": "string",
   "component_name": "string",
-  "component_type": "enum (program|service|task|startup|driver|uwp)",
+  "component_type": "enum (program|service|task|startup|driver|uwp|telemetry)",
   "match_rules": {
     "name_pattern": "regex",
     "publisher_pattern": "regex",
@@ -325,6 +325,7 @@ risk_level = max(
 | Disable | `DISABLE` | Stop service/task/startup; prevent auto-start | Full (re-enable) |
 | Contain | `CONTAIN` | Firewall block, ACL deny, execution prevention | Full (remove rules) |
 | Remove | `REMOVE` | Uninstall via native method or delete files | Partial (reinstall) |
+| Replace | `REPLACE` | Swap component with lightweight alternative | Full (restore original) |
 | Ignore | `IGNORE` | Mark reviewed, take no action | N/A |
 
 ### 7.2 Action Implementation Details
@@ -447,17 +448,17 @@ Move-Item -Path "$quarantine\$file" -Destination $originalPath
 
 | Command | Function |
 |---------|----------|
-| `List-DebloatSessions` | Show all sessions with timestamps |
-| `Get-SessionActions -Id $id` | List all actions in session |
-| `Undo-SessionAction -Id $id -ActionId $aid` | Rollback single action |
-| `Undo-Session -Id $id` | Rollback entire session (reverse order) |
+| `debloatd sessions` | Show all sessions with timestamps |
+| `debloatd sessions --json` | List sessions in JSON format |
+| `debloatd undo <session_id>` | Rollback entire session (reverse order) |
+| `debloatd undo --last` | Rollback the most recent session |
 
 ### 9.4 Boot-Safe Recovery
 
 If system fails to boot after debloat:
 
 1. Boot to Safe Mode
-2. Run: `debloatd --recovery --last-session`
+2. Run: `debloatd recovery --last-session`
 3. Automatic rollback of most recent session
 
 ---
@@ -533,9 +534,9 @@ Required elements:
 
 | Interface | Purpose | Method |
 |-----------|---------|--------|
-| `IDiscoveryModule` | Add custom discovery sources | DLL plugin |
+| `BaseDiscoveryModule` | Add custom discovery sources | Python subclass (`src/discovery/base.py`) |
 | `IClassificationProvider` | Additional signature sources | JSON feed URL |
-| `IActionHandler` | Custom action implementations | DLL plugin |
+| `IActionHandler` | Custom action implementations | Python subclass |
 | `ISignatureProvider` | Additional signature sources | JSON feed URL |
 
 ### 12.2 Configuration Profiles
@@ -571,28 +572,28 @@ External feeds must provide:
 | 3 | Shop | + OEM profiles + expanded signatures | Full classification |
 | 4 | Industrial | + Fleet policies + CI image integration | Enterprise |
 
-### Phase 1 Deliverables (Sketch Grade)
-- [ ] Installed software scanner
-- [ ] Services scanner
-- [ ] Scheduled tasks scanner
-- [ ] Startup entries scanner
-- [ ] JSON report output
-- [ ] Basic CLI interface
+### Phase 1 Deliverables (Sketch Grade) -- Complete
+- [x] Installed software scanner
+- [x] Services scanner
+- [x] Scheduled tasks scanner
+- [x] Startup entries scanner
+- [x] JSON report output
+- [x] Basic CLI interface
 
-### Phase 2 Deliverables (Garage Grade)
-- [ ] Signature database loader
-- [ ] Classification engine (signatures only)
-- [ ] Disable action implementation
-- [ ] Snapshot/rollback system
-- [ ] Basic GUI (component list + actions)
+### Phase 2 Deliverables (Garage Grade) -- Complete
+- [x] Signature database loader
+- [x] Classification engine (signatures only)
+- [x] Disable action implementation
+- [x] Snapshot/rollback system
+- [x] Basic GUI (component list + actions)
 
-### Phase 3 Deliverables (Shop Grade)
-- [ ] Full heuristic rule engine
-- [ ] Risk analyzer
-- [ ] OEM profile support
-- [ ] Complete GUI with all views
-- [ ] Session management
-- [ ] Expanded signature database (150+)
+### Phase 3 Deliverables (Shop Grade) -- Complete
+- [x] Full heuristic rule engine
+- [x] Risk analyzer
+- [x] OEM profile support
+- [x] Complete GUI with all views
+- [x] Session management
+- [x] Expanded signature database (150+)
 
 ---
 
@@ -612,42 +613,60 @@ This tool intentionally does **not**:
 ## 15. File & Directory Structure
 
 ```
-debloatd/
+Debloatr/
 ├── src/
 │   ├── core/
-│   │   ├── orchestrator.py
-│   │   ├── snapshot.py
-│   │   └── rollback.py
+│   │   ├── models.py            # Enums, data classes, type definitions
+│   │   ├── orchestrator.py      # Scan coordinator
+│   │   ├── config.py            # Configuration management
+│   │   ├── logging_config.py    # Logging setup
+│   │   ├── session.py           # Session persistence
+│   │   ├── snapshot.py          # Pre-action state capture
+│   │   ├── rollback.py          # Component-level undo
+│   │   ├── restore.py           # Windows restore point integration
+│   │   └── recovery.py          # Boot-safe recovery mode
 │   ├── discovery/
-│   │   ├── programs.py
-│   │   ├── services.py
-│   │   ├── tasks.py
-│   │   ├── startup.py
-│   │   ├── drivers.py
-│   │   └── telemetry.py
+│   │   ├── base.py              # BaseDiscoveryModule abstract interface
+│   │   ├── programs.py          # Installed software scanner
+│   │   ├── services.py          # Windows services scanner
+│   │   ├── tasks.py             # Scheduled tasks scanner
+│   │   ├── startup.py           # Startup entries scanner
+│   │   ├── drivers.py           # Drivers scanner
+│   │   └── telemetry.py         # Telemetry & network hooks scanner
 │   ├── classification/
-│   │   ├── engine.py
-│   │   ├── signatures.py
-│   │   └── heuristics.py
+│   │   ├── engine.py            # Classification engine
+│   │   ├── signatures.py        # Signature database loader
+│   │   └── heuristics.py        # Heuristic rule engine
 │   ├── analysis/
-│   │   └── risk.py
+│   │   └── risk.py              # Risk assessment (5 dimensions)
 │   ├── actions/
-│   │   ├── planner.py
-│   │   ├── disable.py
-│   │   ├── contain.py
-│   │   ├── remove.py
-│   │   └── executor.py
+│   │   ├── planner.py           # Action planning with safety rules
+│   │   ├── executor.py          # Transactional execution engine
+│   │   ├── disable.py           # Disable handler
+│   │   ├── contain.py           # Containment handler
+│   │   └── remove.py            # Removal handler
 │   └── ui/
-│       ├── cli.py
+│       ├── cli/
+│       │   ├── commands.py      # CLI command handlers
+│       │   └── formatters.py    # Output formatting
 │       └── gui/
+│           └── main.py          # PySide6 GUI application
 ├── data/
 │   ├── signatures/
-│   │   └── default.json
+│   │   ├── default.json         # Core bloatware signatures
+│   │   ├── expanded.json        # Extended signature database (152 signatures)
+│   │   └── TEMPLATE.json        # Template for contributing signatures
 │   └── profiles/
-│       └── default.json
-├── tests/
-├── docs/
-└── debloatd.py (entry point)
+│       └── default.json         # Default configuration profile
+├── tests/                       # 18 test modules with 100+ test cases
+│   ├── integration/             # Windows-specific integration tests
+│   └── conftest.py              # Pytest fixtures
+├── scripts/
+│   └── validate_signature.py    # Signature validation tool
+├── .github/
+│   ├── workflows/ci.yml         # CI pipeline
+│   └── ISSUE_TEMPLATE/          # Bug report and feature request templates
+└── debloatd.py                  # Main entry point
 ```
 
 ---
@@ -660,7 +679,7 @@ debloatd/
 | Runtime | Python 3.10+ or compiled executable |
 | Privileges | Standard user (scan) / Administrator (actions) |
 | Dependencies | pywin32, psutil, winreg (stdlib) |
-| GUI Framework | Qt6 (PySide6) or tkinter |
+| GUI Framework | PySide6 (Qt6) |
 | Storage | ~50MB base + signature database |
 
 ---

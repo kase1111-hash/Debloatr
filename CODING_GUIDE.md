@@ -501,19 +501,11 @@ Implement confidence-based heuristic classification and risk analysis.
        return max(risks)  # Highest risk wins
    ```
 
-5. **Implement LLM Integration Layer** (`src/classification/llm_layer.py`)
-   - Define input/output schemas
-   - REST adapter for OpenAI/Anthropic/local models
-   - Fallback to heuristics if LLM unavailable
-   - Log all LLM outputs to `llm_analysis.log`
-   - **Advisory only** - never auto-execute
-
 ### Deliverables
 - [ ] All heuristic rules implemented
 - [ ] Bloat score calculator
 - [ ] Risk dimension analyzers (all 5)
 - [ ] Composite risk level calculator
-- [ ] LLM integration layer (optional)
 - [ ] Unit tests for heuristics and risk
 
 ---
@@ -912,4 +904,4 @@ Build complete user interfaces for all functionality.
 ---
 
 *Guide Version: 1.0*
-*Compatible with Specification v1.0*
+*Compatible with Specification v0.1.0-alpha*
