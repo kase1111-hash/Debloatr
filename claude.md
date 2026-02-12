@@ -45,7 +45,7 @@ Rollback Manager (src/core/rollback.py)
 | `src/actions/` | Action handlers: planner, executor, disable, remove, contain |
 | `src/ui/cli/` | Command-line interface |
 | `src/ui/gui/` | PySide6/Qt6 GUI |
-| `data/signatures/` | Bloatware signature definitions (55+ signatures) |
+| `data/signatures/` | Bloatware signature definitions (default: 51, expanded: 152) |
 | `data/profiles/` | Configuration profiles |
 | `tests/` | 18 test modules with 100+ test cases |
 | `debloatd.py` | Main entry point |
@@ -54,7 +54,7 @@ Rollback Manager (src/core/rollback.py)
 
 - **ComponentType**: PROGRAM, SERVICE, TASK, STARTUP, DRIVER, TELEMETRY
 - **Classification**: CORE, ESSENTIAL, OPTIONAL, BLOAT, AGGRESSIVE, UNKNOWN
-- **RiskLevel**: NONE, LOW, MODERATE, HIGH, CRITICAL
+- **RiskLevel**: NONE, LOW, MEDIUM, HIGH, CRITICAL
 - **ActionType**: DISABLE, CONTAIN, REMOVE, REPLACE, IGNORE
 
 ## Commands
@@ -85,7 +85,7 @@ debloatd --gui           # Launch GUI
 
 ## Code Style
 
-- **Formatter:** Black (line length 88)
+- **Formatter:** Black (line length 100)
 - **Linter:** Ruff
 - **Type Checking:** mypy (strict mode)
 - Use type hints for all function signatures
@@ -182,4 +182,6 @@ Do not allow removal/disable of components matching:
 - `CODING_GUIDE.md` - 10-phase development breakdown
 - `SECURITY.md` - Security policies and privilege model
 - `AUDIT_REPORT.md` - Software correctness audit
+- `EVALUATION_REPORT.md` - Project evaluation report
+- `REFOCUS_PLAN.md` - Strategic refocus plan
 - `CHANGELOG.md` - Version history

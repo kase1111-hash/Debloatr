@@ -7,7 +7,7 @@ name = "debloatr"
 version = "0.1.0"
 description = "Bloatware Scanner & Debloater for Windows"
 readme = "README.md"
-license = {text = "MIT"}
+license = {text = "CC0-1.0"}
 requires-python = ">=3.10"
 authors = [
     {name = "Debloatr Team"}
@@ -19,7 +19,7 @@ classifiers = [
     "Environment :: Win32 (MS Windows)",
     "Intended Audience :: End Users/Desktop",
     "Intended Audience :: System Administrators",
-    "License :: OSI Approved :: MIT License",
+    "License :: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
     "Operating System :: Microsoft :: Windows :: Windows 10",
     "Operating System :: Microsoft :: Windows :: Windows 11",
     "Programming Language :: Python :: 3",
@@ -50,10 +50,10 @@ dev = [
 debloatd = "debloatd:main"
 
 [project.urls]
-Homepage = "https://github.com/debloatr/debloatr"
-Documentation = "https://github.com/debloatr/debloatr#readme"
-Repository = "https://github.com/debloatr/debloatr"
-Issues = "https://github.com/debloatr/debloatr/issues"
+Homepage = "https://github.com/kase1111-hash/Debloatr"
+Documentation = "https://github.com/kase1111-hash/Debloatr#readme"
+Repository = "https://github.com/kase1111-hash/Debloatr"
+Issues = "https://github.com/kase1111-hash/Debloatr/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
