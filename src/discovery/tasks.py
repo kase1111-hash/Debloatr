@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any
 
 from src.core.models import Component, ComponentType
+from src.core.powershell import SafePowerShell, create_powershell
 from src.discovery.base import BaseDiscoveryModule
 
 logger = logging.getLogger("debloatr.discovery.tasks")
@@ -241,6 +242,7 @@ class TasksScanner(BaseDiscoveryModule):
         self.include_microsoft_tasks = include_microsoft_tasks
         self.detect_self_healing = detect_self_healing
         self._is_windows = os.name == "nt"
+        self._ps = create_powershell(timeout=180)
 
     def get_module_name(self) -> str:
         """Return the module identifier."""
@@ -307,78 +309,65 @@ class TasksScanner(BaseDiscoveryModule):
         tasks: list[dict[str, Any]] = []
 
         try:
-            # Get task list with details
-            cmd = [
-                "powershell.exe",
-                "-NoProfile",
-                "-Command",
-                """
-                Get-ScheduledTask | ForEach-Object {
-                    $task = $_
-                    $info = Get-ScheduledTaskInfo -TaskName $task.TaskName -TaskPath $task.TaskPath -ErrorAction SilentlyContinue
-                    [PSCustomObject]@{
-                        TaskName = $task.TaskName
-                        TaskPath = $task.TaskPath
-                        State = [int]$task.State
-                        Description = $task.Description
-                        Author = $task.Author
-                        Date = $task.Date
-                        URI = $task.URI
-                        Settings = @{
-                            Hidden = $task.Settings.Hidden
-                            Enabled = $task.Settings.Enabled
-                            ExecutionTimeLimit = $task.Settings.ExecutionTimeLimit
-                            RunOnlyIfIdle = $task.Settings.RunOnlyIfIdle
-                        }
-                        Principal = @{
-                            UserId = $task.Principal.UserId
-                            RunLevel = [string]$task.Principal.RunLevel
-                        }
-                        Actions = @($task.Actions | ForEach-Object {
-                            @{
-                                ActionType = $_.CimClass.CimClassName
-                                Execute = $_.Execute
-                                Arguments = $_.Arguments
-                                WorkingDirectory = $_.WorkingDirectory
-                            }
-                        })
-                        Triggers = @($task.Triggers | ForEach-Object {
-                            @{
-                                TriggerType = $_.CimClass.CimClassName
-                                Enabled = $_.Enabled
-                                StartBoundary = $_.StartBoundary
-                                EndBoundary = $_.EndBoundary
-                                Delay = $_.Delay
-                                RepetitionInterval = if ($_.Repetition) { $_.Repetition.Interval } else { $null }
-                                RepetitionDuration = if ($_.Repetition) { $_.Repetition.Duration } else { $null }
-                            }
-                        })
-                        LastRunTime = if ($info) { $info.LastRunTime } else { $null }
-                        NextRunTime = if ($info) { $info.NextRunTime } else { $null }
-                        LastTaskResult = if ($info) { $info.LastTaskResult } else { 0 }
-                    }
-                } | ConvertTo-Json -Depth 5 -Compress
-                """.replace("\n", " "),
-            ]
+            # Use SafePowerShell with -EncodedCommand to preserve multi-line
+            # hash literal syntax (newlines are required between hash entries)
+            script = """
+Get-ScheduledTask | ForEach-Object {
+    $task = $_
+    $info = Get-ScheduledTaskInfo -TaskName $task.TaskName -TaskPath $task.TaskPath -ErrorAction SilentlyContinue
+    [PSCustomObject]@{
+        TaskName = $task.TaskName
+        TaskPath = $task.TaskPath
+        State = [int]$task.State
+        Description = $task.Description
+        Author = $task.Author
+        Date = $task.Date
+        URI = $task.URI
+        Settings = @{
+            Hidden = $task.Settings.Hidden
+            Enabled = $task.Settings.Enabled
+            ExecutionTimeLimit = $task.Settings.ExecutionTimeLimit
+            RunOnlyIfIdle = $task.Settings.RunOnlyIfIdle
+        }
+        Principal = @{
+            UserId = $task.Principal.UserId
+            RunLevel = [string]$task.Principal.RunLevel
+        }
+        Actions = @($task.Actions | ForEach-Object {
+            @{
+                ActionType = $_.CimClass.CimClassName
+                Execute = $_.Execute
+                Arguments = $_.Arguments
+                WorkingDirectory = $_.WorkingDirectory
+            }
+        })
+        Triggers = @($task.Triggers | ForEach-Object {
+            @{
+                TriggerType = $_.CimClass.CimClassName
+                Enabled = $_.Enabled
+                StartBoundary = $_.StartBoundary
+                EndBoundary = $_.EndBoundary
+                Delay = $_.Delay
+                RepetitionInterval = if ($_.Repetition) { $_.Repetition.Interval } else { $null }
+                RepetitionDuration = if ($_.Repetition) { $_.Repetition.Duration } else { $null }
+            }
+        })
+        LastRunTime = if ($info) { $info.LastRunTime } else { $null }
+        NextRunTime = if ($info) { $info.NextRunTime } else { $null }
+        LastTaskResult = if ($info) { $info.LastTaskResult } else { 0 }
+    }
+} | ConvertTo-Json -Depth 5 -Compress
+"""
+            result = self._ps.run(script)
 
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=180,
-                creationflags=(
-                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
-                ),
-            )
-
-            if result.returncode != 0:
-                logger.error(f"PowerShell error: {result.stderr}")
+            if not result.success:
+                logger.error(f"PowerShell error: {result.error}")
                 return tasks
 
-            if not result.stdout.strip():
+            if not result.output.strip():
                 return tasks
 
-            data = json.loads(result.stdout)
+            data = json.loads(result.output)
 
             # Handle single task
             if isinstance(data, dict):
@@ -386,12 +375,8 @@ class TasksScanner(BaseDiscoveryModule):
 
             tasks = data
 
-        except subprocess.TimeoutExpired:
-            logger.error("PowerShell command timed out")
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse PowerShell output: {e}")
-        except FileNotFoundError:
-            logger.error("PowerShell not found")
         except Exception as e:
             logger.error(f"Error getting tasks via PowerShell: {e}")
 

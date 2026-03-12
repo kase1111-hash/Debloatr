@@ -16,6 +16,8 @@ from pathlib import Path
 from typing import Any
 
 from src.core.models import Component, ComponentType
+from src.core.powershell import create_powershell
+from src.core.security import sanitize_powershell_string
 from src.discovery.base import BaseDiscoveryModule
 
 logger = logging.getLogger("debloatr.discovery.startup")
@@ -174,6 +176,7 @@ class StartupScanner(BaseDiscoveryModule):
         self.scan_active_setup = scan_active_setup
         self.include_disabled = include_disabled
         self._is_windows = os.name == "nt"
+        self._ps = create_powershell(timeout=10)
 
     def get_module_name(self) -> str:
         """Return the module identifier."""
@@ -543,41 +546,25 @@ class StartupScanner(BaseDiscoveryModule):
         # Reading .lnk files requires COM or special library
         # For now, just record the shortcut existence
         try:
-            import subprocess
+            safe_path = sanitize_powershell_string(str(shortcut_path))
+            script = f"""
+$sh = New-Object -ComObject WScript.Shell
+$shortcut = $sh.CreateShortcut('{safe_path}')
+@{{
+    TargetPath = $shortcut.TargetPath
+    Arguments = $shortcut.Arguments
+    WorkingDirectory = $shortcut.WorkingDirectory
+    Description = $shortcut.Description
+}} | ConvertTo-Json -Compress
+"""
+            result = self._ps.run(script)
 
-            # Use PowerShell to read shortcut target
-            cmd = [
-                "powershell.exe",
-                "-NoProfile",
-                "-Command",
-                f"""
-                $sh = New-Object -ComObject WScript.Shell
-                $shortcut = $sh.CreateShortcut('{shortcut_path}')
-                @{{
-                    TargetPath = $shortcut.TargetPath
-                    Arguments = $shortcut.Arguments
-                    WorkingDirectory = $shortcut.WorkingDirectory
-                    Description = $shortcut.Description
-                }} | ConvertTo-Json -Compress
-                """.replace("\n", " "),
-            ]
-
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=10,
-                creationflags=(
-                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
-                ),
-            )
-
-            if result.returncode != 0:
+            if not result.success:
                 return None
 
             import json
 
-            data = json.loads(result.stdout)
+            data = json.loads(result.output)
 
             target = data.get("TargetPath", "")
             if not target:

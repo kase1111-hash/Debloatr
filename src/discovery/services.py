@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any
 
 from src.core.models import Component, ComponentType
+from src.core.powershell import create_powershell
 from src.discovery.base import BaseDiscoveryModule
 
 logger = logging.getLogger("debloatr.discovery.services")
@@ -267,6 +268,7 @@ class ServicesScanner(BaseDiscoveryModule):
         self.analyze_network = analyze_network
         self.build_dependency_graph = build_dependency_graph
         self._is_windows = os.name == "nt"
+        self._ps = create_powershell(timeout=120)
         self._network_ports_cache: dict[int, list[int]] = {}
 
     def get_module_name(self) -> str:
@@ -342,48 +344,33 @@ class ServicesScanner(BaseDiscoveryModule):
         services: list[dict[str, Any]] = []
 
         try:
-            # Comprehensive PowerShell command to get service details
-            cmd = [
-                "powershell.exe",
-                "-NoProfile",
-                "-Command",
-                """
-                Get-CimInstance Win32_Service | Select-Object
-                    Name,
-                    DisplayName,
-                    Description,
-                    PathName,
-                    StartMode,
-                    State,
-                    StartName,
-                    ServiceType,
-                    ProcessId,
-                    AcceptStop,
-                    AcceptPause,
-                    @{N='Dependencies';E={($_.ServiceDependencies -join ',')}},
-                    @{N='DependentServices';E={(Get-Service $_.Name -ErrorAction SilentlyContinue).DependentServices.Name -join ','}}
-                | ConvertTo-Json -Compress
-                """.replace("\n", " "),
-            ]
+            script = """
+Get-CimInstance Win32_Service | Select-Object
+    Name,
+    DisplayName,
+    Description,
+    PathName,
+    StartMode,
+    State,
+    StartName,
+    ServiceType,
+    ProcessId,
+    AcceptStop,
+    AcceptPause,
+    @{N='Dependencies';E={($_.ServiceDependencies -join ',')}},
+    @{N='DependentServices';E={(Get-Service $_.Name -ErrorAction SilentlyContinue).DependentServices.Name -join ','}}
+| ConvertTo-Json -Compress
+"""
+            result = self._ps.run(script)
 
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=120,
-                creationflags=(
-                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
-                ),
-            )
-
-            if result.returncode != 0:
-                logger.error(f"PowerShell error: {result.stderr}")
+            if not result.success:
+                logger.error(f"PowerShell error: {result.error}")
                 return services
 
-            if not result.stdout.strip():
+            if not result.output.strip():
                 return services
 
-            data = json.loads(result.stdout)
+            data = json.loads(result.output)
 
             # Handle single service (not a list)
             if isinstance(data, dict):
@@ -391,13 +378,8 @@ class ServicesScanner(BaseDiscoveryModule):
 
             services = data
 
-        except subprocess.TimeoutExpired:
-            logger.error("PowerShell command timed out")
         except json.JSONDecodeError as e:
-            raw_output = result.stdout[:500] if result.stdout else "(empty)"
-            logger.error(f"Failed to parse PowerShell output: {e}. Raw output: {raw_output}")
-        except FileNotFoundError:
-            logger.error("PowerShell not found")
+            logger.error(f"Failed to parse PowerShell output: {e}")
         except Exception as e:
             logger.error(f"Error getting services via PowerShell: {e}")
 
