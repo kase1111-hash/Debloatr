@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 
 from src.core.models import Component, ComponentType
+from src.core.powershell import create_powershell
 from src.discovery.base import BaseDiscoveryModule
 
 logger = logging.getLogger("debloatr.discovery.drivers")
@@ -170,6 +171,7 @@ class DriversScanner(BaseDiscoveryModule):
         self.include_inbox_drivers = include_inbox_drivers
         self.detect_overlay_injectors = detect_overlay_injectors
         self._is_windows = os.name == "nt"
+        self._ps = create_powershell(timeout=120)
 
     def get_module_name(self) -> str:
         """Return the module identifier."""
@@ -249,51 +251,34 @@ class DriversScanner(BaseDiscoveryModule):
         drivers: list[dict[str, Any]] = []
 
         try:
-            # Get drivers with signature info
-            cmd = [
-                "powershell.exe",
-                "-NoProfile",
-                "-Command",
-                """
-                Get-WindowsDriver -Online -All | Select-Object
-                    Driver,
-                    OriginalFileName,
-                    Inbox,
-                    ClassName,
-                    ClassDescription,
-                    BootCritical,
-                    ProviderName,
-                    Date,
-                    Version
-                | ConvertTo-Json -Compress
-                """.replace("\n", " "),
-            ]
+            script = """
+Get-WindowsDriver -Online -All | Select-Object
+    Driver,
+    OriginalFileName,
+    Inbox,
+    ClassName,
+    ClassDescription,
+    BootCritical,
+    ProviderName,
+    Date,
+    Version
+| ConvertTo-Json -Compress
+"""
+            result = self._ps.run(script)
 
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=120,
-                creationflags=(
-                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
-                ),
-            )
-
-            if result.returncode != 0:
-                logger.debug(f"Get-WindowsDriver error: {result.stderr}")
+            if not result.success:
+                logger.debug(f"Get-WindowsDriver error: {result.error}")
                 return drivers
 
-            if not result.stdout.strip():
+            if not result.output.strip():
                 return drivers
 
-            data = json.loads(result.stdout)
+            data = json.loads(result.output)
             if isinstance(data, dict):
                 data = [data]
 
             drivers = data
 
-        except subprocess.TimeoutExpired:
-            logger.error("PowerShell command timed out")
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse PowerShell output: {e}")
         except Exception as e:

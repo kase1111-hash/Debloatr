@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 
 from src.core.models import Component, ComponentType
+from src.core.powershell import create_powershell
 from src.discovery.base import BaseDiscoveryModule
 
 logger = logging.getLogger("debloatr.discovery.telemetry")
@@ -235,6 +236,7 @@ class TelemetryScanner(BaseDiscoveryModule):
         self.include_update_connections = include_update_connections
         self.minimum_connections = minimum_connections
         self._is_windows = os.name == "nt"
+        self._ps = create_powershell(timeout=60)
 
         # Build endpoint lookup
         self._telemetry_endpoints: set[str] = set()
@@ -333,54 +335,37 @@ class TelemetryScanner(BaseDiscoveryModule):
         connections: list[dict[str, Any]] = []
 
         try:
-            # Use PowerShell to get connections with process info
-            cmd = [
-                "powershell.exe",
-                "-NoProfile",
-                "-Command",
-                """
-                Get-NetTCPConnection -State Established |
-                ForEach-Object {
-                    $proc = Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue
-                    [PSCustomObject]@{
-                        LocalAddress = $_.LocalAddress
-                        LocalPort = $_.LocalPort
-                        RemoteAddress = $_.RemoteAddress
-                        RemotePort = $_.RemotePort
-                        State = $_.State
-                        ProcessId = $_.OwningProcess
-                        ProcessName = if ($proc) { $proc.Name } else { "" }
-                        ProcessPath = if ($proc) { $proc.Path } else { "" }
-                    }
-                } | ConvertTo-Json -Compress
-                """.replace("\n", " "),
-            ]
+            script = """
+Get-NetTCPConnection -State Established |
+ForEach-Object {
+    $proc = Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue
+    [PSCustomObject]@{
+        LocalAddress = $_.LocalAddress
+        LocalPort = $_.LocalPort
+        RemoteAddress = $_.RemoteAddress
+        RemotePort = $_.RemotePort
+        State = $_.State
+        ProcessId = $_.OwningProcess
+        ProcessName = if ($proc) { $proc.Name } else { "" }
+        ProcessPath = if ($proc) { $proc.Path } else { "" }
+    }
+} | ConvertTo-Json -Compress
+"""
+            result = self._ps.run(script)
 
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=60,
-                creationflags=(
-                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
-                ),
-            )
-
-            if result.returncode != 0:
-                logger.debug(f"PowerShell error: {result.stderr}")
+            if not result.success:
+                logger.debug(f"PowerShell error: {result.error}")
                 return connections
 
-            if not result.stdout.strip():
+            if not result.output.strip():
                 return connections
 
-            data = json.loads(result.stdout)
+            data = json.loads(result.output)
             if isinstance(data, dict):
                 data = [data]
 
             connections = data
 
-        except subprocess.TimeoutExpired:
-            logger.error("PowerShell command timed out")
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse output: {e}")
         except Exception as e:
