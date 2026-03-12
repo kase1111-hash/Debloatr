@@ -21,6 +21,8 @@ from src.core.models import (
     ComponentType,
     Snapshot,
 )
+from src.core.security import is_safe_path as _is_safe_path
+from src.core.security import validate_registry_path as _validate_registry_path
 
 logger = logging.getLogger("debloatr.actions.remove")
 

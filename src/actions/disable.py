@@ -803,25 +803,8 @@ class DisableHandler:
             return {"success": False, "output": "", "error": str(e)}
 
 
-# Allowed base directories for file operations
-_ALLOWED_PATH_PREFIXES: list[str] = [
-    os.environ.get("PROGRAMFILES", r"C:\Program Files"),
-    os.environ.get("PROGRAMFILES(X86)", r"C:\Program Files (x86)"),
-    os.environ.get("APPDATA", ""),
-    os.environ.get("LOCALAPPDATA", ""),
-    os.environ.get("PROGRAMDATA", r"C:\ProgramData"),
-    os.environ.get("USERPROFILE", ""),
-    r"C:\Users",
-]
-
-
-def _is_safe_path(path: Path) -> bool:
-    """Check if a path is within allowed directories."""
-    resolved = str(path.resolve()).lower()
-    for prefix in _ALLOWED_PATH_PREFIXES:
-        if prefix and resolved.startswith(prefix.lower()):
-            return True
-    return False
+# Import shared security functions (replaces local duplicates)
+from src.core.security import is_safe_path as _is_safe_path  # noqa: E402
 
 
 def create_disable_handler(
