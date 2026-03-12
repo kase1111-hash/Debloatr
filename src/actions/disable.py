@@ -473,7 +473,7 @@ class DisableHandler:
 
         try:
             # Use sc.exe to disable the driver
-            disable_result = self._run_command(f'sc config "{driver_name}" start= disabled')
+            disable_result = self._run_command(["sc", "config", driver_name, "start=", "disabled"])
 
             if not disable_result["success"]:
                 return DisableResult(
@@ -655,7 +655,7 @@ class DisableHandler:
         if not self._is_windows:
             return {"start_type": "Unknown", "state": "Unknown"}
 
-        result = self._run_command(f'sc qc "{driver_name}"')
+        result = self._run_command(["sc", "qc", driver_name])
 
         if result["success"] and result["output"]:
             output = result["output"]
@@ -718,15 +718,23 @@ class DisableHandler:
         if not shortcut_path:
             return {"success": False, "error": "No shortcut path provided"}
 
+        # Validate path is within expected directories
+        resolved = Path(shortcut_path).resolve()
+        if not _is_safe_path(resolved):
+            return {"success": False, "error": f"Path outside allowed directories: {shortcut_path}"}
+
         # Create disabled folder if it doesn't exist
-        startup_folder = Path(shortcut_path).parent
+        startup_folder = resolved.parent
         disabled_folder = startup_folder / "_disabled"
 
+        escaped_shortcut = str(resolved).replace("'", "''")
+        escaped_disabled = str(disabled_folder).replace("'", "''")
+
         result = self._run_powershell(
-            f"if (-not (Test-Path '{disabled_folder}')) {{ "
-            f"New-Item -Path '{disabled_folder}' -ItemType Directory -Force | Out-Null "
+            f"if (-not (Test-Path '{escaped_disabled}')) {{ "
+            f"New-Item -Path '{escaped_disabled}' -ItemType Directory -Force | Out-Null "
             f"}}; "
-            f"Move-Item -Path '{shortcut_path}' -Destination '{disabled_folder}' -Force"
+            f"Move-Item -Path '{escaped_shortcut}' -Destination '{escaped_disabled}' -Force"
         )
 
         return result
@@ -762,8 +770,8 @@ class DisableHandler:
         except Exception as e:
             return {"success": False, "output": "", "error": str(e)}
 
-    def _run_command(self, command: str) -> dict[str, Any]:
-        """Run a shell command."""
+    def _run_command(self, command: list[str]) -> dict[str, Any]:
+        """Run a system command without shell interpolation."""
         if self.dry_run:
             return {"success": True, "output": "", "error": ""}
 
@@ -772,7 +780,7 @@ class DisableHandler:
                 command,
                 capture_output=True,
                 text=True,
-                shell=True,
+                shell=False,
                 timeout=self.command_timeout,
                 creationflags=(
                     subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
@@ -793,6 +801,27 @@ class DisableHandler:
             }
         except Exception as e:
             return {"success": False, "output": "", "error": str(e)}
+
+
+# Allowed base directories for file operations
+_ALLOWED_PATH_PREFIXES: list[str] = [
+    os.environ.get("PROGRAMFILES", r"C:\Program Files"),
+    os.environ.get("PROGRAMFILES(X86)", r"C:\Program Files (x86)"),
+    os.environ.get("APPDATA", ""),
+    os.environ.get("LOCALAPPDATA", ""),
+    os.environ.get("PROGRAMDATA", r"C:\ProgramData"),
+    os.environ.get("USERPROFILE", ""),
+    r"C:\Users",
+]
+
+
+def _is_safe_path(path: Path) -> bool:
+    """Check if a path is within allowed directories."""
+    resolved = str(path.resolve()).lower()
+    for prefix in _ALLOWED_PATH_PREFIXES:
+        if prefix and resolved.startswith(prefix.lower()):
+            return True
+    return False
 
 
 def create_disable_handler(

@@ -437,7 +437,7 @@ class RollbackManager:
 
         try:
             # Enable the task
-            result = self._run_command(f'schtasks /Change /TN "{task_path}" /Enable')
+            result = self._run_command(["schtasks", "/Change", "/TN", task_path, "/Enable"])
 
             if not result["success"]:
                 # Try PowerShell method
@@ -606,7 +606,7 @@ class RollbackManager:
 
         try:
             # Restore original startup type
-            result = self._run_command(f'sc config "{driver_name}" start= {sc_start_type}')
+            result = self._run_command(["sc", "config", driver_name, "start=", sc_start_type])
 
             if not result["success"]:
                 return RollbackResult(
@@ -854,7 +854,7 @@ class RollbackManager:
             xml_path = f.name
 
         try:
-            result = self._run_command(f'schtasks /Create /TN "{task_path}" /XML "{xml_path}"')
+            result = self._run_command(["schtasks", "/Create", "/TN", task_path, "/XML", xml_path])
 
             if result["success"]:
                 logger.info(f"Restored task: {task_path}")
@@ -954,8 +954,8 @@ class RollbackManager:
         except Exception as e:
             return {"success": False, "output": "", "error": str(e)}
 
-    def _run_command(self, command: str) -> dict[str, Any]:
-        """Run a shell command."""
+    def _run_command(self, command: list[str]) -> dict[str, Any]:
+        """Run a system command without shell interpolation."""
         if self.dry_run:
             return {"success": True, "output": "", "error": ""}
 
@@ -965,7 +965,7 @@ class RollbackManager:
         try:
             result = subprocess.run(
                 command,
-                shell=True,
+                shell=False,
                 capture_output=True,
                 text=True,
                 timeout=60,

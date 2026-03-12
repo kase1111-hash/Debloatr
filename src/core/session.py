@@ -10,12 +10,38 @@ from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
 
+from pydantic import BaseModel, ValidationError
+
 from src.core.config import Config, get_default_config
 from src.core.models import (
     ActionResult,
     ActionType,
     Session,
 )
+
+
+class SessionActionSchema(BaseModel):
+    """Schema for validating session action data from disk."""
+    plan_id: str
+    success: bool
+    action: str
+    component_id: str
+    snapshot_id: str | None = None
+    error_message: str | None = None
+    executed_at: str | None = None
+    rollback_available: bool = False
+
+
+class SessionFileSchema(BaseModel):
+    """Schema for validating session file data from disk."""
+    session_id: str
+    description: str = ""
+    started_at: str | None = None
+    ended_at: str | None = None
+    restore_point_id: str | None = None
+    actions: list[SessionActionSchema] = []
+    component_names: dict[str, str] = {}
+
 
 logger = logging.getLogger("debloatr.core.session")
 
@@ -502,6 +528,13 @@ class SessionManager:
         try:
             with open(filepath, encoding="utf-8") as f:
                 data = json.load(f)
+
+            # Validate schema
+            try:
+                SessionFileSchema.model_validate(data)
+            except ValidationError as e:
+                logger.error(f"Session file schema validation failed for {session_id}: {e}")
+                return None
 
             # Parse actions
             actions: list[ActionResult] = []

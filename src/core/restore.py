@@ -297,7 +297,7 @@ class SystemRestoreManager:
             return True
 
         # Use vssadmin to delete the shadow copy
-        result = self._run_command(f"vssadmin delete shadows /shadow={sequence_number} /quiet")
+        result = self._run_command(["vssadmin", "delete", "shadows", f"/shadow={sequence_number}", "/quiet"])
 
         # Alternative: use WMI
         if not result["success"]:
@@ -431,15 +431,15 @@ class SystemRestoreManager:
         except Exception as e:
             return {"success": False, "output": "", "error": str(e)}
 
-    def _run_command(self, command: str) -> dict[str, Any]:
-        """Run a shell command."""
+    def _run_command(self, command: list[str]) -> dict[str, Any]:
+        """Run a system command without shell interpolation."""
         if not self._is_windows:
             return {"success": False, "output": "", "error": "Not Windows"}
 
         try:
             result = subprocess.run(
                 command,
-                shell=True,
+                shell=False,
                 capture_output=True,
                 text=True,
                 timeout=120,

@@ -632,7 +632,7 @@ class SnapshotManager:
     # Windows-specific capture methods
     def _get_service_config(self, service_name: str) -> dict[str, Any]:
         """Get service configuration from registry and sc command."""
-        result = self._run_command(f'sc qc "{service_name}"')
+        result = self._run_command(["sc", "qc", service_name])
         return {"sc_output": result.get("output", "")}
 
     def _get_service_status(self, service_name: str) -> dict[str, Any]:
@@ -650,7 +650,7 @@ class SnapshotManager:
 
     def _get_service_recovery(self, service_name: str) -> dict[str, Any]:
         """Get service recovery options."""
-        result = self._run_command(f'sc qfailure "{service_name}"')
+        result = self._run_command(["sc", "qfailure", service_name])
         return {"recovery_output": result.get("output", "")}
 
     def _get_service_dependencies(self, service_name: str) -> list[str]:
@@ -664,7 +664,7 @@ class SnapshotManager:
 
     def _export_task_xml(self, task_path: str) -> str:
         """Export scheduled task as XML."""
-        result = self._run_command(f'schtasks /Query /TN "{task_path}" /XML')
+        result = self._run_command(["schtasks", "/Query", "/TN", task_path, "/XML"])
         return result.get("output", "")
 
     def _get_task_info(self, task_path: str) -> dict[str, Any]:
@@ -697,7 +697,7 @@ class SnapshotManager:
 
     def _get_driver_config(self, driver_name: str) -> dict[str, Any]:
         """Get driver configuration."""
-        result = self._run_command(f'sc qc "{driver_name}"')
+        result = self._run_command(["sc", "qc", driver_name])
         return {"sc_output": result.get("output", "")}
 
     def _get_driver_info(self, driver_name: str) -> dict[str, Any]:
@@ -771,15 +771,15 @@ class SnapshotManager:
         except Exception as e:
             return {"success": False, "output": "", "error": str(e)}
 
-    def _run_command(self, command: str) -> dict[str, Any]:
-        """Run a shell command."""
+    def _run_command(self, command: list[str]) -> dict[str, Any]:
+        """Run a system command without shell interpolation."""
         if not self._is_windows:
             return {"success": False, "output": "", "error": "Not Windows"}
 
         try:
             result = subprocess.run(
                 command,
-                shell=True,
+                shell=False,
                 capture_output=True,
                 text=True,
                 timeout=60,
