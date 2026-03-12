@@ -450,7 +450,8 @@ class ProgramsScanner(BaseDiscoveryModule):
         except subprocess.TimeoutExpired:
             logger.error("PowerShell command timed out")
         except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse PowerShell output: {e}")
+            raw_output = result.stdout[:500] if result.stdout else "(empty)"
+            logger.error(f"Failed to parse PowerShell output: {e}. Raw output: {raw_output}")
         except FileNotFoundError:
             logger.error("PowerShell not found")
         except Exception as e:

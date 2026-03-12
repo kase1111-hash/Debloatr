@@ -6,6 +6,8 @@ including programs, services, UWP apps, and other components.
 
 import logging
 import os
+import re
+import shlex
 import shutil
 import subprocess
 from dataclasses import dataclass, field
@@ -325,7 +327,6 @@ class RemoveHandler:
             RemoveResult
         """
         service_name = context.get("service_name", component.name)
-        escaped_service = service_name.replace('"', '\\"')
 
         if self.dry_run:
             logger.info(f"[DRY RUN] Would remove service: {service_name}")
@@ -355,10 +356,10 @@ class RemoveHandler:
 
         try:
             # Stop the service first
-            self._run_command(f'net stop "{escaped_service}" /y')
+            self._run_command(["net", "stop", service_name, "/y"])
 
             # Mark for deletion
-            result = self._run_command(f'sc delete "{escaped_service}"')
+            result = self._run_command(["sc", "delete", service_name])
 
             if result["success"]:
                 logger.info(f"Successfully marked service for deletion: {service_name}")
@@ -432,7 +433,7 @@ class RemoveHandler:
 
         try:
             # Delete the task
-            result = self._run_command(f'schtasks /Delete /TN "{task_path}" /F')
+            result = self._run_command(["schtasks", "/Delete", "/TN", task_path, "/F"])
 
             if result["success"]:
                 logger.info(f"Successfully removed task: {task_path}")
@@ -510,14 +511,23 @@ class RemoveHandler:
 
         try:
             if entry_type == "registry":
-                result = self._run_powershell(
-                    f"Remove-ItemProperty -Path '{registry_key}' -Name '{value_name}' "
-                    f"-Force -ErrorAction Stop"
-                )
+                if not _validate_registry_path(registry_key):
+                    result = {"success": False, "error": f"Registry path outside allowed hives: {registry_key}"}
+                else:
+                    escaped_key = registry_key.replace("'", "''")
+                    escaped_name = value_name.replace("'", "''")
+                    result = self._run_powershell(
+                        f"Remove-ItemProperty -Path '{escaped_key}' -Name '{escaped_name}' "
+                        f"-Force -ErrorAction Stop"
+                    )
             elif entry_type == "folder":
                 shortcut_path = context.get("shortcut_path", "")
-                if shortcut_path and Path(shortcut_path).exists():
-                    quarantine = self._quarantine_files(Path(shortcut_path), value_name)
+                if shortcut_path:
+                    resolved_path = Path(shortcut_path).resolve()
+                    if not _is_safe_path(resolved_path):
+                        result = {"success": False, "error": f"Path outside allowed directories: {shortcut_path}"}
+                    elif resolved_path.exists():
+                        quarantine = self._quarantine_files(resolved_path, value_name)
                     result = (
                         {"success": True}
                         if quarantine
@@ -605,14 +615,14 @@ class RemoveHandler:
 
         try:
             # Stop the driver first
-            self._run_command(f'net stop "{driver_name}" /y')
+            self._run_command(["net", "stop", driver_name, "/y"])
 
             # Uninstall using pnputil if we have the INF name
             if inf_name:
-                result = self._run_command(f'pnputil /delete-driver "{inf_name}" /uninstall /force')
+                result = self._run_command(["pnputil", "/delete-driver", inf_name, "/uninstall", "/force"])
             else:
                 # Mark service for deletion
-                result = self._run_command(f'sc delete "{driver_name}"')
+                result = self._run_command(["sc", "delete", driver_name])
 
             if result["success"]:
                 logger.info(f"Successfully removed driver: {driver_name}")
@@ -671,21 +681,21 @@ class RemoveHandler:
         )
 
     def _run_uninstaller(self, uninstall_string: str) -> dict[str, Any]:
-        """Run a program's uninstaller."""
+        """Run a program's uninstaller after parsing into safe components."""
         try:
-            # Parse and execute uninstall string
-            # Handle common patterns like MsiExec.exe /X{GUID}
-            if "msiexec" in uninstall_string.lower():
-                # Add quiet flags for MSI uninstall
-                if "/qn" not in uninstall_string.lower():
-                    uninstall_string += " /qn /norestart"
+            cmd = self._parse_uninstall_string(uninstall_string)
+            if cmd is None:
+                return {
+                    "success": False,
+                    "error": f"Unrecognized uninstall pattern — manual removal required: {uninstall_string[:100]}",
+                }
 
             result = subprocess.run(
-                uninstall_string,
-                shell=True,
+                cmd,
+                shell=False,
                 capture_output=True,
                 text=True,
-                timeout=300,  # 5 minute timeout for uninstallers
+                timeout=300,
                 creationflags=(
                     subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
                 ),
@@ -701,6 +711,60 @@ class RemoveHandler:
             return {"success": False, "error": "Uninstaller timed out"}
         except Exception as e:
             return {"success": False, "error": str(e)}
+
+    @staticmethod
+    def _parse_uninstall_string(uninstall_string: str) -> list[str] | None:
+        """Parse an uninstall string into safe command components.
+
+        Returns a list of command arguments or None if the pattern is unrecognized.
+        """
+        stripped = uninstall_string.strip()
+
+        # Pattern 1: MSI uninstall — MsiExec.exe /X{GUID} or /I{GUID}
+        msi_match = re.match(
+            r'(?i)(?:.*\\)?msiexec(?:\.exe)?\s+(/[XIxi])\s*(\{[0-9A-Fa-f\-]+\})(.*)',
+            stripped,
+        )
+        if msi_match:
+            action = msi_match.group(1)
+            guid = msi_match.group(2)
+            extra = msi_match.group(3).strip()
+            cmd = ["msiexec.exe", action + guid]
+            # Add quiet flags if not already present
+            extra_lower = extra.lower()
+            if "/qn" not in extra_lower:
+                cmd.extend(["/qn", "/norestart"])
+            else:
+                # Parse remaining safe flags
+                for flag in extra.split():
+                    if flag.startswith("/"):
+                        cmd.append(flag)
+            return cmd
+
+        # Pattern 2: Quoted executable with arguments
+        quoted_match = re.match(r'^"([^"]+)"\s*(.*)', stripped)
+        if quoted_match:
+            exe_path = quoted_match.group(1)
+            args_str = quoted_match.group(2).strip()
+            if Path(exe_path).exists():
+                cmd = [exe_path]
+                if args_str:
+                    cmd.extend(shlex.split(args_str, posix=False))
+                return cmd
+
+        # Pattern 3: Unquoted executable path (no spaces in path)
+        unquoted_match = re.match(r'^(\S+\.exe)\s*(.*)', stripped, re.IGNORECASE)
+        if unquoted_match:
+            exe_path = unquoted_match.group(1)
+            args_str = unquoted_match.group(2).strip()
+            if Path(exe_path).exists():
+                cmd = [exe_path]
+                if args_str:
+                    cmd.extend(shlex.split(args_str, posix=False))
+                return cmd
+
+        # Unrecognized pattern — refuse to execute
+        return None
 
     def _quarantine_files(self, path: Path, name: str) -> Path | None:
         """Move files to quarantine instead of deleting."""
@@ -735,8 +799,11 @@ class RemoveHandler:
         try:
             registry_key = context.get("registry_key", "")
             if registry_key:
+                if not _validate_registry_path(registry_key):
+                    return {"success": False, "error": f"Registry path outside allowed hives: {registry_key}"}
+                escaped_key = registry_key.replace("'", "''")
                 result = self._run_powershell(
-                    f"Remove-Item -Path '{registry_key}' -Recurse -Force -ErrorAction Stop"
+                    f"Remove-Item -Path '{escaped_key}' -Recurse -Force -ErrorAction Stop"
                 )
                 return result
 
@@ -747,23 +814,24 @@ class RemoveHandler:
 
     def _get_service_config(self, service_name: str) -> dict[str, Any]:
         """Get service configuration for snapshot."""
-        result = self._run_command(f'sc qc "{service_name}"')
+        result = self._run_command(["sc", "qc", service_name])
         return {"sc_output": result.get("output", "")}
 
     def _get_driver_config(self, driver_name: str) -> dict[str, Any]:
         """Get driver configuration for snapshot."""
-        result = self._run_command(f'sc qc "{driver_name}"')
+        result = self._run_command(["sc", "qc", driver_name])
         return {"sc_output": result.get("output", "")}
 
     def _export_task_xml(self, task_path: str) -> str:
         """Export task definition as XML."""
-        result = self._run_command(f'schtasks /Query /TN "{task_path}" /XML')
+        result = self._run_command(["schtasks", "/Query", "/TN", task_path, "/XML"])
         return result.get("output", "")
 
     def _export_registry(self, registry_key: str) -> str:
         """Export registry key for snapshot."""
+        escaped_key = registry_key.replace("'", "''")
         result = self._run_powershell(
-            f"Get-ItemProperty -Path '{registry_key}' | ConvertTo-Json -Compress"
+            f"Get-ItemProperty -Path '{escaped_key}' | ConvertTo-Json -Compress"
         )
         return result.get("output", "")
 
@@ -826,15 +894,15 @@ class RemoveHandler:
         except Exception as e:
             return {"success": False, "output": "", "error": str(e)}
 
-    def _run_command(self, command: str) -> dict[str, Any]:
-        """Run a shell command."""
+    def _run_command(self, command: list[str]) -> dict[str, Any]:
+        """Run a system command without shell interpolation."""
         if self.dry_run:
             return {"success": True, "output": "", "error": ""}
 
         try:
             result = subprocess.run(
                 command,
-                shell=True,
+                shell=False,
                 capture_output=True,
                 text=True,
                 timeout=120,

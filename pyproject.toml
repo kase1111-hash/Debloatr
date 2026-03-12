@@ -29,21 +29,18 @@ classifiers = [
     "Topic :: System :: Systems Administration",
     "Topic :: Utilities",
 ]
-dependencies = [
-    "pywin32>=305",
-    "psutil>=5.9.0",
-    "pydantic>=2.0",
-]
+dependencies = []
 
 [project.optional-dependencies]
 gui = ["PySide6>=6.5.0"]
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
-    "pytest-mock>=3.10.0",
     "black>=23.0.0",
     "ruff>=0.1.0",
     "mypy>=1.0.0",
+    "bandit>=1.7.0",
+    "pip-audit>=2.6.0",
 ]
 
 [project.scripts]
@@ -99,3 +96,7 @@ warn_unused_configs = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
 check_untyped_defs = true
+
+[tool.bandit]
+exclude_dirs = ["tests"]
+skips = ["B603", "B607"]

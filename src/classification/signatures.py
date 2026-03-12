@@ -63,7 +63,7 @@ class SignatureDatabase:
     def load_from_file(
         self,
         file_path: Path,
-        verify_hash: bool = False,
+        verify_hash: bool = True,
         expected_hash: str | None = None,
     ) -> int:
         """Load signatures from a JSON file.
@@ -151,7 +151,7 @@ class SignatureDatabase:
         total = 0
         for file_path in sorted(directory.glob(pattern)):
             try:
-                total += self.load_from_file(file_path)
+                total += self.load_from_file(file_path, verify_hash=False)
             except Exception as e:
                 logger.error(f"Failed to load {file_path}: {e}")
 

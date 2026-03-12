@@ -17,6 +17,67 @@ from src.core.models import (
     Session,
 )
 
+
+def _validate_session_file(data: object) -> None:
+    """Validate session file data loaded from disk.
+
+    Raises:
+        ValueError: If the data does not match the expected schema.
+    """
+    if not isinstance(data, dict):
+        raise ValueError("Session file must be a JSON object")
+
+    # Required top-level field
+    if "session_id" not in data or not isinstance(data["session_id"], str):
+        raise ValueError("Missing or invalid 'session_id' (must be str)")
+
+    # Optional string fields
+    for field in ("description", "started_at", "ended_at", "restore_point_id"):
+        if field in data and data[field] is not None and not isinstance(data[field], str):
+            raise ValueError(f"Invalid '{field}' (must be str or null)")
+
+    # component_names must be dict[str, str] if present
+    names = data.get("component_names", {})
+    if not isinstance(names, dict):
+        raise ValueError("Invalid 'component_names' (must be object)")
+    for k, v in names.items():
+        if not isinstance(k, str) or not isinstance(v, str):
+            raise ValueError("Invalid 'component_names' (keys and values must be str)")
+
+    # actions must be list of valid action objects if present
+    actions = data.get("actions", [])
+    if not isinstance(actions, list):
+        raise ValueError("Invalid 'actions' (must be array)")
+    for i, action in enumerate(actions):
+        _validate_session_action(action, i)
+
+
+def _validate_session_action(action: object, index: int) -> None:
+    """Validate a single action entry in a session file."""
+    if not isinstance(action, dict):
+        raise ValueError(f"Action [{index}] must be a JSON object")
+
+    # Required fields
+    for field, expected_type in (
+        ("plan_id", str),
+        ("success", bool),
+        ("action", str),
+        ("component_id", str),
+    ):
+        if field not in action or not isinstance(action[field], expected_type):
+            raise ValueError(
+                f"Action [{index}] missing or invalid '{field}' (must be {expected_type.__name__})"
+            )
+
+    # Optional fields
+    for field in ("snapshot_id", "error_message", "executed_at"):
+        if field in action and action[field] is not None and not isinstance(action[field], str):
+            raise ValueError(f"Action [{index}] invalid '{field}' (must be str or null)")
+
+    if "rollback_available" in action and not isinstance(action["rollback_available"], bool):
+        raise ValueError(f"Action [{index}] invalid 'rollback_available' (must be bool)")
+
+
 logger = logging.getLogger("debloatr.core.session")
 
 
@@ -502,6 +563,13 @@ class SessionManager:
         try:
             with open(filepath, encoding="utf-8") as f:
                 data = json.load(f)
+
+            # Validate schema
+            try:
+                _validate_session_file(data)
+            except ValueError as e:
+                logger.error(f"Session file schema validation failed for {session_id}: {e}")
+                return None
 
             # Parse actions
             actions: list[ActionResult] = []
