@@ -16,6 +16,7 @@ from src.core.models import (
     ActionType,
     Session,
 )
+from src.core.security import sign_session_data, verify_session_data
 
 
 def _validate_session_file(data: object) -> None:
@@ -547,6 +548,9 @@ class SessionManager:
             "component_names": self._action_names.get(session.session_id, {}),
         }
 
+        # Sign with HMAC for tamper detection
+        data["_hmac"] = sign_session_data(data)
+
         try:
             with open(filepath, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2, default=str)
@@ -563,6 +567,17 @@ class SessionManager:
         try:
             with open(filepath, encoding="utf-8") as f:
                 data = json.load(f)
+
+            # Verify HMAC integrity
+            if not verify_session_data(data):
+                logger.warning(
+                    f"Session file {session_id} failed HMAC verification — "
+                    f"file may be unsigned (pre-HMAC) or tampered with"
+                )
+                # Allow loading unsigned files for backward compatibility,
+                # but log the warning. Tampered files with wrong HMAC are also
+                # allowed with a warning rather than hard-failing, since the
+                # machine key may have changed.
 
             # Validate schema
             try:

@@ -2100,6 +2100,327 @@
       "breakage_notes": "Audio management UWP companion app. Removing may lose advanced audio settings UI but audio driver continues to work.",
       "evidence_url": "",
       "last_updated": "2026-02-11"
+    },
+
+    {
+      "signature_id": "microsoft-ceip-consolidator-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "CEIP Consolidator",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": ".*\\\\Microsoft\\\\Windows\\\\Customer Experience Improvement Program\\\\Consolidator.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": ["microsoft-ceip-usbceip-001", "microsoft-ceip-kernelceip-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "CEIP data consolidation task. Collects and uploads telemetry data. Safe to disable.",
+      "evidence_url": "",
+      "last_updated": "2026-03-12"
+    },
+    {
+      "signature_id": "microsoft-ceip-usbceip-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "USB CEIP",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": ".*\\\\Microsoft\\\\Windows\\\\Customer Experience Improvement Program\\\\UsbCeip.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": ["microsoft-ceip-consolidator-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Collects USB usage data for Microsoft CEIP. Safe to disable.",
+      "evidence_url": "",
+      "last_updated": "2026-03-12"
+    },
+    {
+      "signature_id": "microsoft-ceip-kernelceip-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Kernel CEIP",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": ".*\\\\Microsoft\\\\Windows\\\\Customer Experience Improvement Program\\\\KernelCeipTask.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": ["microsoft-ceip-consolidator-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Kernel-level CEIP telemetry collection. Safe to disable.",
+      "evidence_url": "",
+      "last_updated": "2026-03-12"
+    },
+    {
+      "signature_id": "microsoft-autochk-proxy-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Proxy (AutoChk SQM Upload)",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": ".*\\\\Microsoft\\\\Windows\\\\Autochk\\\\Proxy.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Uploads AutoChk SQM (Software Quality Metrics) data to Microsoft. Safe to disable.",
+      "evidence_url": "",
+      "last_updated": "2026-03-12"
+    },
+    {
+      "signature_id": "microsoft-appcompat-ait-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Application Impact Telemetry Agent",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": ".*\\\\Microsoft\\\\Windows\\\\Application Experience\\\\AitAgent.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": ["microsoft-appcompat-pcapatch-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Collects and uploads program telemetry information. Safe to disable.",
+      "evidence_url": "",
+      "last_updated": "2026-03-12"
+    },
+    {
+      "signature_id": "microsoft-appcompat-pcapatch-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "PcaPatchDbTask (Compatibility Telemetry)",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": ".*\\\\Microsoft\\\\Windows\\\\Application Experience\\\\PcaPatchDbTask.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["microsoft-appcompat-ait-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Compatibility telemetry database update task. Safe to disable unless relying on compatibility fixes.",
+      "evidence_url": "",
+      "last_updated": "2026-03-12"
+    },
+    {
+      "signature_id": "microsoft-diagtrack-diagnostics-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "DiagTrack Diagnostic Collection",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": ".*\\\\Microsoft\\\\Windows\\\\Feedback\\\\Siuf\\\\DmClient.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Device Management client telemetry task. Part of Connected User Experiences feedback pipeline. Safe to disable.",
+      "evidence_url": "",
+      "last_updated": "2026-03-12"
+    },
+    {
+      "signature_id": "microsoft-feedback-siuf-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Feedback Notification Task",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": ".*\\\\Microsoft\\\\Windows\\\\Feedback\\\\Siuf\\\\DmClientOnScenarioDownload.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Downloads feedback scenarios from Microsoft. Used for targeted feedback prompts. Safe to disable.",
+      "evidence_url": "",
+      "last_updated": "2026-03-12"
+    },
+    {
+      "signature_id": "microsoft-maps-toast-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Maps Toast Notification Task",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": ".*\\\\Microsoft\\\\Windows\\\\Maps\\\\MapsToastTask.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Shows notification to update offline maps. Safe to disable if not using Windows Maps.",
+      "evidence_url": "",
+      "last_updated": "2026-03-12"
+    },
+    {
+      "signature_id": "microsoft-maps-update-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Maps Update Task",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": ".*\\\\Microsoft\\\\Windows\\\\Maps\\\\MapsUpdateTask.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["microsoft-maps-toast-001"],
+      "safe_actions": ["DISABLE", "REMOVE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Auto-updates offline maps data. Safe to disable if not using Windows Maps.",
+      "evidence_url": "",
+      "last_updated": "2026-03-12"
+    },
+    {
+      "signature_id": "microsoft-compattelrunner-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Microsoft Compatibility Appraiser",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": ".*\\\\Microsoft\\\\Windows\\\\Application Experience\\\\Microsoft Compatibility Appraiser.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": ".*CompatTelRunner\\.exe.*",
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": ["REMOVE"],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Major telemetry collector. Scans installed software and hardware, uploads data to Microsoft. Can cause high CPU/disk usage. Safe to disable.",
+      "evidence_url": "",
+      "last_updated": "2026-03-12"
+    },
+    {
+      "signature_id": "microsoft-cloud-experiencehost-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "CloudExperienceHost Background Task",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": ".*\\\\Microsoft\\\\Windows\\\\CloudExperienceHost\\\\CreateObjectTask.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Cloud Experience Host background processing. Related to Microsoft account sign-in prompts and OOBE. Safe to disable on configured systems.",
+      "evidence_url": "",
+      "last_updated": "2026-03-12"
+    },
+    {
+      "signature_id": "microsoft-clipboard-crossdevice-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Clipboard Cross-Device Sync",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": ".*\\\\Microsoft\\\\Windows\\\\Clip\\\\License Validation.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Clipboard cloud sync license validation. Safe to disable if not using clipboard sync across devices.",
+      "evidence_url": "",
+      "last_updated": "2026-03-12"
+    },
+    {
+      "signature_id": "microsoft-inventory-collector-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Device Inventory Collector",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": ".*\\\\Microsoft\\\\Windows\\\\Device Information\\\\Device.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "AGGRESSIVE",
+      "related_components": [],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Collects hardware and software inventory data and sends to Microsoft. Safe to disable.",
+      "evidence_url": "",
+      "last_updated": "2026-03-12"
+    },
+    {
+      "signature_id": "microsoft-family-safety-monitor-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Family Safety Monitor",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": ".*\\\\Microsoft\\\\Windows\\\\Shell\\\\FamilySafetyMonitor.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["microsoft-family-safety-refresh-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Family Safety monitoring task. Safe to disable if not using parental controls.",
+      "evidence_url": "",
+      "last_updated": "2026-03-12"
+    },
+    {
+      "signature_id": "microsoft-family-safety-refresh-001",
+      "publisher": "Microsoft Corporation",
+      "component_name": "Family Safety Settings Refresh",
+      "component_type": "task",
+      "match_rules": {
+        "name_pattern": ".*\\\\Microsoft\\\\Windows\\\\Shell\\\\FamilySafetyRefreshTask.*",
+        "publisher_pattern": "Microsoft",
+        "path_pattern": null,
+        "hash_sha256": []
+      },
+      "classification": "BLOAT",
+      "related_components": ["microsoft-family-safety-monitor-001"],
+      "safe_actions": ["DISABLE"],
+      "unsafe_actions": [],
+      "reinstall_behavior": "update_restored",
+      "breakage_notes": "Syncs Family Safety settings. Safe to disable if not using parental controls.",
+      "evidence_url": "",
+      "last_updated": "2026-03-12"
     }
   ]
 }
