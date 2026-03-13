@@ -252,16 +252,16 @@ class DriversScanner(BaseDiscoveryModule):
 
         try:
             script = """
-Get-WindowsDriver -Online -All | Select-Object
-    Driver,
-    OriginalFileName,
-    Inbox,
-    ClassName,
-    ClassDescription,
-    BootCritical,
-    ProviderName,
-    Date,
-    Version
+Get-WindowsDriver -Online -All | Select-Object `
+    Driver, `
+    OriginalFileName, `
+    Inbox, `
+    ClassName, `
+    ClassDescription, `
+    BootCritical, `
+    ProviderName, `
+    Date, `
+    Version `
 | ConvertTo-Json -Compress
 """
             result = self._ps.run(script)

@@ -345,20 +345,20 @@ class ServicesScanner(BaseDiscoveryModule):
 
         try:
             script = """
-Get-CimInstance Win32_Service | Select-Object
-    Name,
-    DisplayName,
-    Description,
-    PathName,
-    StartMode,
-    State,
-    StartName,
-    ServiceType,
-    ProcessId,
-    AcceptStop,
-    AcceptPause,
-    @{N='Dependencies';E={($_.ServiceDependencies -join ',')}},
-    @{N='DependentServices';E={(Get-Service $_.Name -ErrorAction SilentlyContinue).DependentServices.Name -join ','}}
+Get-CimInstance Win32_Service | Select-Object `
+    Name, `
+    DisplayName, `
+    Description, `
+    PathName, `
+    StartMode, `
+    State, `
+    StartName, `
+    ServiceType, `
+    ProcessId, `
+    AcceptStop, `
+    AcceptPause, `
+    @{N='Dependencies';E={($_.ServiceDependencies -join ',')}}, `
+    @{N='DependentServices';E={(Get-Service $_.Name -ErrorAction SilentlyContinue).DependentServices.Name -join ','}} `
 | ConvertTo-Json -Compress
 """
             result = self._ps.run(script)

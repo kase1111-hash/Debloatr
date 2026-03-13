@@ -453,7 +453,7 @@ Get-ScheduledTask | ForEach-Object {
         triggers = []
 
         for raw in raw_triggers:
-            trigger_type_str = raw.get("TriggerType", "")
+            trigger_type_str = raw.get("TriggerType", "") or ""
             # Extract just the trigger type name
             if "MSFT_Task" in trigger_type_str:
                 trigger_type_str = trigger_type_str.replace("MSFT_Task", "")
